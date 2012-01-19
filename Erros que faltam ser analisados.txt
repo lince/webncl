@@ -1,0 +1,10 @@
+Área funcional Presentation Specification
+	Módulo Descriptor: (<descriptor>)
+		- Se forem especificados vários valores para um mesmo atributo, o valor definido no elemento <property> tem precedência sobre o valor definido em um elemento <descriptorParam>, que, por sua vez, tem precedência sobre o valor definido em um atributo do elemento <descriptor> (incluindo o atributo region). 
+		
+
+Área funcional Connectors
+	Módulo ConnectorCausalExpression:
+		- Se value do <simpleAction> for especificado como “$anyName” (onde o $ é símbolo reservado e anyName é qualquer cadeia de caracteres, exceto um dos nomes reservados para papéis), o valor a ser atribuído deve ser obtido da propriedade ligada à  role=“anyName”, definida em um elemento <bind> do elemento <link> que utiliza o conector. Se esse valor não puder ser obtido, nenhuma atribuição deve ser realizada.
+		- No caso de value=“$anyName”, o valor a ser atribuído deve obrigatoriamente  ser o valor de uma propriedade (elemento <property>) de um componente da mesma composição onde o elo (elemento <link>) que referencia o evento é definido, ou uma propriedade da composição onde o elo é definido, ou uma propriedade de um elemento acessível através de uma porta da composição onde o elo é definido, ou ainda uma propriedade de um elemento acessível através de uma porta de uma composição (elementos <port> ou <switchPort>) aninhada na mesma composição onde o elo é definido. 
+ 		- caso o value do <simpleAction> for declarado como "$anyName" então anyName não pode ser um dos nomes reservados para o role

@@ -1,0 +1,29 @@
+Referenciador				Referenciado
+
+refer do <media>			id de outro <media>
+descriptor do <media>			id de um <descriptor>
+refer do <context>			id do <body> ou de outro <context> 
+component do <port>			id de um <context> ou <media>
+interface do <port>			id de um <media> ou <area> ou <property>
+component do <mapping>			id de um <context> ou <media>
+interface do <mapping>			id de um <media> ou <area> ou <property>
+region do <descriptor>			id do <region>
+moveLeft do <descriptor>		focusIndex do <descriptor>
+moveRight do <descriptor>		focusIndex do <descriptor>
+moveUp do <descriptor>			focusIndex do <descriptor
+moveDown do <descriptor>		focusIndex do <descriptor>
+transIn do <descriptor>			lista de ids de <transition>s
+transOut do <descriptor>		lista de ids de <transition>s
+component do <bind>			id do <context> ou <media>
+interface do <bind>			id do <media> ou <area> ou <property>
+descriptor do <bind>			id do <descriptor>
+name do <linkParam>			name do <conectorParam>
+name do <bindParam>			name do <conectorParam>
+var do <Rule>				name do <property>
+constituent do <bindRule>		id de um <media>
+rule do <bindRule>			id de um <rule>	
+refer do <switch>			id de outro <switch>
+component do <defaultComponent>		id do <context> ou <media>
+descriptor do <defaultDescriptor>	id do <descriptor>
+region do <importBase>			id do <region>
+
