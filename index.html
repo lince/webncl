@@ -1,0 +1,102 @@
+<html>
+	<head>
+		<!-- Bibliotecas -->
+		<script type="text/javascript" src="js/jquery.js"></script>
+		<script type="text/javascript" src="js/popcorn.js"></script>
+		<!-- Debugger -->
+		<script type="text/javascript" src="js/nclplayer/debugger/ncl.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/head.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/body.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/regionBase.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/region.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/media.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/context.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/area.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/port.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/property.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/switch.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/switchPort.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/mapping.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/descriptor.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/descriptorParam.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/descriptorBase.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/link.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/bind.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/linkParam.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/bindParam.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/connectorParam.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/assessmentStatement.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/attributeAssessment.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/valueAssessment.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/compoundStatement.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/simpleCondition.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/compoundCondition.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/simpleAction.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/compoundAction.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/causalConnector.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/connectorBase.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/ruleBase.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/rule.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/compositeRule.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/bindRule.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/defaultComponent.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/descriptorSwitch.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/defaultDescriptor.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/importBase.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/importedDocumentBase.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/importNCL.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/transitionBase.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/transition.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/meta.js"></script>
+		<script type="text/javascript" src="js/nclplayer/debugger/metadata.js"></script>
+		<!-- Principais -->
+		<script type="text/javascript" src="js/nclplayer/Debugger.js"></script>
+		<script type="text/javascript" src="js/nclplayer/Parser.js"></script>
+		<script type="text/javascript" src="js/nclplayer/SystemSettings.js"></script>
+		<script type="text/javascript" src="js/nclplayer/Player.js"></script>
+		<script type="text/javascript" src="js/nclplayer/ContextPlayer.js"></script>
+		<script type="text/javascript" src="js/nclplayer/MediaPlayer.js"></script>
+		<script type="text/javascript" src="js/nclplayer/FocusManager.js"></script>
+		<script type="text/javascript" src="js/nclplayer/Listener.js"></script>
+		<script type="text/javascript" src="js/nclplayer/Keys.js"></script>
+		<script type="text/javascript" src="js/nclplayer/NclPlayer.js"></script>
+		<script type="text/javascript">
+			player = new NclPlayer("data/data5.ncl","myPlayer");
+			
+		</script>
+		<style type="text/css">
+		
+		.context, #contexts, #settings {
+			display: none;
+		}
+		
+		.player {
+			position: absolute;
+			left: 0px;
+			top: 0px;
+			overflow: hidden;
+			display: inline;
+		}
+		
+		.playerBkg {
+			position: absolute;
+			overflow: hidden;
+			display: none;
+		}
+		
+		.nclPlayer {
+			position: fixed;
+			left: 0px;
+			top: 0px;
+			width: 854px;
+			height: 480px;
+		}
+		
+		</style>
+	</head>
+	<body>
+	
+		<div id="myPlayer" class="nclPlayer" />
+		
+	</body>
+</html>
