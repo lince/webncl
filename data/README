@@ -1,0 +1,10 @@
+Nesta pasta devem ficar todas as midias referenciadas pelo arquivo NCL
+
+Por exemplo:
+    Se o NCL referencia <media src="imagem1.png" descriptor=" ... />
+    Então devemos ter o arquivo imagem1.png nesta pasta
+
+    Se o NCL referencia <media src="imagens/imagem1.png" descriptor=" ... />
+    Então uma pasta imagens contendo o arquivo imagem1.png devera existir nesta pasta
+    
+Isto independe de onde esteja localizado o arquivo .ncl

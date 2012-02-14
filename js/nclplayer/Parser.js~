@@ -11,6 +11,32 @@ var Parser = {
 		"onEndAttribution": "attribution"
 	},
 
+	mediaTypes: {
+		htm: "text/htm",	html: "text/html",	txt: "text/plain",	css: "text/css",	xml: "text/xml",	bmp: "image",	png: "image",
+		gif: "image",		jpg: "image",			jpeg: "image",			wav: "audio",		mp3: "audio",		mp2: "audio",	mp4: "video",
+		mpg4: "video",		mpeg: "video",			mpg: "video",			webm: "video",
+		lua: "application/x-ginga-NCLua",		'class': "application/x-ginga-NCLet",		jar: "application/x-ginga-NCLet",				
+	},
+	
+	colorValues: {
+		white: "255,255,255",
+		black: "0,0,0",
+		silver: "192,192,192",
+		gray: "128,128,128",
+		red: "255,0,0",
+		maroon: "128,0,0",
+		fuchsia: "255,0,255",
+		purple: "128,0,128",
+		lime: "0,255,0",
+		green: "0,128,0",
+		yellow: "255,255,0",
+		olive: "128,128,0",
+		blue: "0,0,255",
+		navy: "0,0,128",
+		aqua: "0,255,255",
+		teal: "0,128,128"
+	},
+	
 	parseAttrs: function (obj,tag,tree,parent) {
 		var isVector = true;
 		if (obj && typeof(obj)!="string") {
@@ -34,29 +60,27 @@ var Parser = {
 	},	
 	
 	isNotArray: [
-		"head","body","importedDocumentBase","ruleBase","transitionBase","descriptorBase",
+		"ncl","head","body","importedDocumentBase","ruleBase","transitionBase","descriptorBase",
 		"connectorBase","defaultDescriptor","valueAssessment","defaultComponent"
 	],
 	
-	parse: function (ncl, tagName) {
-		var parentData = $(ncl).find(tagName||"ncl");
-		if ($(parentData).length == 0) return null;
-		return Parser.createNode("ncl",parentData,attr,tags);
+	parse: function (ncl) {
+		var nclObj = Parser.createNode(ncl,"ncl");
+		Parser.parseAttrs(nclObj,"ncl");
+		return nclObj;
 	},
 	
-	createNode: function (tagName, parentData) {
-	
-		var parentData = $(
-		
-	
-		var data = [];
-
+	createNode: function (parent, tagName) {
+		var data = $(parent).find(tagName=="ncl" ? "ncl" : "> "+tagName);
+		if (data.length==0) return false;
+		var nodes = [];
+		// atributos
 		var attr = Parser.nclStructureMap[tagName].attrs;
 		attr.required || (attr.required=[]);
 		attr.optional || (attr.optional=[]);
 		attr.oneOf || (attr.oneOf=[]);
 		var allAttrs = [].concat(attr.required,attr.optional,attr.oneOf);
-		
+		// tags
 		var tags = Parser.nclStructureMap[tagName].tags;
 		tags.optional || (tags.optional=[]);
 		tags.one || (tags.one=[]);
@@ -65,78 +89,26 @@ var Parser = {
 		tags.star || (tags.star=[]);
 		tags.custom || (tags.custom=[]);
 		var allTags = [].concat(tags.optional,tags.one,tags.plus,tags.plusOneOf,tags.star,tags.custom);
-		
-		$(parentData).each(function() {
+		// cria o objeto
+		$(data).each(function() {
 			var node = {};
 			node["_type"] = tagName;
 			for (i in allAttrs) {
 				node[allAttrs[i]!="interface"?allAttrs[i]:"nodeInterface"] = $(this).attr(allAttrs[i]);
 			}
 			for (i in allTags) {
-				if ($.inArray(allTags[i],Parser.isNotArray)==-1) {
-					//node[allTags[i]] = Parser["parse"+allTags[i][0].toUpperCase()+allTags[i].slice(1,allTags[i].length)](this);
-					node[allTags[i]] = Parser.parse(this,allTags[i]);
-				} else {
-					//node[allTags[i]] = Parser["parse"+allTags[i][0].toUpperCase()+allTags[i].slice(1,allTags[i].length)](this)[0];
-					node[allTags[i]] = Parser.parse(this,allTags[i])[0];
-				}
+				node[allTags[i]] = Parser.createNode(this,allTags[i]);
 			}
-			data.push(node);
+			nodes.push(node);
 			Debugger.checkAll(this,attr,tags,node);
 		});
-		if (tagName == "ncl") {
-			data = data[0];
-			Parser.parseAttrs(data,"ncl");
+		if ($.inArray(tagName,Parser.isNotArray)==-1) {
+			return nodes;
+		} else {
+			return nodes[0];
 		}
-		return data;
 	},
 	
-	parseNCL: parseNCL,
-	parseArea: parseArea,
-	parseAssessmentStatement: parseAssessmentStatement,
-	parseAttributeAssessment: parseAttributeAssessment,
-	parseBind: parseBind,
-	parseBindParam: parseBindParam,
-	parseBindRule: parseBindRule,
-	parseBody: parseBody,
-	parseCausalConnector: parseCausalConnector,
-	parseCompositeRule: parseCompositeRule,
-	parseCompoundAction: parseCompoundAction,
-	parseCompoundCondition: parseCompoundCondition,
-	parseCompoundStatement: parseCompoundStatement,
-	parseConnectorBase: parseConnectorBase,
-	parseConnectorParam: parseConnectorParam,
-	parseContext: parseContext,
-	parseDefaultComponent: parseDefaultComponent,
-	parseDefaultDescriptor: parseDefaultDescriptor,
-	parseDescriptor: parseDescriptor,
-	parseDescriptorBase: parseDescriptorBase,
-	parseDescriptorParam: parseDescriptorParam,
-	parseDescriptorSwitch: parseDescriptorSwitch,
-	parseHead: parseHead,
-	parseImportBase: parseImportBase,
-	parseImportedDocumentBase: parseImportedDocumentBase,
-	parseImportNCL: parseImportNCL,
-	parseLink: parseLink,
-	parseLinkParam: parseLinkParam,
-	parseMapping: parseMapping,
-	parseMedia: parseMedia,
-	parseMeta: parseMeta,
-	parseMetadata: parseMetadata,
-	parsePort: parsePort,
-	parseProperty: parseProperty,
-	parseRegion: parseRegion,
-	parseRegionBase: parseRegionBase,
-	parseRule: parseRule,
-	parseRuleBase: parseRuleBase,
-	parseSimpleAction: parseSimpleAction,
-	parseSimpleCondition: parseSimpleCondition,
-	parseSwitch: parseSwitch,
-	parseSwitchPort: parseSwitchPort,
-	parseTransition: parseTransition,
-	parseTransitionBase: parseTransitionBase,
-	parseValueAssessment: parseValueAssessment,
-
 	nclStructureMap: {
 		"area": {
 			attrs: {

@@ -1,4 +1,3 @@
-
 MediaPlayer.prototype = new Player();
 
 function MediaPlayer (node, parentContext) {
@@ -60,7 +59,7 @@ MediaPlayer.prototype.create = function (node) {
 		this.type = node.type;
 	} else {
 		var buffer = node.src.split(".");
-		this.type = mediaTypes[buffer[buffer.length-1]];
+		this.type = Parser.mediaTypes[buffer[buffer.length-1]];
 	}
 	// Cria os IDs (região e mídia)
 	this.htmlPlayer = "#" + this.presentation.getDivId(node.id);
@@ -147,9 +146,9 @@ MediaPlayer.prototype.create = function (node) {
 			this.stop();
 		},this));
 		for (i in this.area) {
-			if (this.area[i].end) {
+			if (this.area[i].end) {	
 				eval("this.popcornPlayer.exec(this.area[i].endTime,$.proxy(function() {"+
-					"$(this.htmlPlayer).trigger('presentation.onEnd',[this.area['"+i+"'].id]);"+
+					"$(this.htmlPlayer).trigger('stop',[this.area['"+i+"'].id]);"+
 				"},this));");
 			}				
 			if (this.area[i].begin) {
@@ -241,7 +240,7 @@ MediaPlayer.prototype.focus = function () {
 			if (borderWidth > 0) {
 				var color = this.node.descriptor.focusBorderColor || this.presentation.systemSettings.getPropertyValue("default.focusBorderColor");
 				var alpha = 1 - parseInt(this.node.descriptor.focusBorderTransparency || 0);
-				var border = borderWidth + "px solid rgba(" + colorValues[color] + "," + alpha + ")";
+				var border = borderWidth + "px solid rgba(" + Parser.colorValues[color] + "," + alpha + ")";
 				$(this.htmlPlayerBkg).css("left","-="+borderWidth);
 				$(this.htmlPlayerBkg).css("top","-="+borderWidth);
 				$(this.htmlPlayerBkg).css("border",border);

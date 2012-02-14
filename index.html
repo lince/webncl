@@ -61,8 +61,12 @@
 		<script type="text/javascript" src="js/nclplayer/Keys.js"></script>
 		<script type="text/javascript" src="js/nclplayer/NclPlayer.js"></script>
 		<script type="text/javascript">
-			player = new NclPlayer("data/data5.ncl","myPlayer");
-			
+			player = new NclPlayer("interface.ncl","myPlayer");
+			/*
+			Para disparar eventos personalizados
+			player.triggerEvent('evento','id do elemento ncl','interface (opcional)')
+			player.triggerEvent('evento','id do elemento ncl')
+			*/
 		</script>
 		<style type="text/css">
 		

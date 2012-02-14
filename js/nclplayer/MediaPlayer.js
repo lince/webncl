@@ -193,26 +193,26 @@ MediaPlayer.prototype.load = function (source) {
 	$(this.htmlPlayer).empty();
 	source = "data/" + source;
 	switch (this.type.split("/")[0]) {
-		case "video": {
+		case "video": 
 			// type = video/*
 			$(this.htmlPlayer).append("<source src='" + source + "'></source>");
 			break;
-		}
-		case "audio": {
+		
+		case "audio": 
 			// type = audio/*
 			$(this.htmlPlayer).append("<source src='" + source + "'></source>");
 			break;
-		}
-		case "image": {
+		
+		case "image": 
 			// type = image/*
 			$(this.htmlPlayer).attr("src",source);
 			break;
-		}
-		case "application": {
+		
+		case "application": 
 			// type = application/*
 			// não faz nada
-		}
-		case "text": {
+			break;
+		case "text": 
 			if (this.checkType(["text/plain","text/html"])) {
 				// type = text/plain, text/html
 				$.ajax({
@@ -227,7 +227,7 @@ MediaPlayer.prototype.load = function (source) {
 				// TODO?
 			}
 			break;
-		}
+		
 	}
 };
 
