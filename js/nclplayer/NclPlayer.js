@@ -29,7 +29,10 @@ function NclPlayer (file, div) {
 // execute
 NclPlayer.prototype.execute = function (data) {
 	// cria o objeto NCL
-	this.presentation.ncl = Parser.parse(data);
+	var t = new Date();
+	this.presentation.parser = new Parser();
+	this.presentation.ncl = this.presentation.parser.parse(data);
+	console.log(new Date() - t);
 	this.presentation.focusManager = new FocusManager(this.presentation);
 	this.presentation.systemSettings = new SystemSettings(this.presentation);
 	// cálculo da posição real de cada região
