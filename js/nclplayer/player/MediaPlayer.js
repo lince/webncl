@@ -211,6 +211,7 @@ MediaPlayer.prototype.load = function (source) {
 		case "application": {
 			// type = application/*
 			// não faz nada
+            break;
 		}
 		case "text": {
 			if (this.checkType(["text/plain","text/html"])) {
