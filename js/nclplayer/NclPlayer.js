@@ -11,7 +11,11 @@ function NclPlayer (file, div) {
 	this.presentation.bodyDiv = "body" + this.presentation.playerId;
 	this.presentation.settingsDiv = "settings" + this.presentation.playerId;
 	this.presentation.contextsDiv = "contexts" + this.presentation.playerId;
-	
+    this.presentation.keyEvents = {};
+
+	/*
+        Comentar efeito do ajax!
+    */
 	$.ajax({
 		type: "GET",
 		url: file,
@@ -30,6 +34,7 @@ function NclPlayer (file, div) {
 NclPlayer.prototype.execute = function (data) {
 	// cria o objeto NCL
 	var t = new Date();
+
 	this.presentation.parser = new Parser();
 	this.presentation.ncl = this.presentation.parser.parse(data);
 	console.log(new Date() - t);
@@ -47,6 +52,8 @@ NclPlayer.prototype.execute = function (data) {
 			this.fixRegionBounds(this.presentation.ncl.head.regionBase[rb].region[i],bounds);
 		}
 	}
+    // torna a div selecionavel
+    $('#'+this.presentation.playerDiv).attr('tabindex',this.presentation.playerId);
 	// cria as divs iniciais
 	$("#"+this.presentation.playerDiv).append("<div id='" + this.presentation.settingsDiv + "'></div>");
 	$("#"+this.presentation.playerDiv).append("<div id='" + this.presentation.contextsDiv + "'></div>");

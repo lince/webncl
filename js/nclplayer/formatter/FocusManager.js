@@ -8,14 +8,18 @@
  * Gerenciador de foco da aplicacao NCL. Trata os eventos do teclado e do mouse
  * Deve ser instanciada somente depois que o objeto presentation recebeu o objeto ncl
  * classes foram instanciadas
+ * Tambem eh responsavel por tratar os eventos de tecla nao relacionados com o foco
  * @param {Object} presentation Estrutura que contem objetos 
  * 				   como FocusManager, o proprio SystemSettings,
  * 				   entre outras configuracoes.
  * @constructor
  */
 function FocusManager(presentation) {
-	
+
+    this.presentation = presentation;
+
 	var descriptors = presentation.ncl.head.descriptorBase.descriptor;
+    var keyEventsObject = presentation.keyEvents;
 	var focusIndexArray = [];
 		
 	for (var i in descriptors)
@@ -183,7 +187,7 @@ FocusManager.prototype.removeMediaFocus = function(mediaId)
  * */
 FocusManager.prototype.bindKeyDown = function()
 {
-	$(window).on('keydown', $.proxy(function(event){
+	$('#'+this.presentation.playerDiv).on('keydown', $.proxy(function(event){
 	
 		if(Keys.allCodes.indexOf(event.which) != -1)
 		{
@@ -214,6 +218,8 @@ FocusManager.prototype.unbindKeyDown=  function()
 
 FocusManager.prototype.keyEvent = function(keyCode)
 {
+    this.triggerKeyEvents(keyCode);
+
 	if(this.currentFocusIndex)
 	{
 		currentDescriptor = this.descriptors[this.currentFocusIndex];
@@ -223,6 +229,7 @@ FocusManager.prototype.keyEvent = function(keyCode)
 			case Keys.CURSOR_UP:
 				if(currentDescriptor.self.moveUp)
 					this.setCurrentFocus(currentDescriptor.self.moveUp.focusIndex)
+                
 			break;		
 			
 			case Keys.CURSOR_DOWN:
@@ -252,6 +259,9 @@ FocusManager.prototype.keyEvent = function(keyCode)
 				}
 				
 			break;
+
+
+            
 			
 		}
 	}
@@ -289,6 +299,32 @@ FocusManager.prototype.unbindMouseEvents=  function(mediaId)
     $(mediaId).css("cursor","default");
 };
 
+FocusManager.prototype.enableKeys = function(mediaId)
+{
+    if(mediaId)
+        if(mediaId in this.presentation.keyEvents)
+            this.presentation.keyEvents[mediaId] = true;
+};
+
+FocusManager.prototype.disableKeys = function(mediaId)
+{
+    if(mediaId)
+        if(mediaId in this.presentation.keyEvents)
+            this.presentation.keyEvents[mediaId] = false;
+};
+
+FocusManager.prototype.triggerKeyEvents = function(whichKey)
+{
+    for(var mediaId in this.presentation.keyEvents)
+    {
+        if(this.presentation.keyEvents[mediaId])
+            var e = $.Event('selection.onSelection');
+            e.which = whichKey;
+            $(mediaId).trigger(e);
+    }
+};
+
+
 //Mantem a informacao de qual objeto possui o foco atualmente
 FocusManager.prototype.currentFocusIndex = undefined;
 
@@ -297,6 +333,7 @@ FocusManager.prototype.descriptors = {};
 
 //Mantem informacao dos descriptors com medias ativas
 FocusManager.prototype.focusIndexArray = [];
+
 
 
 /*

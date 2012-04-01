@@ -52,6 +52,7 @@ MediaPlayer.prototype.create = function (node) {
 		}
 		if (node.area[i].end) {
 			this.area[node.area[i].id].endTime = parseInt(node.area[i].end.split('s')[0]);
+            this.area[node.area[i].id].started = false;
 		}
 	}
 	// Verifica o tipo da mídia
@@ -138,17 +139,31 @@ MediaPlayer.prototype.create = function (node) {
 	$(this.htmlPlayerBkg).css("display","none");
 	this.load(node.src);
 	// Cria o player do Popcorn
+//	if (this.checkType(["video","audio","image"])) {
 	if (this.checkType(["video","audio"])) {
 		do {
+            //if (this.checkType(["image"]))
+			////{
+			//	Popcorn.player("baseplayer");
+			//	this.popcornPlayer = new Popcorn.baseplayer(this.htmlPlayer);
+			//} else {
+			//	this.popcornPlayer = new Popcorn(this.htmlPlayer, { frameAnimation: true });
+			//}
 			this.popcornPlayer = new Popcorn(this.htmlPlayer);
 		} while (!this.popcornPlayer);
 		$(this.htmlPlayer).on("ended",$.proxy(function() {
 			this.stop();
 		},this));
 		for (i in this.area) {
-			if (this.area[i].end) {	
+			if (this.area[i].end) {
 				eval("this.popcornPlayer.exec(this.area[i].endTime,$.proxy(function() {"+
-					"$(this.htmlPlayer).trigger('stop',[this.area['"+i+"'].id]);"+
+					"if (this.area['"+i+"'].started) {"+
+						"$(this.htmlPlayer).trigger('stop',[this.area['"+i+"'].id]);"+
+						"this.area['"+i+"'].started = false;"+
+					"}"+
+                    "else {"+
+                    "$(this.htmlPlayer).trigger('presentation.onEnd',[this.area['"+i+"'].id]); "+
+                    "}" +
 				"},this));");
 			}				
 			if (this.area[i].begin) {
@@ -415,6 +430,7 @@ MediaPlayer.prototype.hide = function () {
 // start
 MediaPlayer.prototype.start = function (nodeInterface) {
 	if (this.isStopped) {
+        this.presentation.focusManager.enableKeys(this.htmlPlayer);
 		this.presentation.focusManager.addMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
 		this.isPlaying = true;
 		this.isStopped = false;
@@ -423,6 +439,7 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 			this.parentContext.syncPlayer(this);
 			if (nodeInterface && this.area[nodeInterface]._type=="area") {
 				if (this.area[this.area[nodeInterface].id].begin) {
+                    this.area[this.area[nodeInterface].id].started = true;
 					this.seek(this.area[this.area[nodeInterface].id].beginTime);
 					$(this.htmlPlayer).one("seeked",$.proxy(function() {
 						this.parentContext.notify(this);
@@ -441,6 +458,7 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 // stop
 MediaPlayer.prototype.stop = function (nodeInterface) {
 	if (!this.isStopped) {
+        this.presentation.focusManager.disableKeys(this.htmlPlayer);
 		this.presentation.focusManager.removeMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
 		this.isPlaying = false;
 		this.isStopped = true;

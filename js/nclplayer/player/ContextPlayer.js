@@ -282,7 +282,9 @@ ContextPlayer.prototype.bindLinks = function()
 					},
 					function(e)
 					{
-						$(e.data.contextElement).trigger(e.data.eventName,[e.data.interfaceId])
+                        var evento = $.Event(e.data.eventName);
+                        evento.which = e.which;
+						$(e.data.contextElement).trigger(evento,[e.data.interfaceId])
 					
 					});
 							
@@ -397,12 +399,34 @@ ContextPlayer.prototype.bindLinks = function()
 		for (var i in conditions)
 		{
 
-			flagMap[conditions[i].role] = {
+            var currentCondition = conditions[i];
+			var conditionUseVariable = false;
+			var conditionDefaultValue = '';
+			var conditionUseKey = false;
+
+			if (currentCondition.role == 'onSelection')
+			{
+				if(currentCondition.key)
+				{
+					if (ContextPlayer.isVariable(currentCondition.key))
+					 	conditionUseVariable = true;
+						
+					conditionDefaultValue = currentCondition.key;
+					conditionUseKey = true;
+				}
+			}
+
+			flagMap[currentCondition.role] = {
 				bindComponent: "",
 				bindInterface: null,
-				eventType: Parser.eventType[conditions[i].role],
-				flag: false
+				eventType: Parser.eventType[currentCondition.role],
+				flag: false,
+				keyUseVariable : conditionUseVariable,
+				keyDefaultValue: conditionDefaultValue,
+				useKey : conditionUseKey
+				
 			}
+
 		}
 		
 		
@@ -543,13 +567,15 @@ ContextPlayer.prototype.bindLinks = function()
 			  
 			//Se o bind for do tipo de condicao (attributeAssessment)
 			} else if (flagMap[currentBind.role]){
+			   var currentFlag = flagMap[currentBind.role];
 			   //associa o component no flagMap do listener para este link				   			   
-			   flagMap[currentBind.role].bindComponent = currentBindComponentSelector;
-			   flagMap[currentBind.role].bindInterface = currentInterface;
+			   currentFlag.bindComponent = currentBindComponentSelector;
+			   currentFlag.bindInterface = currentInterface;
 			   
 			   var hinterface = currentInterface ? 'i'+currentInterface: 'none'; 			   		
 			   
-			   //TODO: Tratar 'key' do evento selection.onSeletion
+			   
+
 			   var componentDivId = currentBindComponentSelector;
 			   var eventType = Parser.eventType[currentBind.role];
 			   var eventName = currentBind.role;
@@ -558,6 +584,21 @@ ContextPlayer.prototype.bindLinks = function()
 			   
 			   var triggerArrayName = bindName+'.triggerArray';
 			   
+			   //TODO: Melhorar sistema que trata 'key' do onSelection
+			   //Se o key deste condition provem de uma variavel 
+			   if(currentFlag.useKey)
+			   {
+			   	 var localParamMap = ContextPlayer.createLocalParamMap(currentBind.bindParam);
+			   	 currentFlag.keyDefaultValue = localParamMap[currentFlag.keyDefaultValue] ? localParamMap[currentFlag.keyDefaultValue] : connectorParam[currentFlag.keyDefaultValue];	
+				 if (currentFlag.keyDefaultValue in Keys)
+				 {
+					currentFlag.keyDefaultValue = Keys[currentFlag.keyDefaultValue];
+				 }		 
+
+				 this.presentation.keyEvents[componentDivId] = false;
+			   }
+
+
 			   //Caso um handler ainda nao foi criado para este link
 			   if(!handlers[ handlerName ])
 			   {
@@ -588,8 +629,16 @@ ContextPlayer.prototype.bindLinks = function()
 						for(var listener in cdata)
 						{
 							var clistener = cdata[listener];
-							if(nclInterface == clistener.flagMap[e.data.eventName].bindInterface)
-								clistener.notifyEvent(e.data.eventName);
+							var flag = clistener.flagMap[e.data.eventName]
+							if(nclInterface == flag.bindInterface)
+                                if(!e.which  && !flag.usekey)
+								    clistener.notifyEvent(e.data.eventName);
+								else
+								{
+									if(e.which && flag.keyDefaultValue == e.which)
+										clistener.notifyEvent(e.data.eventName);
+								}
+							
 						}
 						ContextPlayer.executeTriggerArray($(e.data.componentDivId).data(e.data.triggerArrayName))
 					  	
