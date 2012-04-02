@@ -149,17 +149,17 @@ MediaPlayer.prototype.create = function (node) {
 				//this.popcornPlayer = new Popcorn(this.htmlPlayer, { frameAnimation: true });
 				this.popcornPlayer = new Popcorn(this.htmlPlayer);	
 		} while (!this.popcornPlayer);
-	} else if(this.checkType["image","text"]) {
+	} else if(this.checkType(["image","text"])){
 		do {	
 				Popcorn.player("baseplayer");
 				this.popcornPlayer = new Popcorn.baseplayer(this.htmlPlayer);
+                
 		} while (!this.popcornPlayer);
-	}
-	
+	} 
 	//Caso um popcornPlayer tenta sido criado (media do tipo video, audio,image ou text)
 	// 'equivale' a trocar this.popcornPlayer por this.checkType(["video","audio","image","text"])
 	// sendo o usado o mais eficiente
-	if(this.popcornPlayer)
+	if(this.checkType(["video","audio","image","text"]))
 	{
 		$(this.htmlPlayer).on("ended",$.proxy(function() {
 			this.stop();
@@ -168,8 +168,8 @@ MediaPlayer.prototype.create = function (node) {
 			if (this.area[i].end) {
 				eval("this.popcornPlayer.exec(this.area[i].endTime,$.proxy(function() {"+
 					"if (this.area['"+i+"'].started) {"+
+                        "this.area['"+i+"'].started = false;"+
 						"$(this.htmlPlayer).trigger('stop',[this.area['"+i+"'].id]);"+
-						"this.area['"+i+"'].started = false;"+
 					"} else {"+
 		            "$(this.htmlPlayer).trigger('presentation.onEnd',[this.area['"+i+"'].id]); "+
 		            "}" +
@@ -439,6 +439,10 @@ MediaPlayer.prototype.hide = function () {
 
 // start
 MediaPlayer.prototype.start = function (nodeInterface) {
+// (danilo): Sugiro que quando o start for dado,
+// caso o player esteja tocando ele seja parado
+// e iniciado do lugar onde foi pedido (A maquina virtual
+// comporta-se assim no caso de ancoras), nao sei se eh o funcionamento oficial
 	if (this.isStopped) {
         this.presentation.focusManager.enableKeys(this.htmlPlayer);
 		this.presentation.focusManager.addMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
