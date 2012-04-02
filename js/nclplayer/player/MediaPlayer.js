@@ -1,3 +1,6 @@
+// TODO: Tratar sincronizacao das imagens e dos textos
+//
+
 MediaPlayer.prototype = new Player();
 
 function MediaPlayer (node, parentContext) {
@@ -138,19 +141,26 @@ MediaPlayer.prototype.create = function (node) {
 	}
 	$(this.htmlPlayerBkg).css("display","none");
 	this.load(node.src);
-	// Cria o player do Popcorn
-//	if (this.checkType(["video","audio","image"])) {
-	if (this.checkType(["video","audio"])) {
-		do {
-            //if (this.checkType(["image"]))
-			////{
-			//	Popcorn.player("baseplayer");
-			//	this.popcornPlayer = new Popcorn.baseplayer(this.htmlPlayer);
-			//} else {
-			//	this.popcornPlayer = new Popcorn(this.htmlPlayer, { frameAnimation: true });
-			//}
-			this.popcornPlayer = new Popcorn(this.htmlPlayer);
+
+	//Tenta criar o popCorn player de acordo com o tipo d emedia
+    if (this.checkType(["video","audio"]))
+    {
+		do {	
+				//this.popcornPlayer = new Popcorn(this.htmlPlayer, { frameAnimation: true });
+				this.popcornPlayer = new Popcorn(this.htmlPlayer);	
 		} while (!this.popcornPlayer);
+	} else if(this.checkType["image","text"]) {
+		do {	
+				Popcorn.player("baseplayer");
+				this.popcornPlayer = new Popcorn.baseplayer(this.htmlPlayer);
+		} while (!this.popcornPlayer);
+	}
+	
+	//Caso um popcornPlayer tenta sido criado (media do tipo video, audio,image ou text)
+	// 'equivale' a trocar this.popcornPlayer por this.checkType(["video","audio","image","text"])
+	// sendo o usado o mais eficiente
+	if(this.popcornPlayer)
+	{
 		$(this.htmlPlayer).on("ended",$.proxy(function() {
 			this.stop();
 		},this));
@@ -160,10 +170,9 @@ MediaPlayer.prototype.create = function (node) {
 					"if (this.area['"+i+"'].started) {"+
 						"$(this.htmlPlayer).trigger('stop',[this.area['"+i+"'].id]);"+
 						"this.area['"+i+"'].started = false;"+
-					"}"+
-                    "else {"+
-                    "$(this.htmlPlayer).trigger('presentation.onEnd',[this.area['"+i+"'].id]); "+
-                    "}" +
+					"} else {"+
+		            "$(this.htmlPlayer).trigger('presentation.onEnd',[this.area['"+i+"'].id]); "+
+		            "}" +
 				"},this));");
 			}				
 			if (this.area[i].begin) {
@@ -174,6 +183,7 @@ MediaPlayer.prototype.create = function (node) {
 			// TODO: area definida por frames ao invés de tempo
 		}
 	}
+
 	// Cria as propriedades
 	$(this.htmlPlayer).data("property",[]);
 	if (node.descriptor) {
@@ -463,7 +473,7 @@ MediaPlayer.prototype.stop = function (nodeInterface) {
 		this.isPlaying = false;
 		this.isStopped = true;
 		this.hide();
-		if (this.checkType(["video","audio"])) {
+		if (this.checkType(["video","audio","image","text"])) {
 			this.popcornPlayer.pause();
 		}
 		$(this.htmlPlayer).trigger("presentation.onEnd",[nodeInterface]);
@@ -475,7 +485,7 @@ MediaPlayer.prototype.pause = function (nodeInterface) {
 	if (this.isPlaying) {
 		this.isPlaying = false;
 		this.isStopped = false;
-		if (this.checkType(["video","audio"])) {
+		if (this.checkType(["video","audio","image","text"])) {
 			this.popcornPlayer.pause();
 		}
 		$(this.htmlPlayer).trigger("presentation.onPause",[nodeInterface]);
@@ -487,7 +497,7 @@ MediaPlayer.prototype.resume = function (nodeInterface) {
 	if (!this.isStopped && !this.isPlaying) {
 		this.isPlaying = true;
 		this.isStopped = false;
-		if (this.checkType(["video","audio"])) {
+		if (this.checkType(["video","audio","image","text"])) {
 			this.popcornPlayer.play();
 		}
 		$(this.htmlPlayer).trigger("presentation.onResume",[nodeInterface]);
@@ -501,7 +511,7 @@ MediaPlayer.prototype.abort = function (nodeInterface) {
 		this.isPlaying = false;
 		this.isStopped = true;
 		this.hide();
-		if (this.checkType(["video","audio"])) {
+		if (this.checkType(["video","audio","image","text"])) {
 			this.popcornPlayer.pause();
 		}
 		$(this.htmlPlayer).trigger("presentation.onAbort",[nodeInterface]);
@@ -509,12 +519,14 @@ MediaPlayer.prototype.abort = function (nodeInterface) {
 };
 
 MediaPlayer.prototype.seek = function (newTime) {
-	try {
-		this.popcornPlayer.currentTime(newTime);
-	} catch(e) {
-		eval("$(this.htmlPlayer).one('loadedmetadata',$.proxy(function() {"+
-			"this.popcornPlayer.currentTime("+newTime+");"+
-		"},this));");
+	if (this.checkType(["video","audio","image","text"])) {
+		try {
+			this.popcornPlayer.currentTime(newTime);
+		} catch(e) {
+			eval("$(this.htmlPlayer).one('loadedmetadata',$.proxy(function() {"+
+				"this.popcornPlayer.currentTime("+newTime+");"+
+			"},this));");
+		}
 	}
 };
 
@@ -532,6 +544,8 @@ MediaPlayer.prototype.seekAndPlay = function (newTime) {
 			$(this.htmlPlayer).one("seeked",$.proxy(function() {
 				this.popcornPlayer.play();
 			},this));
+		} else if(this.checkType(["image","text"])) {
+				this.popcornPlayer.currentTime(newTime);
 		}
 	}
 };
