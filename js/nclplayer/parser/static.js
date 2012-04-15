@@ -103,7 +103,7 @@ Parser.nclStructureMap = {
 			reference_source: [
 				[["descriptor"],["descriptor"]],
 				[["component"],["context","media"]],
-				[["interface"],["port","area","property"]]
+				[["nodeInterface"],["port","area","property"]]
 			],
 			required: ["role","component"],
 			optional: ["interface","descriptor"]
@@ -362,7 +362,7 @@ Parser.nclStructureMap = {
 		attrs: {
 			reference_source: [
 				[["component"],["context","media"]],
-				[["interface"],["port","area","property"]]
+				[["nodeInterface"],["port","area","property"]]
 			],
 			required: ["component"],
 			optional: ["interface"]
@@ -406,7 +406,7 @@ Parser.nclStructureMap = {
 		attrs: {
 			reference_source: [
 				[["component"],["context","media"]],
-				[["interface"],["port","area","property"]]
+				[["nodeInterface"],["port","area","property"]]
 			],
 			reference_target: ["id"],
 			required: ["id","component"],
