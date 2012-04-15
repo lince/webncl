@@ -113,7 +113,7 @@ Parser.prototype.createNode = function (parent, tagName, parentNode, tree) {
 		parser.parseAttributes(this,node);
 		parser.parseContent(this,node);
 		for (i in allTags) {
-			node[allTags[i]=="interface" ? "nodeInterface" : allTags[i]] = parser.createNode(this,allTags[i],node,newTree);
+			node[allTags[i]] = parser.createNode(this,allTags[i],node,newTree);
 		}
 		nodes.push(node);
 		if (tagName == "ncl") {

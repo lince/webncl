@@ -102,12 +102,12 @@ ContextPlayer.prototype.startPort = function (port) {
 			// component = context -> nodeInterface = port
 			if (!this.context[port.component.id]) {
 				Debugger.error(Debugger.ERR_INVALID_CONTEXT_REFERENCE,"port",[port.id,"component",port.component.id]);
-			} else if (port.nodeInterface) {
+			} else if (port['interface']) {
 				this.context[port.component.id].create();
-				if (!this.context[port.component.id].port[port.nodeInterface.id]) {
-					Debugger.error(Debugger.ERR_INVALID_CONTEXT_REFERENCE,"port",[port.id,"interface",port.nodeInterface.id]);
+				if (!this.context[port.component.id].port[port['interface'].id]) {
+					Debugger.error(Debugger.ERR_INVALID_CONTEXT_REFERENCE,"port",[port.id,"interface",port['interface'].id]);
 				} else {
-					this.context[port.component.id].start(port.nodeInterface.id);
+					this.context[port.component.id].start(port['interface'].id);
 				}
 			} else {
 				this.context[port.component.id].start();
@@ -116,8 +116,8 @@ ContextPlayer.prototype.startPort = function (port) {
 		}
 		case "media": {
 			// component = media -> nodeInterface = area, property
-			if (port.nodeInterface) {
-				this.media[port.component.id].start(port.nodeInterface.id);
+			if (port['interface']) {
+				this.media[port.component.id].start(port['interface'].id);
 			} else {
 				this.media[port.component.id].start();
 			}
