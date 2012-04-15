@@ -1,0 +1,4 @@
+To compile all code into nclplayer.min.js 
+just do:
+
+make CLOSURE_COMPILER=/path/to/closure/compiler.jar
