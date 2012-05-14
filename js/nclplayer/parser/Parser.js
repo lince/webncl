@@ -3,6 +3,9 @@ function Parser () {
 	this.referenceMap = {
 		// Tabela de IDs que podem ser referenciados por outros objetos
 		map: [],
+		// ----- REFER -----
+		instReuse: [],
+		// -----------------
 		addSource: function (obj,attr,type) {
 			// TODO
 			// - salvar todos os sources e todos os targets e, no final do parse, ligar as referências
@@ -58,7 +61,25 @@ function Parser () {
 				for (i in this.map[id].sources) {
 					var src = this.map[id].sources[i];
 					if (this.map[id].target && this.map[id].target.obj && $.inArray(this.map[id].target.type,src.type)!=-1) {
-						src.obj[src.attr] = this.map[id].target.obj;
+						// --- REFER ---
+						if (src.attr=="refer") {
+							if (src.obj._type=="media") {
+								// TODO: é só DESCRIPTOR, SRC e TYPE que "herdam" do refer?
+								// (area, property, ... ?)
+								src.obj.descriptor = this.map[id].target.obj.descriptor;
+								src.obj.src = this.map[id].target.obj.src;
+								src.obj.type = this.map[id].target.obj.type;
+								if (src.obj.instance!="new") {
+									// instSame ou gradSame
+									this.instReuse[src.obj.id] = id;
+								}
+							} else if (src.obj._type=="context") {
+								// TODO
+							}
+						} else {
+						// -------------
+							src.obj[src.attr] = this.map[id].target.obj;
+						}
 					} else {
 						Debugger.error(Debugger.ERR_INVALID_ID_REFERENCE,src.type,[src.attr,src.obj[src.attr],src.type]);
 					}
@@ -105,6 +126,7 @@ Parser.prototype.createNode = function (parent, tagName, parentNode, tree) {
 		};
 		for (i in allAttrs) {
 			node[allAttrs[i]] = $(this).attr(allAttrs[i]);
+			//node[allAttrs[i]=="interface"?"nodeInterface":allAttrs[i]] = $(this).attr(allAttrs[i]);
 		}
 		var newTree = tree + ">" + tagName;
 		if (node.id) {
@@ -113,7 +135,7 @@ Parser.prototype.createNode = function (parent, tagName, parentNode, tree) {
 		parser.parseAttributes(this,node);
 		parser.parseContent(this,node);
 		for (i in allTags) {
-			node[allTags[i]=="interface" ? "nodeInterface" : allTags[i]] = parser.createNode(this,allTags[i],node,newTree);
+			node[allTags[i]] = parser.createNode(this,allTags[i],node,newTree);
 		}
 		nodes.push(node);
 		if (tagName == "ncl") {

@@ -5,7 +5,11 @@ function NclPlayer (file, div) {
 		playerId: ++NclPlayer.playerCount,
 		playerDiv: div,
 		getDivId: function (nodeId, type) {
-			return "ncl" + this.playerId + (type||"") + "_" + nodeId;
+			// ----- REFER -----
+			var mediaId = this.parser.referenceMap.instReuse[nodeId] || nodeId;
+			return "ncl" + this.playerId + (type||"") + "_" + mediaId;
+			// -----------------
+			// return "ncl" + this.playerId + (type||"") + "_" + nodeId;
 		}
 	};
 	this.presentation.bodyDiv = "body" + this.presentation.playerId;
@@ -34,7 +38,6 @@ function NclPlayer (file, div) {
 NclPlayer.prototype.execute = function (data) {
 	// cria o objeto NCL
 	var t = new Date();
-
 	this.presentation.parser = new Parser();
 	this.presentation.ncl = this.presentation.parser.parse(data);
 	console.log(new Date() - t);

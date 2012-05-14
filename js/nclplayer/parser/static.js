@@ -377,8 +377,8 @@ Parser.nclStructureMap = {
 			],
 			reference_target: ["id"],
 			required: ["id"],
-			optional: ["refer","instance","descriptor"],
-			oneOf: ["type","src"]
+			optional: ["instance","descriptor"],
+			oneOf: ["type","src","refer"]
 		},
 		content: {
 			star: ["area","property"]

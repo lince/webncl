@@ -78,7 +78,7 @@ ContextPlayer.prototype.create = function () {
 
 // start
 ContextPlayer.prototype.start = function (nodeInterface) {
-if (this.isStopped) {
+	if (this.isStopped) {
 		if (!this.isCreated) {
 			this.create();
 		}
