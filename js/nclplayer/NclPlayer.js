@@ -43,7 +43,7 @@ NclPlayer.prototype.execute = function (data) {
 	console.log(new Date() - t);
 	this.presentation.focusManager = new FocusManager(this.presentation);
 	this.presentation.systemSettings = new SystemSettings(this.presentation);
-	// c·lculo da posiÁ„o real de cada regi„o
+	// c√°lculo da posi√ß√£o real de cada regi√£o
 	for (rb in this.presentation.ncl.head.regionBase) {
 		for (i in this.presentation.ncl.head.regionBase[rb].region) {
 			var bounds = {
@@ -83,14 +83,14 @@ NclPlayer.prototype.fixRegionBounds = function (node, parentBounds) {
 		height: 0
 	};
 
-	// Converte px em valor n˙merico
+	// Converte px em valor n√∫merico
 	for (i in relativeBounds) {
 		if (relativeBounds[i] != null) {
 			relativeBounds[i] = parseInt(relativeBounds[i].split("px")[0]);
 		}
 	}
 	
-	// Converte % em valor numÈrico
+	// Converte % em valor num√©rico
 	var attrs, buffer;
 	// left, right, width
 	attrs = ["left","right","width"];
@@ -185,7 +185,7 @@ NclPlayer.prototype.fixRegionBounds = function (node, parentBounds) {
 	absoluteBounds.width = relativeBounds.width;
 	absoluteBounds.height = relativeBounds.height;
 	
-	// Salva os valores calculados na prÛpria regi„o
+	// Salva os valores calculados na pr√≥pria regi√£o
 	node.left = absoluteBounds.left + "px";
 	node.top = absoluteBounds.top + "px";
 	node.width = absoluteBounds.width + "px";
@@ -193,7 +193,7 @@ NclPlayer.prototype.fixRegionBounds = function (node, parentBounds) {
 	node.right = null;
 	node.bottom = null;
 	
-	// Calcula as posiÁıes absolutas das regiıes filhas
+	// Calcula as posi√ß√µes absolutas das regi√µes filhas
 	for (i in node.region) {
 		this.fixRegionBounds(node.region[i],absoluteBounds);
 	}

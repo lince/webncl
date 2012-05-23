@@ -146,7 +146,7 @@ Parser.nclStructureMap = {
 			star: ["connectorParam"],
 			custom: ["simpleCondition","compoundCondition","simpleAction","compoundAction"],
 			validate: function (count,errors) {
-				// Condições
+				// CondiÃ§Ãµes
 				if (count["simpleCondition"]==0 && count["compoundCondition"]==0) {
 					errors.push({
 						code: Debugger.ERR_MISSING_TAG_ONEOF,
@@ -168,7 +168,7 @@ Parser.nclStructureMap = {
 						params: ["compoundCondition"]
 					});
 				}
-				// Ações
+				// AÃ§Ãµes
 				if (count["simpleAction"]==0 && count["compoundAction"]==0) {
 					errors.push({
 						code: Debugger.ERR_MISSING_TAG_ONEOF,

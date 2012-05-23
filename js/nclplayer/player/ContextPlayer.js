@@ -216,7 +216,7 @@ ContextPlayer.createLocalParamMap = function (bindParam) {
 // executeTriggerArray
 //	triggerArray[i][0] = bindComponent
 // triggerArray[i][1] = actionName
-// triggerArray[i][2] = parâmetros do trigger
+// triggerArray[i][2] = parÃ¢metros do trigger
 ContextPlayer.executeTriggerArray = function (triggerArray) {
 	var currentTrigger;
 	while ((currentTrigger = triggerArray.shift()) != undefined) {
@@ -358,7 +358,7 @@ ContextPlayer.prototype.bindLinks = function()
 			if(conditions.length > 1)
 				lType = Listener.listenerType[linkConnector.compoundCondition[0].operator.toUpperCase()];
 			
-			//Verifica se assessmentStatements (só ocorre no compoundCondition)
+			//Verifica se assessmentStatements (sÃ³ ocorre no compoundCondition)
 			//Para cada assessmentStatement
 			for (var i in linkConnector.compoundCondition[0].assessmentStatement)
 			{

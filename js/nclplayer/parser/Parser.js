@@ -8,7 +8,7 @@ function Parser () {
 		// -----------------
 		addSource: function (obj,attr,type) {
 			// TODO
-			// - salvar todos os sources e todos os targets e, no final do parse, ligar as referências
+			// - salvar todos os sources e todos os targets e, no final do parse, ligar as referÃªncias
 			// - resolver o problema do transition (id1;id2;...)
 			if (!this.map[obj[attr]]) {
 				this.map[obj[attr]] = {
@@ -26,12 +26,12 @@ function Parser () {
 			if (this.map[id]) {
 				if (this.map[id].target) {
 					if (refType=="property" || refType=="connectorParam") {
-						// não pode repetir no mesmo pai
+						// nÃ£o pode repetir no mesmo pai
 						if (this.map[id].target.parents[pid]) {
 							return false;
 						}
 					} else {
-						// não pode repetir nunca
+						// nÃ£o pode repetir nunca
 						return false;
 					}
 				} else {
@@ -64,7 +64,7 @@ function Parser () {
 						// --- REFER ---
 						if (src.attr=="refer") {
 							if (src.obj._type=="media") {
-								// TODO: é só DESCRIPTOR, SRC e TYPE que "herdam" do refer?
+								// TODO: Ã© sÃ³ DESCRIPTOR, SRC e TYPE que "herdam" do refer?
 								// (area, property, ... ?)
 								src.obj.descriptor = this.map[id].target.obj.descriptor;
 								src.obj.src = this.map[id].target.obj.src;
@@ -212,7 +212,7 @@ Parser.prototype.parseAttributes = function (nodeXml, nodeObj) {
 	if (!oneFound) {
 		Debugger.error(Debugger.ERR_MISSING_ATTR_ONEOF,nodeType,attrs.oneOf);
 	}
-	// Atributos inválidos
+	// Atributos invÃ¡lidos
 	for (attr in foundAttrs) {
 		if (foundAttrs[attr] != 0) {
 			Debugger.warning(Debugger.WARN_INVALID_ATTR,nodeType,[foundAttrs[attr]]);
@@ -286,7 +286,7 @@ Parser.prototype.parseContent = function (nodeXml,nodeObj) {
 			tagCount[tags.custom[tag]] = 0;
 		}			
 	}
-	// Tags inválidas
+	// Tags invÃ¡lidas
 	for (var tag in tagCount) {
 		if (tagCount[tag] > 0) {
 			Debugger.warning(Debugger.WARN_INVALID_TAG,nodeType,[tag]);

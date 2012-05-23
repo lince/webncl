@@ -42,12 +42,12 @@ MediaPlayer.prototype.checkType = function (typeList) {
 
 // create
 MediaPlayer.prototype.create = function (node) {
-	// Cria as transições
+	// Cria as transiÃ§Ãµes
 	if (node.descriptor) {
 		this.transIn = node.descriptor.transIn;
 		this.transOut = node.descriptor.transOut;
 	}
-	// Cria as áreas
+	// Cria as Ã¡reas
 	for (i in node.area) {
 		this.area[node.area[i].id] = node.area[i];
 		if (node.area[i].begin) {
@@ -58,14 +58,14 @@ MediaPlayer.prototype.create = function (node) {
             this.area[node.area[i].id].started = false;
 		}
 	}
-	// Verifica o tipo da mídia
+	// Verifica o tipo da mÃ­dia
 	if (node.type) {
 		this.type = node.type;
 	} else {
 		var buffer = node.src.split(".");
 		this.type = Parser.mediaTypes[buffer[buffer.length-1]];
 	}
-	// Cria os IDs (região e mídia)
+	// Cria os IDs (regiÃ£o e mÃ­dia)
 	this.htmlPlayer = "#" + this.presentation.getDivId(node.id);
 	this.htmlPlayerBkg = "#" + this.presentation.getDivId(node.id,"bkg");
 	if (this.checkType(["application"])) {
@@ -78,9 +78,9 @@ MediaPlayer.prototype.create = function (node) {
 		return;
 	} else {
 	// -----------------
-		// Cria o fundo da mídia
+		// Cria o fundo da mÃ­dia
 		$(this.region).append("<div class='playerBkg' id='" + this.presentation.getDivId(node.id,"bkg") + "'></div>");
-		// Cria a mídia
+		// Cria a mÃ­dia
 		switch (this.type.split("/")[0]) {
 			case "video": {
 				// type = video/*
@@ -185,7 +185,7 @@ MediaPlayer.prototype.create = function (node) {
 						"$(this.htmlPlayer).trigger('presentation.onBegin',[this.area['"+i+"'].id]);"+
 					"},this));");
 				}
-				// TODO: area definida por frames ao invés de tempo
+				// TODO: area definida por frames ao invÃ©s de tempo
 			}
 		}
 	
@@ -244,7 +244,7 @@ MediaPlayer.prototype.load = function (source) {
 		}
 		case "application": {
 			// type = application/*
-			// não faz nada
+			// nÃ£o faz nada
             break;
 		}
 		case "text": {
@@ -430,8 +430,8 @@ MediaPlayer.prototype.applyTransition = function (transition, flagInOut) {
 // show
 MediaPlayer.prototype.show = function () {
 	if (this.isVisible) {
-		// TODO: múltiplas transições (transIn e transOut podem receber vários IDs separados por ponto e vírgula)
-		// (retirar a gambiarra abaixo, que foi feita para transformar uma transição em um vetor com uma transição)
+		// TODO: mÃºltiplas transiÃ§Ãµes (transIn e transOut podem receber vÃ¡rios IDs separados por ponto e vÃ­rgula)
+		// (retirar a gambiarra abaixo, que foi feita para transformar uma transiÃ§Ã£o em um vetor com uma transiÃ§Ã£o)
 		if (this.transIn && this.transIn._type) this.transIn = [this.transIn];
 		if (this.transOut && this.transOut._type) this.transOut = [this.transOut];
 		// ---
