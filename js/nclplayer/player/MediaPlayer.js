@@ -506,7 +506,7 @@ MediaPlayer.prototype.stop = function (nodeInterface) {
 		this.isStopped = true;
 		this.hide();
 		if (this.checkType(["video","audio","image","text"])) {
-			this.popcornPlayer.pause();
+			this.popcornPlayer.pause(0);
 		}
 		$(this.htmlPlayer).trigger("presentation.onEnd",[nodeInterface]);
 	}
@@ -544,7 +544,7 @@ MediaPlayer.prototype.abort = function (nodeInterface) {
 		this.isStopped = true;
 		this.hide();
 		if (this.checkType(["video","audio","image","text"])) {
-			this.popcornPlayer.pause();
+			this.popcornPlayer.pause(0);
 		}
 		$(this.htmlPlayer).trigger("presentation.onAbort",[nodeInterface]);
 	}
