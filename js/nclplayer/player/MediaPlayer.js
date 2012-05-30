@@ -17,6 +17,7 @@ function MediaPlayer (node, parentContext) {
 	this.isStopped = true;
 	this.isVisible = true;
 	this.isFocused = false;
+	this.explicitDur = undefined;
 	this.opacity = 1;	
 	this.node = node;
 	this.presentation = parentContext.presentation;
@@ -73,7 +74,10 @@ MediaPlayer.prototype.create = function (node) {
 	} else {
 		this.region = "#" + this.presentation.playerDiv;
 	}
-	// ----- REFER -----
+	
+	
+	
+	// ----- REFER -----	
 	if (node.refer && (node.instance!="new")) {
 		return;
 	} else {
@@ -216,6 +220,15 @@ MediaPlayer.prototype.create = function (node) {
 		// Propriedades da tag <media> (property)
 		this.setProperty(node.property[i].name,node.property[i].value);
 	}
+	
+	// Tratamento do explicitDur
+	if(this.explicitDur)
+	{
+		this.popcornPlayer.exec(this.explicitDur,$.proxy(function() {
+			this.stop();
+		},this));
+	}
+	
 	// Faz o bind dos eventos
 	this.bindEvents();
 	// Salva o player no elemento HTML via JQuery
@@ -463,21 +476,21 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 		this.isPlaying = true;
 		this.isStopped = false;
 		this.show();
-		if (this.checkType(["audio","video"])) {
-			//this.parentContext.syncPlayer(this);
+		if (this.checkType(["video","audio","image","text"])) {
+			this.parentContext.syncPlayer(this);
             this.popcornPlayer.play();
 			if (nodeInterface && this.area[nodeInterface]._type=="area") {
 				if (this.area[this.area[nodeInterface].id].begin) {
                     this.area[this.area[nodeInterface].id].started = true;
 					this.seek(this.area[this.area[nodeInterface].id].beginTime);
 					$(this.htmlPlayer).one("seeked",$.proxy(function() {
-				//		this.parentContext.notify(this);
+						this.parentContext.notify(this);
 					},this));
 				} else {
 					// TODO (frames)
 				}
 			} else {
-				//this.parentContext.notify(this);
+				this.parentContext.notify(this);
 			}
 		}
 		$(this.htmlPlayer).trigger("presentation.onBegin",[nodeInterface]);

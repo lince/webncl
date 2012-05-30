@@ -214,7 +214,11 @@ Player.prototype.setProperty = function (name, value) {
 			
 			// ???
 			
-			case "explicitDur":
+			case "explicitDur": {
+				var buffer = value.split("s");
+				this.explicitDur = parseInt(buffer[0]);
+				break;
+			}
 			case "baseDeviceRegion":
 			case "deviceClass":
 			case "plan":
