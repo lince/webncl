@@ -477,7 +477,9 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 		this.isStopped = false;
 		this.show();
 		if (this.checkType(["video","audio","image","text"])) {
-			this.parentContext.syncPlayer(this);
+            if(this.checkType(["video","audio"]))
+			    this.parentContext.syncPlayer(this);
+
             this.popcornPlayer.play();
 			if (nodeInterface && this.area[nodeInterface]._type=="area") {
 				if (this.area[this.area[nodeInterface].id].begin) {
