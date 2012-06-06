@@ -1,5 +1,7 @@
 function NclPlayer (file, div) {
 
+	var patt=/[\/]*.+\//g;
+
 	this.presentation = {
 		TIME_LIMIT: 1000,
 		playerId: ++NclPlayer.playerCount,
@@ -10,7 +12,8 @@ function NclPlayer (file, div) {
 			return "ncl" + this.playerId + (type||"") + "_" + mediaId;
 			// -----------------
 			// return "ncl" + this.playerId + (type||"") + "_" + nodeId;
-		}
+		},
+		path: patt.exec(file)[0]
 	};
 	this.presentation.bodyDiv = "body" + this.presentation.playerId;
 	this.presentation.settingsDiv = "settings" + this.presentation.playerId;
@@ -86,7 +89,8 @@ NclPlayer.prototype.fixRegionBounds = function (node, parentBounds) {
 	// Converte px em valor númerico
 	for (i in relativeBounds) {
 		if (relativeBounds[i] != null) {
-			relativeBounds[i] = parseInt(relativeBounds[i].split("px")[0]);
+			if (relativeBounds[i].split("%").length == 1)
+				relativeBounds[i] = parseInt(relativeBounds[i].split("px")[0]);
 		}
 	}
 	
@@ -97,7 +101,7 @@ NclPlayer.prototype.fixRegionBounds = function (node, parentBounds) {
 	for (i in attrs) {
 		if (relativeBounds[attrs[i]]!=null && isNaN(relativeBounds[attrs[i]])) {
 			buffer = relativeBounds[attrs[i]].split("%");
-			if (buffer.length > 1) {
+			if (buffer.length > 0) {
 				relativeBounds[attrs[i]] = parseInt(parentBounds.width*parseFloat(buffer[0])/100);
 			}
 		}

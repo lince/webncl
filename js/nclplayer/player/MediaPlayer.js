@@ -238,7 +238,7 @@ MediaPlayer.prototype.create = function (node) {
 // load
 MediaPlayer.prototype.load = function (source) {
 	$(this.htmlPlayer).empty();
-	source = "data/" + source;
+	source = this.presentation.path + source;
 	switch (this.type.split("/")[0]) {
 		case "video": {
 			// type = video/*
