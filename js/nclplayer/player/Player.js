@@ -86,7 +86,12 @@ Player.prototype.setProperty = function (name, value) {
 			}
 			case "height":
 			case "width": {
-				// TODO: %
+				var buffer = value.split("%");
+				if (buffer.length > 1) {
+					var currentValue = $(this.htmlPlayerBkg).css(name);
+					value = parseInt(parseInt(currentValue)*parseFloat(buffer[0])/100);
+				}
+				
 				$(this.htmlPlayer).css(name,value);
 				$(this.htmlPlayerBkg).css(name,value);
 				break;
