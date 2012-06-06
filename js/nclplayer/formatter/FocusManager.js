@@ -318,9 +318,11 @@ FocusManager.prototype.triggerKeyEvents = function(whichKey)
     for(var mediaId in this.presentation.keyEvents)
     {
         if(this.presentation.keyEvents[mediaId])
+        {
             var e = $.Event('selection.onSelection');
             e.which = whichKey;
             $(mediaId).trigger(e);
+        }
     }
 };
 
