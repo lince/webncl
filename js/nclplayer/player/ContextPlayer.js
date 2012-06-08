@@ -516,7 +516,7 @@ ContextPlayer.prototype.bindLinks = function()
 			for (var i in link.linkParam)
 			{
 				currentLinkParam = link.linkParam[i];
-				connectorParam[currentLinkParam.name] = currentLinkParam.value;
+				connectorParam['$' + currentLinkParam.name] = currentLinkParam.value;
 			}
 		}
 		
@@ -671,8 +671,17 @@ ContextPlayer.prototype.bindLinks = function()
 			   if(currentAssessment.variable)
 			   {
 			   	 localParamMap = ContextPlayer.createLocalParamMap(currentBind.bindParam);
-			   	 currentAssessment.value = localParamMap[currentAssessment.value] ? localParamMap[currentAssessment.value] : connectorParam[currentAssessment.value];			   	 
+		/*1*/    currentAssessment.value = localParamMap[currentAssessment.value] ? localParamMap[currentAssessment.value] : connectorParam[currentAssessment.value];		
 			   }
+			   /* 
+			    * As variáveis definidas via linkParam tem o identificaro (dentro do dicionário connectorParam) sem o '$'.
+			    * No if-inline (1), é procurado no connectorParam por currentAssessment.value, que o $ no nome da variável.
+			    * Na minha correção, eu fiz o linkParam adquirir o $ quando ele é criado lá em cima.
+			    * Nâo sei se está minha correção vai acarretar outros bugs, se for, podem reverté-la.
+			    * 
+			    * Sugestão: sempre utilizar $ nos nomes das variáveis.
+			    * 
+			    * */
 			   
 			}
 		}
