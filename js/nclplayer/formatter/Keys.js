@@ -4,7 +4,7 @@
 
 
 Keys = {
-	allCodes : [13,37,38,39,40,81,87,69,82,96,97,98,99,100,101,102,103,104,105],
+	allCodes : [13,37,38,39,40,81,87,69,82,96,97,98,99,100,101,102,103,104,105,90,88,67,86,66,78,65,83,68],
 	
 	CURSOR_UP	    :	38, 	/* arrow up */
 	CURSOR_DOWN 	: 	40,		/* arrow down */
@@ -46,4 +46,5 @@ Keys = {
  *   Conforme a quantidade de codigos uma modificacao importante a ser feita
  * eh gerar allCodes dinamicamente!
  * 
+ *  Allow pass the keymap for the player as a parameter
  */
