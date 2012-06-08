@@ -590,9 +590,14 @@ ContextPlayer.prototype.bindLinks = function()
 			   {
 			   	 var localParamMap = ContextPlayer.createLocalParamMap(currentBind.bindParam);
 			   	 currentFlag.keyDefaultValue = localParamMap[currentFlag.keyDefaultValue] ? localParamMap[currentFlag.keyDefaultValue] : connectorParam[currentFlag.keyDefaultValue];	
-				 if (currentFlag.keyDefaultValue in Keys)
+				 var tempKey = currentFlag.keyDefaultValue
+				 if ($.isNumeric(tempKey)) 
 				 {
-					currentFlag.keyDefaultValue = Keys[currentFlag.keyDefaultValue];
+					 tempKey = 'KEY_' + tempKey;
+				 }
+			   	 if (tempKey in Keys)
+				 {
+					currentFlag.keyDefaultValue = Keys[tempKey];
 				 }		 
 
 				 this.presentation.keyEvents[componentDivId] = false;
