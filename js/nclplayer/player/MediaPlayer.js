@@ -487,6 +487,7 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 					this.seek(this.area[this.area[nodeInterface].id].beginTime);
 					$(this.htmlPlayer).one("seeked",$.proxy(function() {
 						this.parentContext.notify(this);
+						this.popcornPlayer.play();
 					},this));
 				} else {
 					// TODO (frames)
