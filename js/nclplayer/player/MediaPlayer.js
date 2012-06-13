@@ -48,6 +48,13 @@ MediaPlayer.prototype.create = function (node) {
 		this.transIn = node.descriptor.transIn;
 		this.transOut = node.descriptor.transOut;
 	}
+	
+	//Seta o valor de expliticDur
+	if (node.descriptor.explicitDur) {
+		vector = node.descriptor.explicitDur.split("s");
+		this.explicitDur = vector[0];
+	}
+	
 	// Cria as áreas
 	for (i in node.area) {
 		this.area[node.area[i].id] = node.area[i];
