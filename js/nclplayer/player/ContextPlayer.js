@@ -117,7 +117,6 @@ ContextPlayer.prototype.startPort = function (port) {
 		case "media": {
 			// component = media -> nodeInterface = area, property
 			nodeInterface = port["interface"];
-			console.log(nodeInterface)
 			if (nodeInterface) {
 				this.media[port.component.id].start(nodeInterface);
 			} else {
