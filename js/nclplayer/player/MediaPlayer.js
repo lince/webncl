@@ -47,12 +47,12 @@ MediaPlayer.prototype.create = function (node) {
 	if (node.descriptor) {
 		this.transIn = node.descriptor.transIn;
 		this.transOut = node.descriptor.transOut;
-	}
-	
-	//Seta o valor de expliticDur
-	if (node.descriptor.explicitDur) {
-		vector = node.descriptor.explicitDur.split("s");
-		this.explicitDur = vector[0];
+		
+		//Seta o valor de expliticDur
+		if (node.descriptor.explicitDur) {
+			vector = node.descriptor.explicitDur.split("s");
+			this.explicitDur = vector[0];
+		}
 	}
 	
 	// Cria as áreas
