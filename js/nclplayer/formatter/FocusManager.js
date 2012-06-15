@@ -317,10 +317,8 @@ FocusManager.prototype.disableKeys = function(mediaId)
 
 FocusManager.prototype.triggerKeyEvents = function(whichKey)
 {
-	console.log(this.presentation.keyEvents)
     for(var mediaId in this.presentation.keyEvents)
     {
-    	console.log(mediaId);
         if(this.presentation.keyEvents[mediaId])
         {
             var e = $.Event('selection.onSelection');
