@@ -255,7 +255,6 @@ FocusManager.prototype.keyEvent = function(keyCode)
 				for(var i in currentDescriptor.mediaArray)
 				{
 					currentMedia = currentDescriptor.mediaArray[i];
-					//console.log(currentMedia)
 					$(currentMedia).trigger('selection.onSelection');
 				}
 				
@@ -302,7 +301,6 @@ FocusManager.prototype.unbindMouseEvents=  function(mediaId)
 
 FocusManager.prototype.enableKeys = function(mediaId)
 {
-	console.log('enableKeys: ' + mediaId);
     if(mediaId)
         if(mediaId in this.presentation.keyEvents)
             this.presentation.keyEvents[mediaId] = true;
@@ -317,14 +315,20 @@ FocusManager.prototype.disableKeys = function(mediaId)
 
 FocusManager.prototype.triggerKeyEvents = function(whichKey)
 {
+	var enabledMedias = [];
     for(var mediaId in this.presentation.keyEvents)
     {
         if(this.presentation.keyEvents[mediaId])
         {
-            var e = $.Event('selection.onSelection');
-            e.which = whichKey;
-            $(mediaId).trigger(e);
+        	enabledMedias.push(mediaId);
         }
+    }
+    
+    for (var i in enabledMedias) {
+    	mediaId = enabledMedias[i];
+        var e = $.Event('selection.onSelection');
+        e.which = whichKey;
+        $(mediaId).trigger(e);
     }
 };
 
