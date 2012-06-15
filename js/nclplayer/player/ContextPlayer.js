@@ -590,7 +590,7 @@ ContextPlayer.prototype.bindLinks = function()
 			   if(currentFlag.useKey)
 			   {
 			   	 var localParamMap = ContextPlayer.createLocalParamMap(currentBind.bindParam);
-			   	 currentFlag.keyDefaultValue = localParamMap[currentFlag.keyDefaultValue] ? localParamMap[currentFlag.keyDefaultValue] : connectorParam[currentFlag.keyDefaultValue];	
+			   	 currentFlag.keyDefaultValue =  localParamMap[currentFlag.keyDefaultValue] || connectorParam[currentFlag.keyDefaultValue];	
 				 var tempKey = currentFlag.keyDefaultValue
 				 if ($.isNumeric(tempKey)) 
 				 {
@@ -599,9 +599,27 @@ ContextPlayer.prototype.bindLinks = function()
 			   	 if (tempKey in Keys)
 				 {
 					currentFlag.keyDefaultValue = Keys[tempKey];
-				 }		 
-
-				 this.presentation.keyEvents[componentDivId] = false;
+				 }
+				 
+				 var port = 'undefined';
+				 var triggerMedia = componentDivId;
+				 
+				 //Caso o componente seja um contexto e possua uma interface (uma porta para uma media)
+				 //Deve-se usar a media para realizar o trigger da ação de teclas
+				 //TODO: usei um loop para encontrar a porta, deve existir uma solução melhor
+				 if (currentBind.component._type == "context" && currentInterface) {
+				 	for (var i in currentBind.component.port) {
+				 		currentPort = currentBind.component.port[i]
+				 		portId = currentBind.component.port[i].id;
+				 		if (portId == currentInterface) {
+				 			port = currentPort;
+				 			break;
+				 		}
+				 	}
+				 	triggerMedia = "#"+this.presentation.getDivId(port.component.id);
+				 }
+				 
+				 this.presentation.keyEvents[triggerMedia] = false;
 			   }
 
 

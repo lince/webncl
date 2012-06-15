@@ -494,6 +494,7 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 					this.seek(this.area[this.area[nodeInterface].id].beginTime);
 					$(this.htmlPlayer).one("seeked",$.proxy(function() {
 						this.parentContext.notify(this);
+						//TODO: Quando for resolvida a sincronização, remover esse play.
 						this.popcornPlayer.play();
 					},this));
 				} else {
