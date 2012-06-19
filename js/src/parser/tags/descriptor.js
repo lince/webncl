@@ -1,7 +1,27 @@
-// <descriptor>
+/*
+ * Lince - Laboratory for Innovation on Computing and Engineering
+ * UFSCar - Universidade Federal de SÃ£o Carlos
+ * SÃ£o Carlos - SP, Brazil
+ * <http://lince.dc.ufscar.br>
+ * <http://webncl.org>
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 Parser.prototype.parseDescriptor = function (obj,tag,parent,tree) {
 	// explicitDur
-	values = ["(número inteiro)s"];
+	values = ["(nÃºmero inteiro)s"];
 	patt = /^\d+s$/;
 	if (obj.explicitDur!=null && !patt.test(obj.explicitDur)) {
 		Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["explicitDur",obj.explicitDur,values]);
@@ -27,13 +47,13 @@ Parser.prototype.parseDescriptor = function (obj,tag,parent,tree) {
 		}
 	}
 	// focusBorderWidth
-	values = ["(número inteiro)"];
+	values = ["(nÃºmero inteiro)"];
 	patt = /^-?\d+$/;
 	if (obj.focusBorderWidth!=null && !patt.test(obj.focusBorderWidth)) {
 		Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["focusBorderWidth",obj.focusBorderWidth,values]);
 	}
 	// focusBorderTransparency
-	values = ["(número real entre 0 e 1)","(número real entre 0 e 100)%"];
+	values = ["(nÃºmero real entre 0 e 1)","(nÃºmero real entre 0 e 100)%"];
 	patt = /^((0?\.\d+|1(\.0+)?)|(\d?\d?\.\d+|100(\.0+)?)%)$/;
 	if (obj.focusBorderTransparency!=null && !patt.test(obj.focusBorderTransparency)) {
 		Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["focusBorderTransparency",obj.focusBorderTransparency,values]);

@@ -1,4 +1,24 @@
-// <simpleCondition>
+/*
+ * Lince - Laboratory for Innovation on Computing and Engineering
+ * UFSCar - Universidade Federal de SÃ£o Carlos
+ * SÃ£o Carlos - SP, Brazil
+ * <http://lince.dc.ufscar.br>
+ * <http://webncl.org>
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 Parser.prototype.parseSimpleCondition = function (obj,tag,parent,tree) {
 	// role
 	values = ["onBegin","onEnd","onAbort","onPause","onResume","onSelection","onBeginAttribution","onEndAttribution"];
@@ -46,7 +66,7 @@ Parser.prototype.parseSimpleCondition = function (obj,tag,parent,tree) {
 		Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["key",obj.key,values]);
 	}
 	// min
-	values = ["(número inteiro entre 1 e max)"];
+	values = ["(nï¿½mero inteiro entre 1 e max)"];
 	patt = /^\d+$/;
 	if (obj.min!=null) {
 		if (!patt.test(obj.min)) {
@@ -58,7 +78,7 @@ Parser.prototype.parseSimpleCondition = function (obj,tag,parent,tree) {
 		}
 	}
 	// max
-	values = ["(número inteiro maior ou igual a min)","unbounded"];
+	values = ["(nï¿½mero inteiro maior ou igual a min)","unbounded"];
 	patt = /^(\d+|unbounded)$/;
 	if (obj.max!=null) {
 		if (!patt.test(obj.max)) {

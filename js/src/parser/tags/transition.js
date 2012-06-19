@@ -1,4 +1,24 @@
-// <transition>
+/*
+ * Lince - Laboratory for Innovation on Computing and Engineering
+ * UFSCar - Universidade Federal de SÃ£o Carlos
+ * SÃ£o Carlos - SP, Brazil
+ * <http://lince.dc.ufscar.br>
+ * <http://webncl.org>
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 Parser.prototype.parseTransition = function (obj,tag,parent,tree) {
 	// type
 	values = ["barWipe","irisWipe","clockWipe","snakeWipe","fade"];
@@ -6,13 +26,13 @@ Parser.prototype.parseTransition = function (obj,tag,parent,tree) {
 		Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["type",obj.type,values]);
 	}
 	// dur
-	values = ["(número inteiro positivo)s"];
+	values = ["(nÃºmero inteiro positivo)s"];
 	patt = /^\d+s$/;
 	if (obj.dur!=null && !patt.test(obj.dur)) {
 		Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["dur",obj.dur,values]);
 	}
 	// startProgress, endProgress
-	values = ["(número real entre 0 e 1)"];
+	values = ["(nÃºmero real entre 0 e 1)"];
 	patt = /^(0*\.\d+|1\.0)$/;
 	if (obj.startProgress!=null && !patt.test(obj.startProgress)) {
 		Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["startProgress",obj.startProgress,values]);
@@ -34,19 +54,19 @@ Parser.prototype.parseTransition = function (obj,tag,parent,tree) {
 		Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["fadeColor",obj.fadeColor,values]);
 	}
 	// horRepeat
-	values = ["(número inteiro não negativo)"];
+	values = ["(nÃºmero inteiro nÃ£o negativo)"];
 	patt = /^\d+$/;
 	if (obj.horRepeat!=null && patt.test(obj.horRepeat,values)==-1) {
 		Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["horRepeat",obj.horRepeat,values]);
 	}
 	// vertRepeat
-	values = ["(número inteiro não negativo)"];
+	values = ["(nÃºmero inteiro nÃ£o negativo)"];
 	patt = /^\d+$/;
 	if (obj.vertRepeat!=null && patt.test(obj.vertRepeat,values)==-1) {
 		Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["vertRepeat",obj.vertRepeat,values]);
 	}
 	// borderWidth
-	values = ["(número inteiro não negativo)"];
+	values = ["(nÃºmero inteiro nÃ£o negativo)"];
 	patt = /^\d+$/;
 	if (obj.borderWidth!=null && patt.test(obj.borderWidth,values)==-1) {
 		Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["borderWidth",obj.borderWidth,values]);

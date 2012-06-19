@@ -1,8 +1,28 @@
-// <region>
+/*
+ * Lince - Laboratory for Innovation on Computing and Engineering
+ * UFSCar - Universidade Federal de SÃ£o Carlos
+ * SÃ£o Carlos - SP, Brazil
+ * <http://lince.dc.ufscar.br>
+ * <http://webncl.org>
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 Parser.prototype.parseRegion = function (obj,tag,parent,tree) {
 	// left, right, top, bottom, height, width
 	attrs = ["left","right","top","bottom","height","width"];
-	values = ["(número inteiro)","(número inteiro)px","(número real)%"];
+	values = ["(nï¿½mero inteiro)","(nï¿½mero inteiro)px","(nï¿½mero real)%"];
 	for (var i in attrs) {
 		attr = attrs[i]
 		value = obj[attr];
@@ -14,7 +34,7 @@ Parser.prototype.parseRegion = function (obj,tag,parent,tree) {
 		}
 	}
 	if (obj.left && obj.right && obj.width) {
-		// TODO: verificar a soma de dimensões relativas (%)
+		// TODO: verificar a soma de dimensï¿½es relativas (%)
 		if (isFinite(obj.left) && isFinite(obj.right) && isFinite(obj.width) && isFinite(parent.width)) {
 			var soma = parseInt(obj.left) + parseInt(obj.right) + parseInt(obj.width);
 			if (soma!=parent.width) {
@@ -23,7 +43,7 @@ Parser.prototype.parseRegion = function (obj,tag,parent,tree) {
 		}
 	}
 	if (obj.top && obj.bottom && obj.height) {
-		// TODO: verificar a soma de dimensões relativas (%)
+		// TODO: verificar a soma de dimensï¿½es relativas (%)
 		if (isFinite(obj.top) && isFinite(obj.bottom) && isFinite(obj.height) && isFinite(parent.height)) {
 			var soma = parseInt(obj.top) + parseInt(obj.bottom) + parseInt(obj.height);
 			if (soma!=parent.height) {
@@ -32,7 +52,7 @@ Parser.prototype.parseRegion = function (obj,tag,parent,tree) {
 		}
 	}
 	// zIndex
-	values = ["número inteiro entre 0 e 255"];
+	values = ["nï¿½mero inteiro entre 0 e 255"];
 	patt = /^\d+$/;
 	if (obj.zIndex!=null && (!patt.test(obj.zIndex) || obj.zIndex<0 || obj.zIndex>255)) {
 		Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["zIndex",obj.zIndex,values]);
