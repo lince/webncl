@@ -8,9 +8,9 @@
 
 CLOSURE_COMPILER=~/bin/compiler.jar
 JSPATH=js
-SPATH=$(JSPATH)/nclplayer
+SPATH=$(JSPATH)/src
 FILES=$(wildcard $(SPATH)/*.js) $(wildcard $(SPATH)/formatter/*.js) $(wildcard $(SPATH)/parser/*.js) $(wildcard $(SPATH)/player/*.js) $(wildcard $(SPATH)/parser/tags/*.js)
-MINFILE=$(JSPATH)/nclplayer.min.js
+MINFILE=$(JSPATH)/webncl.min.js
 
 all: $(MINFILE)
 
