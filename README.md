@@ -4,6 +4,8 @@ WebNCL is a NCL presentation machine developed on top of Web technologies stack 
 
 It allows the execution of NCL Documents in any device which has a HTML5-compatible browser, such as PC, Tablets, Smartphones and Smart TVs.
 
+For NCL demos visit the site: [http://webncl.org](http://webncl.org)
+
 # DEPENDENCIES
 -------------------------------------------------------
 ## To run
@@ -26,6 +28,9 @@ WebNCL was tested in the following browsers and devices:
 * Safari
 * iOS devices
 * Android devices > 2.3
+
+## NCL Documents Compatibility
+For a discussion of compatibility with NCL documents, see the [Compatibily Issues](wiki/Compatibily-Issues) page.
 
 # BUILD WEBNCL
 -------------------------------------------------------
