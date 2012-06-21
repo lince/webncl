@@ -7,7 +7,7 @@ It allows the execution of NCL Documents in any device which has a HTML5-compati
 # DEPENDENCIES
 -------------------------------------------------------
 ## To run
- - popcorn.js (http://popcornjs.org)
+ - popcorn.js = 1.1.2 (http://popcornjs.org)
  - jquery > 1.7.1 (http://jquery.org)
  
 ## To build
@@ -33,4 +33,5 @@ To build the minified version of the code, just do:
 
 `
 ` $ make CLOSURE_COMPILER=/path/to/closure/compiler.jar
+`
 `
