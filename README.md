@@ -30,7 +30,7 @@ WebNCL was tested in the following browsers and devices:
 * Android devices > 2.3
 
 ## NCL Documents Compatibility
-For a discussion of compatibility with NCL documents, see the [Compatibily Issues](wiki/Compatibily-Issues) page.
+For a discussion of compatibility with NCL documents, see the [Compatibily Issues](webncl/wiki/Compatibily-Issues) page.
 
 # BUILD WEBNCL
 -------------------------------------------------------
