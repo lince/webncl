@@ -52,6 +52,18 @@ function ContextPlayer (node, presentation) {
 
 }
 
+//ContextPlayer specific constants
+ContextPlayer.prototype.eventType = {
+	"onBegin": "presentation",
+	"onEnd": "presentation",
+	"onAbort": "presentation",
+	"onPause": "presentation",
+	"onResume": "presentation",
+	"onSelection": "selection",
+	"onBeginAttribution": "attribution",
+	"onEndAttribution": "attribution"
+};
+
 ContextPlayer.prototype.syncPlayer = function (player) {
 	this.synchronizedPlayers.push(player.popcornPlayer);
 	this.loadingPlayers++;
@@ -283,9 +295,9 @@ ContextPlayer.prototype.bindLinks = function()
 			var currentComponentElement  = "#"+this.presentation.getDivId(currentPort.component.id);
 			var interfaceId = currentPort.id;
 			
-			for(var j in Parser.eventType)
+			for(var j in this.eventType)
 			{
-				var eventType = Parser.eventType[j];
+				var eventType = this.eventType[j];
 				if(eventType != 'attribution')
 				{
 					var eventName = [eventType,j].join('.');
@@ -440,7 +452,7 @@ ContextPlayer.prototype.bindLinks = function()
 			flagMap[currentCondition.role] = {
 				bindComponent: "",
 				bindInterface: null,
-				eventType: Parser.eventType[currentCondition.role],
+				eventType: this.eventType[currentCondition.role],
 				flag: false,
 				keyUseVariable : conditionUseVariable,
 				keyDefaultValue: conditionDefaultValue,
@@ -598,7 +610,7 @@ ContextPlayer.prototype.bindLinks = function()
 			   
 
 			   var componentDivId = currentBindComponentSelector;
-			   var eventType = Parser.eventType[currentBind.role];
+			   var eventType = this.eventType[currentBind.role];
 			   var eventName = currentBind.role;
 			   var bindName = [eventType,eventName].join('.');
 			   var handlerName =  [currentBindComponent,bindName].join('.');

@@ -48,6 +48,36 @@ function MediaPlayer (node, parentContext) {
 
 }
 
+//Class specific constants
+
+MediaPlayer.prototype.colorValues = {
+	'white': "255,255,255",
+	'black': "0,0,0",
+	'silver': "192,192,192",
+	'gray': "128,128,128",
+	'red': "255,0,0",
+	'maroon': "128,0,0",
+	'fuchsia': "255,0,255",
+	'purple': "128,0,128",
+	'lime': "0,255,0",
+	'green': "0,128,0",
+	'yellow': "255,255,0",
+	'olive': "128,128,0",
+	'blue': "0,0,255",
+	'navy': "0,0,128",
+	'aqua': "0,255,255",
+	'teal': "0,128,128"
+};
+
+MediaPlayer.prototype.mediaTypes = {
+	'htm': "text/htm",	'html': "text/html",	'txt': "text/plain",	'css': "text/css",	'xml': "text/xml",	'bmp': "image",	'png': "image",
+	'gif': "image",		'jpg': "image",			'jpeg': "image",			'wav': "audio",		'mp3': "audio",		'mp2': "audio",	'mp4': "video",
+	'mpg4': "video",		'mpeg': "video",			'mpg': "video",			'webm': "video",	'ogg': "audio"	, 'ogv': "video",
+	'lua': "application/x-ginga-NCLua",		'class': "application/x-ginga-NCLet",		'jar': "application/x-ginga-NCLet"		
+};
+
+
+
 // checkType
 MediaPlayer.prototype.checkType = function (typeList) {
 	var thisType = this.type.split("/");
@@ -92,7 +122,7 @@ MediaPlayer.prototype.create = function (node) {
 		this.type = node.type;
 	} else {
 		var buffer = node.src.split(".");
-		this.type = Parser.mediaTypes[buffer[buffer.length-1]];
+		this.type = this.mediaTypes[buffer[buffer.length-1]];
 	}
 	// Cria os IDs (região e mídia)
 	this.htmlPlayer = "#" + this.presentation.getDivId(node.id);
@@ -316,7 +346,7 @@ MediaPlayer.prototype.focus = function () {
 			if (borderWidth > 0) {
 				var color = this.node.descriptor.focusBorderColor || this.presentation.systemSettings.getPropertyValue("default.focusBorderColor");
 				var alpha = 1 - parseInt(this.node.descriptor.focusBorderTransparency || 0);
-				var border = borderWidth + "px solid rgba(" + Parser.colorValues[color] + "," + alpha + ")";
+				var border = borderWidth + "px solid rgba(" + this.colorValues[color] + "," + alpha + ")";
 				$(this.htmlPlayerBkg).css("left","-="+borderWidth);
 				$(this.htmlPlayerBkg).css("top","-="+borderWidth);
 				$(this.htmlPlayerBkg).css("border",border);

@@ -19,43 +19,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-Parser.eventType = {
-	"onBegin": "presentation",
-	"onEnd": "presentation",
-	"onAbort": "presentation",
-	"onPause": "presentation",
-	"onResume": "presentation",
-	"onSelection": "selection",
-	"onBeginAttribution": "attribution",
-	"onEndAttribution": "attribution"
-};
-
-Parser.mediaTypes = {
-	'htm': "text/htm",	'html': "text/html",	'txt': "text/plain",	'css': "text/css",	'xml': "text/xml",	'bmp': "image",	'png': "image",
-	'gif': "image",		'jpg': "image",			'jpeg': "image",			'wav': "audio",		'mp3': "audio",		'mp2': "audio",	'mp4': "video",
-	'mpg4': "video",		'mpeg': "video",			'mpg': "video",			'webm': "video",	'ogg': "audio"	, 'ogv': "video",
-	'lua': "application/x-ginga-NCLua",		'class': "application/x-ginga-NCLet",		'jar': "application/x-ginga-NCLet"		
-};
-	
-Parser.colorValues = {
-	'white': "255,255,255",
-	'black': "0,0,0",
-	'silver': "192,192,192",
-	'gray': "128,128,128",
-	'red': "255,0,0",
-	'maroon': "128,0,0",
-	'fuchsia': "255,0,255",
-	'purple': "128,0,128",
-	'lime': "0,255,0",
-	'green': "0,128,0",
-	'yellow': "255,255,0",
-	'olive': "128,128,0",
-	'blue': "0,0,255",
-	'navy': "0,0,128",
-	'aqua': "0,255,255",
-	'teal': "0,128,128"
-};
-
 Parser.isNotArray = [
 	"ncl","head","body","importedDocumentBase","ruleBase","transitionBase","descriptorBase",
 	"connectorBase","defaultDescriptor","valueAssessment","defaultComponent"
