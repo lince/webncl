@@ -208,7 +208,7 @@ FocusManager.prototype.bindKeyDown = function()
 {
 	$('#'+this.presentation.playerDiv).on('keydown', $.proxy(function(event){
 	
-		if(Keys.allCodes.indexOf(event.which) != -1)
+		if(this.presentation.keys.allCodes.indexOf(event.which) != -1)
 		{
 			event.preventDefault();
 			this.keyEvent(event.which);
@@ -242,6 +242,7 @@ FocusManager.prototype.keyEvent = function(keyCode)
 	if(this.currentFocusIndex)
 	{
 		currentDescriptor = this.descriptors[this.currentFocusIndex];
+                var Keys =  this.presentation.keys;
 		switch (keyCode)
 		{
 
@@ -297,7 +298,7 @@ FocusManager.prototype.bindMouseEvents = function(focusIndex, mediaId)
     
     $(mediaId).on('click', $.proxy(function(event){            
         if (event.which == 1)
-            this.keyEvent(Keys.ENTER);
+            this.keyEvent(this.presentation.keys.ENTER);
     },this))
     
     $(mediaId).on('mouseover',{focusIndex: focusIndex}, $.proxy(function(event){

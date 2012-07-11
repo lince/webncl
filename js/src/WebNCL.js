@@ -24,7 +24,10 @@ function WebNclPlayer (file, div) {
 	var patt=/[\/]*.+\//g;
 
 	this.presentation = {
+                
+                //Time limit used by events, can be changed by the user
 		TIME_LIMIT: 1000,
+                
 		playerId: ++WebNclPlayer.playerCount,
 		playerDiv: div,
 		getDivId: function (nodeId, type) {
@@ -34,12 +37,101 @@ function WebNclPlayer (file, div) {
 			// -----------------
 			// return "ncl" + this.playerId + (type||"") + "_" + nodeId;
 		},
-		path: patt.exec(file)[0]
+		path: patt.exec(file)[0],
+                
+                //Default media players
+                //TODO: Future webncl versions should
+                //inspect browser features and choose the
+                //best players for the browser
+                //MediaPlayers can be changed by the user
+                mediaPlayers: {
+                "text/htm" : 
+                    {
+                            defaultPlayer: Html5Player
+                    },
+                "image" :
+                    {
+                            defaultPlayer: Html5Player
+                    },
+                "audio": 
+                    {
+                            defaultPlayer: Html5Player
+                    },
+                "video" : 
+                    {
+                            defaultPlayer: Html5Player
+                            //Its possible to choose players for specific file formats
+                            //"mp4": Mp4SpecificPlayer
+                    },
+                "text/css" : undefined,                 //No player - Issue Debbuger.Warning
+                "text/html" : 
+                    {
+                            defaultPlayer: Html5Player
+                    },
+                "text/plain": 
+                    {
+                            defaultPlayer: Html5Player
+                    },
+                "application/x-ginga-NCLua" : undefined,
+                "application/x-ginga-NCLet" : undefined,
+                "text/xml" : undefined
+
+                },
+                
+                keyEvents : {}
+                
+                
+
 	};
 	this.presentation.bodyDiv = "body" + this.presentation.playerId;
 	this.presentation.settingsDiv = "settings" + this.presentation.playerId;
 	this.presentation.contextsDiv = "contexts" + this.presentation.playerId;
-    this.presentation.keyEvents = {};
+        
+        
+        /*
+         * Keys mapping declaration
+         * They can be redefined by the user
+         **/
+        
+        this.presentation.keys = {
+            CURSOR_UP           :	38, 	/* arrow up */
+            CURSOR_DOWN         : 	40,	/* arrow down */
+            CURSOR_LEFT         :	37,	/* arrow left */
+            CURSOR_RIGHT        :	39,	/* arrow right */
+            ENTER               :	13,	/* enter */
+            RED                 :       81,  	/* q */
+            GREEN               :       87,	/* w */
+            YELLOW              :       69,	/* e */
+            BLUE                :       82,	/* r */
+            KEY_0               :       96,	/* 0 */
+            KEY_1               :       97,	/* 1 */
+            KEY_2               :       98,	/* 2 */
+            KEY_3               :       99,	/* 3 */
+            KEY_4               :       100,	/* 4 */
+            KEY_5               :       101,	/* 5 */
+            KEY_6               :       102,	/* 6 */
+            KEY_7               :       103,	/* 7 */
+            KEY_8               :       104,	/* 8 */
+            KEY_9               :       105,	/* 9 */
+
+            BACK                :	90,	/* z */
+            EXIT                :	88,	/* x */
+            PLAY                :	67,	/* c */
+            STOP                :	86,	/* v */
+            PAUSE               :	66,	/* b */
+            RECORD              :	78,	/* n */
+
+            POWER               :	65,	/* a */
+            REWIND              :	83,	/* s */
+            EJECT               :	68	/* d */
+        }
+        
+        //Despite the key codes defined above, an array should be defined
+        //with the codes that are going to be processed by the event handler
+        //User can redefine this array to avoid player from processing some key events
+        this.presentation.keys.allCodes = [13,37,38,39,40,81,87,69,82,96,97,98,99,100,101,102,103,104,105,90,88,67,86,66,78,65,83,68],
+	
+
 
 	/*
         Comentar efeito do ajax!
