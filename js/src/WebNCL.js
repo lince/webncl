@@ -129,7 +129,7 @@ function WebNclPlayer (file, div) {
         //Despite the key codes defined above, an array should be defined
         //with the codes that are going to be processed by the event handler
         //User can redefine this array to avoid player from processing some key events
-        this.presentation.keys.allCodes = [13,37,38,39,40,81,87,69,82,96,97,98,99,100,101,102,103,104,105,90,88,67,86,66,78,65,83,68],
+        this.presentation.keys.allCodes = [13,37,38,39,40,81,87,69,82,96,97,98,99,100,101,102,103,104,105,90,88,67,86,66,78,65,83,68];
 	
 
 
