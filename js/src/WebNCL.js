@@ -74,6 +74,9 @@ function WebNclPlayer (file, div) {
                     },
                 "application/x-ginga-NCLua" : undefined,
                 "application/x-ginga-NCLet" : undefined,
+                "application/x-ginga-settings" : {
+                            defaultPlayer: Html5Player
+                    },
                 "text/xml" : undefined
 
                 },

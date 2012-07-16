@@ -25,11 +25,256 @@
 
 /**
  * Default player for video, image, text/plain, text/html and text/htm.
- * This is a Work in Progress. All player are still handled by MediaPlayer.js
+ * This is a Work in Progress. All players are still handled by MediaPlayer.js
  * @constructor
  */
-function Html5Player() {
+function Html5Player(p) {
+    this.p = p;
+    this.popcornPlayer  = undefined;
+    this.htmlPlayer = "#" + p.id;
+    this.onEnded = undefined;
     
+
     
+    switch (p.source.type.split("/")[0]) {
+                            case "video": {
+                                    // type = video/*
+                                    p.createElement("<video class='player' poster='images/loading.gif' id='" + p.id + "'></video>");	
+                                    break;
+                            }
+                            case "audio": {
+                                    // type = audio/*
+                                    p.createElement("<audio class='player' id='" + p.id+ "'></audio>");
+                                    break;
+                            }
+                            case "image": {
+                                    // type = image/*
+                                    p.createElement("<img class='player' id='" + p.id + "'></img>");
+                                    break;
+                            }
+                            case "application": {
+                                    switch (p.source.type) {
+                                            case "application/x-ginga-settings": {
+                                                    // type = application/x-ginga-settings
+                                                     p.createElement("<div class='player' id='" + p.id + "'></div>");
+                                                    break;
+                                            }
+                                            case "application/x-ginga-NCLua": {
+                                                    // type = application/x-ginga-NCLua
+                                                    Debugger.warning(Debugger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
+                                                    break;
+                                            }
+                                            case "application/x-ginga-NCLet": {
+                                                    // type = application/x-ginga-NCLet
+                                                    Debugger.warning(Debugger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
+                                                    break;
+                                            }
+                                            case "application/x-ginga-time": {
+                                                    // type = application/x-ginga-time
+                                                    Debugger.warning(Debugger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
+                                                    break;
+                                            }
+                                    }
+                                    break;
+                            }
+                            case "text": {
+                                    switch (p.source.type) {
+                                            case "text/plain":
+                                            case "text/html": {
+                                                    // type = text/plain, text/html
+                                                    p.createElement("<div class='player' id='" + p.id + "'></div>");
+                                                    break;
+                                            }
+                                            case "text/css": {
+                                                    // type = text/css
+                                                    Debugger.warning(Debugger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
+                                                    break;
+                                            }
+                                            case "text/xml": {
+                                                    // type = text/xml
+                                                    Debugger.warning(Debugger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
+                                                    break;
+                                            }
+                                    }
+                                    break;
+                            }
+                    }
+
+
+                //Tenta criar o popCorn player de acordo com o tipo de media
+		if (p.checkType(["video","audio"]))
+		{
+			do {	
+					//this.popcornPlayer = new Popcorn(this.htmlPlayer, { frameAnimation: true });
+					this.popcornPlayer = new Popcorn(this.htmlPlayer);	
+			} while (!this.popcornPlayer);
+		} else if(p.checkType(["image","text"])){
+			do {	
+					Popcorn.player("baseplayer");
+					this.popcornPlayer = new Popcorn.baseplayer(this.htmlPlayer);
+					
+			} while (!this.popcornPlayer);
+		} 
+                
+                
+                
+    //events are placed
+    $(this.htmlPlayer).on("ended",$.proxy(function() {
+                                if(this.onEnded)
+                                    this.onEnded();
+			},this));
+
     
 };
+
+
+/**
+ * Called when the player need to load (or reload) it sources 
+ */
+Html5Player.prototype.load = function(source)
+{
+        //erases older content
+        $(this.htmlPlayer).empty();        
+        
+        //load a new content base on file type
+	switch (this.p.source.type.split("/")[0]) {
+		case "video": {
+			// type = video/*
+			$(this.htmlPlayer).append("<source src='" + source + "'></source>");
+			break;
+		}
+		case "audio": {
+			// type = audio/*
+			$(this.htmlPlayer).append("<source src='" + source + "'></source>");
+			break;
+		}
+		case "image": {
+			// type = image/*
+			$(this.htmlPlayer).attr("src",source);
+			break;
+		}
+		case "application": {
+			// type = application/*
+			// não faz nada
+            break;
+		}
+		case "text": {
+			if (this.checkType(["text/plain","text/html"])) {
+				// type = text/plain, text/html
+				$.ajax({
+					type: "GET",
+					url: source,
+					dataType: "text",
+					success: $.proxy(function (data) {
+						$(this.htmlPlayer).append(data);
+					},this)
+				});
+			} else {
+				// TODO?
+			}
+			break;
+		}
+	}
+    
+}
+
+
+
+/**
+ * This function should be called to set function calls based on
+ * the video progress in time 
+ */
+Html5Player.prototype.exec = function(time,callback)
+{
+    //Trivial to this player
+    this.popcornPlayer.exec(time,callback);
+}
+
+/**
+ * Start
+ */
+Html5Player.prototype.start =  function()
+{
+    this.popcornPlayer.play();
+}
+
+/**
+ * Stop
+ */
+Html5Player.prototype.stop = function()
+{
+    if (this.p.checkType(["video","audio","image","text"])) {
+	this.popcornPlayer.pause(0);
+    }
+}
+
+/**
+ * Pause
+ */
+Html5Player.prototype.pause = function()
+{
+    if (this.p.checkType(["video","audio","image","text"])) {
+			this.popcornPlayer.pause();
+    }
+}
+
+/**
+ * Resume
+ */
+Html5Player.prototype.resume = function()
+{
+    if (this.p.checkType(["video","audio","image","text"])) {
+			this.popcornPlayer.play();
+    }
+}
+
+
+
+
+/**
+ * Abort
+ */
+Html5Player.prototype.abort = function()
+{
+    this.stop();
+}
+
+
+/**
+ * Seek
+ */
+Html5Player.prototype.seek = function(newTime)
+{
+    if (this.p.checkType(["video","audio","image","text"])) {
+		try {
+			this.popcornPlayer.currentTime(newTime);
+		} catch(e) {
+			eval("$(this.htmlPlayer).one('loadedmetadata',$.proxy(function() {"+
+				"this.popcornPlayer.currentTime("+newTime+");"+
+			"},this));");
+		}
+	}
+}
+
+
+
+/**
+ * SeekAndPLay
+ */
+Html5Player.prototype.seekAndPlay = function(newTime)
+{
+    if (this.p.checkType(["video","audio"])) {
+			try {
+				this.popcornPlayer.currentTime(newTime);
+			} catch(e) {
+				eval("$(this.htmlPlayer).one('loadedmetadata',$.proxy(function() {"+
+					"this.popcornPlayer.currentTime("+newTime+");"+
+				"},this));");
+			}
+			$(this.htmlPlayer).one("seeked",$.proxy(function() {
+				this.popcornPlayer.play();
+			},this));
+		} else if(this.p.checkType(["image","text"])) {
+				this.popcornPlayer.currentTime(newTime);
+		}
+}

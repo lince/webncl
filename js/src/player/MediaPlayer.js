@@ -29,8 +29,9 @@ function MediaPlayer (node, parentContext) {
 	this.region = "";
 	this.type = "";
 	this.htmlPlayer = "";
-	this.htmlPlayerBkg = "";
-	this.popcornPlayer = {};
+	this.htmlPlayerBkg = ""; 
+        this.player = undefined;
+        this.playerSettings = undefined;
 	this.area = [];
 	this.transIn = [];
 	this.transOut = [];
@@ -43,8 +44,9 @@ function MediaPlayer (node, parentContext) {
 	this.node = node;
 	this.presentation = parentContext.presentation;
 	this.parentContext = parentContext;
-	
+        this.divId =  this.presentation.getDivId(node.id);
 	this.create(node);
+
 
 }
 
@@ -92,6 +94,13 @@ MediaPlayer.prototype.checkType = function (typeList) {
 	return false;
 };
 
+// creatElement
+// (used by user defined players to create their own html)
+MediaPlayer.prototype.createElement =  function(htmlText)
+{
+    $(this.htmlPlayerBkg).append(htmlText);
+}
+
 // create
 MediaPlayer.prototype.create = function (node) {
 	// Cria as transições
@@ -125,7 +134,7 @@ MediaPlayer.prototype.create = function (node) {
 		this.type = this.mediaTypes[buffer[buffer.length-1]];
 	}
 	// Cria os IDs (região e mídia)
-	this.htmlPlayer = "#" + this.presentation.getDivId(node.id);
+	this.htmlPlayer = "#" + this.divId;
 	this.htmlPlayerBkg = "#" + this.presentation.getDivId(node.id,"bkg");
 	if (this.checkType(["application"])) {
 		this.region = "#" + this.presentation.settingsDiv;
@@ -133,6 +142,7 @@ MediaPlayer.prototype.create = function (node) {
 		this.region = "#" + this.presentation.playerDiv;
 	}
 	
+
 	
 	
 	// ----- REFER -----	
@@ -140,116 +150,84 @@ MediaPlayer.prototype.create = function (node) {
 		return;
 	} else {
 	// -----------------
-		// Cria o fundo da mídia
+		// Creates media background div
 		$(this.region).append("<div class='playerBkg' id='" + this.presentation.getDivId(node.id,"bkg") + "'></div>");
-		// Cria a mídia
-		switch (this.type.split("/")[0]) {
-			case "video": {
-				// type = video/*
-				$(this.htmlPlayerBkg).append("<video class='player' poster='images/loading.gif' id='" + this.presentation.getDivId(node.id) + "'></video>");	
-				break;
-			}
-			case "audio": {
-				// type = audio/*
-				$(this.htmlPlayerBkg).append("<audio class='player' id='" + this.presentation.getDivId(node.id) + "'></audio>");
-				break;
-			}
-			case "image": {
-				// type = image/*
-				$(this.htmlPlayerBkg).append("<img class='player' id='" + this.presentation.getDivId(node.id) + "'></img>");
-				break;
-			}
-			case "application": {
-				switch (this.type) {
-					case "application/x-ginga-settings": {
-						// type = application/x-ginga-settings
-						$(this.htmlPlayerBkg).append("<div class='player' id='" + this.presentation.getDivId(node.id) + "'></div>");
-						break;
-					}
-					case "application/x-ginga-NCLua": {
-						// type = application/x-ginga-NCLua
-						Debugger.warning(Debugger.WARN_NOT_IMPLEMENTED_YET,"media",[this.type]);
-						break;
-					}
-					case "application/x-ginga-NCLet": {
-						// type = application/x-ginga-NCLet
-						Debugger.warning(Debugger.WARN_NOT_IMPLEMENTED_YET,"media",[this.type]);
-						break;
-					}
-					case "application/x-ginga-time": {
-						// type = application/x-ginga-time
-						Debugger.warning(Debugger.WARN_NOT_IMPLEMENTED_YET,"media",[this.type]);
-						break;
-					}
-				}
-				break;
-			}
-			case "text": {
-				switch (this.type) {
-					case "text/plain":
-					case "text/html": {
-						// type = text/plain, text/html
-						$(this.htmlPlayerBkg).append("<div class='player' id='" + this.presentation.getDivId(node.id) + "'></div>");
-						break;
-					}
-					case "text/css": {
-						// type = text/css
-						Debugger.warning(Debugger.WARN_NOT_IMPLEMENTED_YET,"media",[this.type]);
-						break;
-					}
-					case "text/xml": {
-						// type = text/xml
-						Debugger.warning(Debugger.WARN_NOT_IMPLEMENTED_YET,"media",[this.type]);
-						break;
-					}
-				}
-				break;
-			}
-		}
-		$(this.htmlPlayerBkg).css("display","none");
-		this.load(node.src);
+		
+                // Creates media player
+                var mediaPlayers = this.presentation.mediaPlayers;
+                
+                if(mediaPlayers[this.type])
+                    {
+                        //creates the playerSettings data structure
+                        this.playerSettings = 
+                        {
+                             source: 
+                                {
+                                    type: this.type,
+                                    ext: node._ext,
+                                    url: this.presentation.path + node.src
+                                },
 
-		//Tenta criar o popCorn player de acordo com o tipo d emedia
-		if (this.checkType(["video","audio"]))
-		{
-			do {	
-					//this.popcornPlayer = new Popcorn(this.htmlPlayer, { frameAnimation: true });
-					this.popcornPlayer = new Popcorn(this.htmlPlayer);	
-			} while (!this.popcornPlayer);
-		} else if(this.checkType(["image","text"])){
-			do {	
-					Popcorn.player("baseplayer");
-					this.popcornPlayer = new Popcorn.baseplayer(this.htmlPlayer);
-					
-			} while (!this.popcornPlayer);
-		} 
-		//Caso um popcornPlayer tenta sido criado (media do tipo video, audio,image ou text)
-		// 'equivale' a trocar this.popcornPlayer por this.checkType(["video","audio","image","text"])
-		// sendo o usado o mais eficiente
-		if(this.checkType(["video","audio","image","text"]))
-		{
-			$(this.htmlPlayer).on("ended",$.proxy(function() {
-				this.stop();
-			},this));
-			for (i in this.area) {
-				if (this.area[i].end) {
-					eval("this.popcornPlayer.exec(this.area[i].endTime,$.proxy(function() {"+
-						"if (this.area['"+i+"'].started) {"+
-							"this.area['"+i+"'].started = false;"+
-							"$(this.htmlPlayer).trigger('stop',[this.area['"+i+"'].id]);"+
-						"} else {"+
-						"$(this.htmlPlayer).trigger('presentation.onEnd',[this.area['"+i+"'].id]); "+
-						"}" +
-					"},this));");
-				}				
-				if (this.area[i].begin) {
-					eval("this.popcornPlayer.exec(this.area[i].beginTime,$.proxy(function() {"+
-						"$(this.htmlPlayer).trigger('presentation.onBegin',[this.area['"+i+"'].id]);"+
-					"},this));");
-				}
-				// TODO: area definida por frames ao invés de tempo
-			}
-		}
+
+                                id : this.divId,
+                                parentId: this.presentation.getDivId(node.id,"bkg"),
+
+                                createElement: $.proxy(this.createElement,this),
+                                checkType: $.proxy(this.checkType,this),
+                                
+                              media:{
+                                areas: this.area  
+                              }
+                                
+
+
+                        }
+                       
+                        
+                        var playerClass = mediaPlayers[this.type][node._ext] || mediaPlayers[this.type].defaultPlayer;
+                        this.player = new playerClass(this.playerSettings);
+                    }
+                else
+                    {
+                        //Error, no player defined for type
+                    }
+                
+		
+		$(this.htmlPlayerBkg).css("display","none");
+                
+                //presetup (construtor)
+		this.load(node.src);
+                //possetup( needed ?? )
+                
+                
+                player.onEnded = $.proxy(function() {
+                        this.stop();
+                },this);
+                
+                //if player supports area
+                if(player.exec)
+                {
+                    for (i in this.area) {
+                            if (this.area[i].end) {
+                                    eval("this.player.exec(this.area[i].endTime,$.proxy(function() {"+
+                                            "if (this.area['"+i+"'].started) {"+
+                                                    "this.area['"+i+"'].started = false;"+
+                                                    "$(this.htmlPlayer).trigger('stop',[this.area['"+i+"'].id]);"+
+                                            "} else {"+
+                                            "$(this.htmlPlayer).trigger('presentation.onEnd',[this.area['"+i+"'].id]); "+
+                                            "}" +
+                                    "},this));");
+                            }				
+                            if (this.area[i].begin) {
+                                    eval("this.player.exec(this.area[i].beginTime,$.proxy(function() {"+
+                                            "$(this.htmlPlayer).trigger('presentation.onBegin',[this.area['"+i+"'].id]);"+
+                                    "},this));");
+                            }
+                            // TODO: area definida por frames ao invés de tempo
+                    }
+                 }
+
+
 	
 	// ---- REFER ----
 	}
@@ -279,62 +257,31 @@ MediaPlayer.prototype.create = function (node) {
 		this.setProperty(node.property[i].name,node.property[i].value);
 	}
 	
-	// Tratamento do explicitDur
+	// explicitDur treatment
 	if(this.explicitDur)
 	{
-		this.popcornPlayer.exec(this.explicitDur,$.proxy(function() {
-			this.stop();
-		},this));
+                //explicitDur will not work unless player implements exec
+		if(this.player.exec)
+                    this.player.exec(this.explicitDur,$.proxy(function() {
+                         this.stop();
+                    },this));
 	}
 	
-	// Faz o bind dos eventos
+	// Bind events
 	this.bindEvents();
-	// Salva o player no elemento HTML via JQuery
+	// Saves the media player using jQuery data function
 	$(this.htmlPlayer).data("player",this);
 };
 
 // load
 MediaPlayer.prototype.load = function (source) {
-	$(this.htmlPlayer).empty();
+
+        //Recalculates the url based on presentation path
 	source = this.presentation.path + source;
-	switch (this.type.split("/")[0]) {
-		case "video": {
-			// type = video/*
-			$(this.htmlPlayer).append("<source src='" + source + "'></source>");
-			break;
-		}
-		case "audio": {
-			// type = audio/*
-			$(this.htmlPlayer).append("<source src='" + source + "'></source>");
-			break;
-		}
-		case "image": {
-			// type = image/*
-			$(this.htmlPlayer).attr("src",source);
-			break;
-		}
-		case "application": {
-			// type = application/*
-			// não faz nada
-            break;
-		}
-		case "text": {
-			if (this.checkType(["text/plain","text/html"])) {
-				// type = text/plain, text/html
-				$.ajax({
-					type: "GET",
-					url: source,
-					dataType: "text",
-					success: $.proxy(function (data) {
-						$(this.htmlPlayer).append(data);
-					},this)
-				});
-			} else {
-				// TODO?
-			}
-			break;
-		}
-	}
+        //TODO: Needs to deal with other types (create a new media player )
+        
+        //Calls specific player load function
+	this.player.load(source);
 };
 
 // focus
@@ -534,27 +481,31 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 		this.isPlaying = true;
 		this.isStopped = false;
 		this.show();
-		if (this.checkType(["video","audio","image","text"])) {
-            if(this.checkType(["video","audio"]))
-			    this.parentContext.syncPlayer(this);
+		//if (this.checkType(["video","audio","image","text"])) {
+            //if(this.checkType(["video","audio"]))
+			    //this.parentContext.syncPlayer(this);
 
-            this.popcornPlayer.play();
+                        this.player.start();
+                        //this.popcornPlayer.play();
 			if (nodeInterface && this.area[nodeInterface]._type=="area") {
 				if (this.area[this.area[nodeInterface].id].begin) {
-                    this.area[this.area[nodeInterface].id].started = true;
+                                        this.area[this.area[nodeInterface].id].started = true;
 					this.seek(this.area[this.area[nodeInterface].id].beginTime);
-					$(this.htmlPlayer).one("seeked",$.proxy(function() {
+					/*
+                                         * TODO: synchronization
+                                         *
+                                        $(this.htmlPlayer).one("seeked",$.proxy(function() {
 						this.parentContext.notify(this);
 						//TODO: Quando for resolvida a sincronização, remover esse play.
 						this.popcornPlayer.play();
-					},this));
+					},this)); */
 				} else {
 					// TODO (frames)
 				}
-			} else {
-				this.parentContext.notify(this);
+			//} else {
+			//	this.parentContext.notify(this);
 			}
-		}
+		//}
 		$(this.htmlPlayer).trigger("presentation.onBegin",[nodeInterface]);
 	}
 };
@@ -567,9 +518,9 @@ MediaPlayer.prototype.stop = function (nodeInterface) {
 		this.isPlaying = false;
 		this.isStopped = true;
 		this.hide();
-		if (this.checkType(["video","audio","image","text"])) {
-			this.popcornPlayer.pause(0);
-		}
+                
+		this.player.stop();
+                
 		$(this.htmlPlayer).trigger("presentation.onEnd",[nodeInterface]);
 	}
 };
@@ -579,9 +530,9 @@ MediaPlayer.prototype.pause = function (nodeInterface) {
 	if (this.isPlaying) {
 		this.isPlaying = false;
 		this.isStopped = false;
-		if (this.checkType(["video","audio","image","text"])) {
-			this.popcornPlayer.pause();
-		}
+		
+                this.player.pause()
+                
 		$(this.htmlPlayer).trigger("presentation.onPause",[nodeInterface]);
 	}
 };
@@ -591,9 +542,9 @@ MediaPlayer.prototype.resume = function (nodeInterface) {
 	if (!this.isStopped && !this.isPlaying) {
 		this.isPlaying = true;
 		this.isStopped = false;
-		if (this.checkType(["video","audio","image","text"])) {
-			this.popcornPlayer.play();
-		}
+		
+                this.player.resume();
+                
 		$(this.htmlPlayer).trigger("presentation.onResume",[nodeInterface]);
 	}
 };
@@ -605,41 +556,20 @@ MediaPlayer.prototype.abort = function (nodeInterface) {
 		this.isPlaying = false;
 		this.isStopped = true;
 		this.hide();
-		if (this.checkType(["video","audio","image","text"])) {
-			this.popcornPlayer.pause(0);
-		}
+		
+                this.player.abort();
+                
 		$(this.htmlPlayer).trigger("presentation.onAbort",[nodeInterface]);
 	}
 };
 
 MediaPlayer.prototype.seek = function (newTime) {
-	if (this.checkType(["video","audio","image","text"])) {
-		try {
-			this.popcornPlayer.currentTime(newTime);
-		} catch(e) {
-			eval("$(this.htmlPlayer).one('loadedmetadata',$.proxy(function() {"+
-				"this.popcornPlayer.currentTime("+newTime+");"+
-			"},this));");
-		}
-	}
+	this.player.seek(newTime);
 };
 
 // seekAndPlay
 MediaPlayer.prototype.seekAndPlay = function (newTime) {
-	if (!this.isStopped) {
-		if (this.checkType(["video","audio"])) {
-			try {
-				this.popcornPlayer.currentTime(newTime);
-			} catch(e) {
-				eval("$(this.htmlPlayer).one('loadedmetadata',$.proxy(function() {"+
-					"this.popcornPlayer.currentTime("+newTime+");"+
-				"},this));");
-			}
-			$(this.htmlPlayer).one("seeked",$.proxy(function() {
-				this.popcornPlayer.play();
-			},this));
-		} else if(this.checkType(["image","text"])) {
-				this.popcornPlayer.currentTime(newTime);
-		}
+	if (this.isStopped) {
+		this.player.seekAndPlay(newTime);
 	}
 };
