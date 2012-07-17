@@ -42,6 +42,7 @@ function Listener(listenerType, actionOperator, actionMap, flagMap, assessmentSt
 	this.assessmentStatements = assessmentStatements;
 	this.last = new Date();
 	this.triggerBuffer = undefined;
+	this.presentation = presentation;
 	
 	/*
 	 * actionNamesArray
@@ -76,7 +77,7 @@ Listener.prototype.notifyEvent = function(conditionName)
 			break;
 			
 		case Listener.listenerType.AND:
-			if((new Date().valueOf() - this.last.valueOf()) > presentation.TIME_LIMIT)
+			if((new Date().valueOf() - this.last.valueOf()) > this.presentation.TIME_LIMIT)
 			{
 				//Reseta todas as flags
 				for(var index in this.flagMap)
@@ -114,7 +115,7 @@ Listener.prototype.notifyEvent = function(conditionName)
 			break;
 		
 		case NclPlayer.listenerType.OR:
-			if((new Date().valueOf() - this.last.valueOf()) > presentation.TIME_LIMIT)
+			if((new Date().valueOf() - this.last.valueOf()) > this.presentation.TIME_LIMIT)
 			{
 				this.last = new Date();
 				this.__executeActions();

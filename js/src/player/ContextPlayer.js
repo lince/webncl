@@ -525,7 +525,7 @@ ContextPlayer.prototype.bindLinks = function()
 
 
 		//Como o tipo de listener e o tipo de action (operator) ja estao definidos,posso criar o listener
-		var listener = new Listener(lType,aOperator,actionMap,flagMap,assessmentsArray);
+		var listener = new Listener(lType,aOperator,actionMap,flagMap,assessmentsArray,this.presentation);
 		/*
 		 * Note que o flagMap e o actionMap ainda nao estao completos
 		 * entranto, como o objeto listener referencia os objetos que 
