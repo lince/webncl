@@ -174,9 +174,12 @@ function WebNclPlayer (file, div) {
 	
 	} else {
 	    
+		file = document.URL.split('/');
+		file = file[file.length-1];
+		
 		$.ajax({
 			type: "GET",
-			url: 'index.html',
+			url: file,
 			dataType: "text",
 			success: $.proxy(function (data) {
 				// TODO: checar a sintaxe do arquivo XML
