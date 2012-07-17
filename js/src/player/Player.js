@@ -186,10 +186,14 @@ Player.prototype.setProperty = function (name, value) {
 			case "visible": {
 				this.isVisible = value=="true"?true:false;
 				if (this.isVisible) {
-					this.presentation.focusManager.addMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
+					if(this.node.descriptor){
+						this.presentation.focusManager.addMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
+					}
 					$(this.htmlPlayerBkg).css("display","inline");
 				} else {
-					this.presentation.focusManager.removeMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
+					if(this.node.descriptor){
+						this.presentation.focusManager.removeMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
+					}
 					$(this.htmlPlayerBkg).css("display","none");
 				}
 				break;

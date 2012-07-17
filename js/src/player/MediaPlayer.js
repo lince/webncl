@@ -276,7 +276,24 @@ MediaPlayer.prototype.create = function (node) {
 	}
 	for (i in node.property) {
 		// Propriedades da tag <media> (property)
-		this.setProperty(node.property[i].name,node.property[i].value);
+		var name = node.property[i].name;
+		var value = node.property[i].value;
+		if(value){
+		// Aqui, se a propriedade for de tamanho, deve ocorrer um tratamento específico, para o caso de o valor ser em porcentagem.
+			// Isto se deve ao fato que o "setProperty" trata valores com porcentagem de uma forma que não é a que desejamos neste caso. 
+			// Por isso, ao final deste bloco de código, "setProperty" é chamado com valores absolutos.
+			if(name == "width" || name == "height"){
+				value = this.__fixPercentageSize(name, value);
+			}
+			else if(name == "bounds")
+			{
+				var bounds = value.split(",");
+				bounds[2] = this.__fixPercentageSize("width",bounds[2]);
+				bounds[3] = this.__fixPercentageSize("height",bounds[3]);
+				value = bounds.join();
+			}
+			this.setProperty(name,value);
+		}
 	}
 	
 	// Tratamento do explicitDur
@@ -292,6 +309,30 @@ MediaPlayer.prototype.create = function (node) {
 	// Salva o player no elemento HTML via JQuery
 	$(this.htmlPlayer).data("player",this);
 };
+
+// Esta função é utilizada para auxiliar no tratamento dos valores em porcentagem de propriedades, retornando um valor absoluto para ser mandado para o "setProperty".
+MediaPlayer.prototype.__fixPercentageSize = function(name, value){
+	if(name == "width" || name == "height"){		
+		var buffer = value.split("%");
+		if (buffer.length > 1) {
+			var playerDivValue = (name=="width") ? parseInt($("#"+this.presentation.playerDiv).css("width").split("px")[0]) : parseInt($("#"+this.presentation.playerDiv).css("height").split("px")[0]);
+			var parentValue;
+			if(this.node.descriptor && this.node.descriptor.region){
+				var pai = this.node.descriptor.region._parent;
+				
+				if (name == "width"){
+					parentValue = (pai.width) ? pai.width : playerDivValue;
+				}
+				else if (name == "height"){
+					parentValue = (pai.height) ? pai.height : playerDivValue;
+				}
+			}
+			else parentValue = playerDivValue;
+			return (parseInt(parentValue)*parseFloat(buffer[0])/100).toString();
+		}
+	}
+	return value;
+}
 
 // load
 MediaPlayer.prototype.load = function (source) {
@@ -530,7 +571,9 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 // comporta-se assim no caso de ancoras), nao sei se eh o funcionamento oficial
 	if (this.isStopped) {
         this.presentation.focusManager.enableKeys(this.htmlPlayer);
-		this.presentation.focusManager.addMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
+		if(this.node.descriptor){
+			this.presentation.focusManager.addMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
+		}
 		this.isPlaying = true;
 		this.isStopped = false;
 		this.show();
@@ -563,7 +606,9 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 MediaPlayer.prototype.stop = function (nodeInterface) {
 	if (!this.isStopped) {
         this.presentation.focusManager.disableKeys(this.htmlPlayer);
-		this.presentation.focusManager.removeMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
+		if(this.node.descriptor){
+			this.presentation.focusManager.removeMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
+		}
 		this.isPlaying = false;
 		this.isStopped = true;
 		this.hide();
@@ -601,7 +646,9 @@ MediaPlayer.prototype.resume = function (nodeInterface) {
 // abort
 MediaPlayer.prototype.abort = function (nodeInterface) {
 	if (!this.isStopped) {
-		this.presentation.focusManager.removeMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
+		if(this.node.descriptor){
+			this.presentation.focusManager.removeMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
+		}
 		this.isPlaying = false;
 		this.isStopped = true;
 		this.hide();
