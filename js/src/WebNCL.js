@@ -22,10 +22,14 @@
 function WebNclPlayer (file, div) {
 
 	var patt=/[\/]*.+\//g;
-
+	this.div = div;
+	
 	this.presentation = {
                 
-                //Time limit used by events, can be changed by the user
+		// Timer Manager
+		timerManager: new TimerManager(),
+				
+        //Time limit used by events, can be changed by the user
 		TIME_LIMIT: 1000,
                 
 		playerId: ++WebNclPlayer.playerCount,
@@ -37,7 +41,7 @@ function WebNclPlayer (file, div) {
 			// -----------------
 			// return "ncl" + this.playerId + (type||"") + "_" + nodeId;
 		},
-		path: patt.exec(file)[0],
+		path: (file && patt.exec(file)[0]) || '',
                 
                 //Default media players
                 //TODO: Future webncl versions should
@@ -83,10 +87,27 @@ function WebNclPlayer (file, div) {
                 
 
 	};
+	
 	this.presentation.bodyDiv = "body" + this.presentation.playerId;
 	this.presentation.settingsDiv = "settings" + this.presentation.playerId;
 	this.presentation.contextsDiv = "contexts" + this.presentation.playerId;
         
+	this.presentation.pause = function() {
+		this.timerManager.pauseAll();
+		this.context.pause();
+	}
+	this.presentation.resume = function() {
+		this.timerManager.resumeAll();
+		this.context.resume();
+	}
+	this.presentation.abort = function() {
+		this.timerManager.stopAll();
+		this.context.abort();
+	}
+	this.presentation.stop = function() {
+		this.timerManager.stopAll();
+		this.context.stop();
+	}
         
         /*
          * Keys mapping declaration
@@ -129,24 +150,42 @@ function WebNclPlayer (file, div) {
         //Despite the key codes defined above, an array should be defined
         //with the codes that are going to be processed by the event handler
         //User can redefine this array to avoid player from processing some key events
-        this.presentation.keys.allCodes = [13,37,38,39,40,81,87,69,82,96,97,98,99,100,101,102,103,104,105,90,88,67,86,66,78,65,83,68],
+        this.presentation.keys.allCodes = [13,37,38,39,40,81,87,69,82,96,97,98,99,100,101,102,103,104,105,90,88,67,86,66,78,65,83,68];
 	
 
 
 	/*
         Comentar efeito do ajax!
     */
-	$.ajax({
-		type: "GET",
-		url: file,
-		dataType: "xml",
-		success: $.proxy(function (data) {
-			// TODO: checar a sintaxe do arquivo XML
-			//Debugger.checkFile(file); ???
-			this.execute(data);
-		},this)
-		// TODO: checar se o arquivo XML foi aberto com sucesso
-	});
+	
+	if (file) {
+	
+		$.ajax({
+			type: "GET",
+			url: file,
+			dataType: "xml",
+			success: $.proxy(function (data) {
+				// TODO: checar a sintaxe do arquivo XML
+				//Debugger.checkFile(file); ???
+				this.execute(data);
+			},this)
+			// TODO: checar se o arquivo XML foi aberto com sucesso
+		});
+	
+	} else {
+	    
+		$.ajax({
+			type: "GET",
+			url: 'index.html',
+			dataType: "text",
+			success: $.proxy(function (data) {
+				// TODO: checar a sintaxe do arquivo XML
+				this.execute($($.parseXML(data)).find("#"+this.div)[0]);
+			},this)
+			// TODO: checar se o arquivo XML foi aberto com sucesso
+		});
+		
+	}
 	
 };
 
@@ -156,9 +195,11 @@ WebNclPlayer.prototype.execute = function (data) {
 	var t = new Date();
 	this.presentation.parser = new Parser();
 	this.presentation.ncl = this.presentation.parser.parse(data);
-	console.log('Loading time: ' + (new Date() - t) + 'ms');
+	console.log('Player "'+this.div+'" loaded in ' + (new Date() - t) + 'ms');
 	this.presentation.focusManager = new FocusManager(this.presentation);
 	this.presentation.systemSettings = new SystemSettings(this.presentation);
+	// cria métodos para manipulação da apresentação
+	
 	// cálculo da posição real de cada região
 	for (rb in this.presentation.ncl.head.regionBase) {
 		for (i in this.presentation.ncl.head.regionBase[rb].region) {
@@ -177,7 +218,9 @@ WebNclPlayer.prototype.execute = function (data) {
 	$("#"+this.presentation.playerDiv).append("<div id='" + this.presentation.settingsDiv + "'></div>");
 	$("#"+this.presentation.playerDiv).append("<div id='" + this.presentation.contextsDiv + "'></div>");
 	// cria o primeiro contexto (body)
-	new ContextPlayer(this.presentation.ncl.body,this.presentation).start();
+	this.presentation.context = new ContextPlayer(this.presentation.ncl.body,this.presentation);
+	// inicia a apresentação
+	this.presentation.context.start();
 };
 
 // fixRegionBounds
@@ -322,3 +365,44 @@ WebNclPlayer.prototype.triggerEvent = function (event,nodeId,nodeInterface) {
 };
 
 WebNclPlayer.playerCount = 0;
+
+$(document).ready(function() {
+
+	$("nclplayer").each(function() {
+	
+		// todo: demais atributos
+		var src = $(this).attr("src");
+		var id = $(this).attr("id");
+		
+		this.outerHTML = '<div id="'+id+'" class="nclPlayer_'+id+'"> </div>';
+
+		webNclPlayers.push(new WebNclPlayer(src,id));
+		
+		$(".nclPlayer_"+id).css({
+			position: 'relative',
+			left: $(this).attr("left") || '0px',
+			top: $(this).attr("top") || '0px',
+			width: $(this).attr("width") || "854px",
+			height: $(this).attr("height") || "480px"
+		});
+	});
+	
+	$(".context, #contexts, #settings").css({display: 'none'});
+	
+	$(".player").css({
+		position: 'absolute',
+		left: '0px',
+		top: '0px',
+		overflow: 'hidden',
+		display: 'inline'
+	});
+	
+	$(".playerBkg").css({
+		position: 'absolute',
+		overflow: 'hidden',
+		display: 'none'
+	});
+	
+});
+
+webNclPlayers = [];
