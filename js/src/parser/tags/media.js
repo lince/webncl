@@ -36,13 +36,17 @@ Parser.prototype.parseMedia = function (obj,tag,parent,tree) {
 	// TODO: verificar o atributo "src" para os tipos "image/mng", "application/x-ncl-*", "applications/x-ginga-NCL"
 	// "application/x-ginga-settings" e "application/x-ginga-time"
 	if (obj.type!=null) {
-		obj.type = obj.type.toLowerCase();
+
+                obj.type = obj.type.toLowerCase();
+
 		if (jQuery.inArray(obj.type,values)==-1) {
 			Debugger.error(ERR_INVALID_ATTR_VALUE,tag,["type",obj.type,values]);
 		} else if (obj.src!=null) {
 			var ext = obj.src.split(".");
-			obj._ext = ext[ext.length-1].toLowerCase();
-			// TODO: fazer essa verificação com a tabela dinâmica
+
+                        obj._ext = ext[ext.length-1].toLowerCase();
+                        ext = obj._ext;
+                        //TODO: Verify attributes below using a dinamic table
 			switch (obj.type) {
 				case "text/html": {
 					if (ext!="htm" && ext!="html") {
