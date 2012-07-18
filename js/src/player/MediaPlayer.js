@@ -31,6 +31,7 @@ function MediaPlayer (node, parentContext) {
 	this.htmlPlayer = "";
 	this.htmlPlayerBkg = ""; 
         this.player = undefined;
+        this.playerName = undefined;
         this.playerSettings = undefined;
 	this.area = [];
 	this.transIn = [];
@@ -185,11 +186,21 @@ MediaPlayer.prototype.create = function (node) {
                        
                         
                         var playerClass = mediaPlayers[this.type][node._ext] || mediaPlayers[this.type].defaultPlayer;
-                        this.player = new playerClass(this.playerSettings);
+                        if(playerClass)
+                            {
+                                this.player = new playerClass(this.playerSettings);
+                                this.playerName = playerClass.name;
+                            }
+                        else
+                            {
+                                Debugger.error(Debugger.ERR_MEDIAPLAYER_NOPLAYER,this.type,['no defaultPlayer or extension player']);
+                                this.player = {};
+                            }
                     }
                 else
                     {
-                        //Error, no player defined for type
+                        Debugger.error(Debugger.ERR_MEDIAPLAYER_NOPLAYER,this.type);
+                        this.player = {};
                     }
                 
 		
@@ -322,7 +333,10 @@ MediaPlayer.prototype.load = function (source) {
         //TODO: Needs to deal with other types (create a new media player )
         
         //Calls specific player load function
-	this.player.load(source);
+        if(this.player.load)
+            this.player.load(source);
+        else
+            Debugger.error(Debugger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['load',source]);
 };
 
 // focus
@@ -528,7 +542,11 @@ MediaPlayer.prototype.start = function (nodeInterface) {
             //if(this.checkType(["video","audio"]))
 			    //this.parentContext.syncPlayer(this);
 
-                        this.player.start();
+                        if(this.player.start)
+                            this.player.start();
+                        else
+                            Debugger.error(Debugger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['start',nodeInterface]);
+                        
                         //this.popcornPlayer.play();
 			if (nodeInterface && this.area[nodeInterface]._type=="area") {
 				if (this.area[this.area[nodeInterface].id].begin) {
@@ -566,7 +584,10 @@ MediaPlayer.prototype.stop = function (nodeInterface) {
 		this.isStopped = true;
 		this.hide();
                 
-		this.player.stop();
+                if(this.player.stop)
+                    this.player.stop();
+                else
+                    Debugger.error(Debugger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['stop',nodeInterface]);
                 
 		$(this.htmlPlayer).trigger("presentation.onEnd",[nodeInterface]);
 	}
@@ -578,7 +599,10 @@ MediaPlayer.prototype.pause = function (nodeInterface) {
 		this.isPlaying = false;
 		this.isStopped = false;
 		
-                this.player.pause()
+                if(this.player.pause)
+                    this.player.pause()
+                else
+                    Debugger.error(Debugger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['pause',nodeInterface]);
                 
 		$(this.htmlPlayer).trigger("presentation.onPause",[nodeInterface]);
 	}
@@ -590,7 +614,10 @@ MediaPlayer.prototype.resume = function (nodeInterface) {
 		this.isPlaying = true;
 		this.isStopped = false;
 		
-                this.player.resume();
+                if(this.player.resume)
+                    this.player.resume();
+                else
+                    Debugger.error(Debugger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['resume',nodeInterface]);
                 
 		$(this.htmlPlayer).trigger("presentation.onResume",[nodeInterface]);
 	}
@@ -606,19 +633,31 @@ MediaPlayer.prototype.abort = function (nodeInterface) {
 		this.isStopped = true;
 		this.hide();
 		
-                this.player.abort();
+                if(this.player.abort)
+                    this.player.abort();
+                else
+                    Debugger.error(Debugger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['abort',nodeInterface]);
+                        
                 
 		$(this.htmlPlayer).trigger("presentation.onAbort",[nodeInterface]);
 	}
 };
 
 MediaPlayer.prototype.seek = function (newTime) {
-	this.player.seek(newTime);
+        if(this.player.seek)
+            this.player.seek(newTime);
+        else
+            Debugger.error(Debugger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['seek',newTime]);
+                
 };
 
 // seekAndPlay
 MediaPlayer.prototype.seekAndPlay = function (newTime) {
 	if (this.isStopped) {
-		this.player.seekAndPlay(newTime);
+                if(this.player.seekAndPlay)
+                	this.player.seekAndPlay(newTime);
+                else
+                        Debugger.error(Debugger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['seekAndPlay',newTime]);
+                
 	}
 };

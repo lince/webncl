@@ -34,9 +34,22 @@ function Html5Player(p) {
     this.htmlPlayer = "#" + p.id;
     this.onEnded = undefined;
     
+    /*
+     * User defined properties
+     
+     this.propertyMap = 
+    {
+       "propertyname" : override true / false 
+    }
     
+    if propertyName is in this.propertyMap then Player.js will
+    call a function name setProperty in this player.
+    if the value is true than this player override default setProperty behavior
+    if the value is false than this player adds some functionality
+     
+     
+     */
 
-    
     switch (p.source.type.split("/")[0]) {
                             case "video": {
                                     // type = video/*
@@ -189,7 +202,7 @@ Html5Player.prototype.exec = function(time,callback)
 {
     //if popcornPlayer is defined then player type is in the list ['video','audio','image','text']
     if(this.popcornPlayer)
-        this.popcornPlayer.exec(time,callback);
+        this.popcornPlayer.cue(time,callback);
 }
 
 /**

@@ -47,6 +47,9 @@ var Debugger = {
 	ERR_DUPLICATED_ALIAS:				215,	// Alias duplicado
 	ERR_INVALID_CONTEXT_REFERENCE:	216,	// Objeto referenciado em outro contexto
 	
+        ERR_MEDIAPLAYER_METHOD_NOTFOUND: 301,               // User defined media player has not a necessary method
+        ERR_MEDIAPLAYER_NOPLAYER: 302,                      // No player was defined for current mime type or file extension
+        
 	MESSAGES: {
 		100: "Atributo inválido",
 		101: "Tag inválida",
@@ -54,6 +57,7 @@ var Debugger = {
 		103: "Dimensões de região inválidas",
 		104: "zIndex duplicado",
 		105: "Recurso não implementado ainda",
+                
 		201: "Atributo obrigatório faltando",
 		202: "Atributo obrigatório faltando (um desses)",
 		203: "Atributo dependente faltando",
@@ -69,7 +73,10 @@ var Debugger = {
 		213: "URI inválida",
 		214: "Atributo duplicado",
 		215: "Alias duplicado",
-		216: "Objeto referenciado em outro contexto"
+		216: "Objeto referenciado em outro contexto",
+                
+                301: "Método não encontrado no media player",
+                302: "Nenhum player foi definido para este mime type/extensão"
 	},
 	
 	abort: false,
