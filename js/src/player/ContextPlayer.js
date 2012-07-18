@@ -634,9 +634,9 @@ ContextPlayer.prototype.bindLinks = function()
 				 {
 					 tempKey = 'KEY_' + tempKey;
 				 }
-			   	 if (tempKey in Keys)
+			   	 if (tempKey in this.presentation.keys)
 				 {
-					currentFlag.keyDefaultValue = Keys[tempKey];
+					currentFlag.keyDefaultValue = this.presentation.keys[tempKey];
 				 }
 				 
 				 var port = 'undefined';
