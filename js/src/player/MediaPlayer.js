@@ -200,7 +200,7 @@ MediaPlayer.prototype.create = function (node) {
                 //possetup( needed ?? )
                 
                 
-                player.onEnded = $.proxy(function() {
+                this.player.onEnded = $.proxy(function() {
                         this.stop();
                 },this);
                 
@@ -513,7 +513,7 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 // stop
 MediaPlayer.prototype.stop = function (nodeInterface) {
 	if (!this.isStopped) {
-        this.presentation.focusManager.disableKeys(this.htmlPlayer);
+                this.presentation.focusManager.disableKeys(this.htmlPlayer);
 		this.presentation.focusManager.removeMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
 		this.isPlaying = false;
 		this.isStopped = true;

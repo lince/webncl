@@ -299,5 +299,7 @@ Player.prototype.setProperty = function (name, value) {
 		}
 
 	}
+        
+        $(this.htmlPlayer).trigger("attribution.onEndAttribution",[name]);
 
 };

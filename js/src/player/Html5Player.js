@@ -34,6 +34,7 @@ function Html5Player(p) {
     this.htmlPlayer = "#" + p.id;
     this.onEnded = undefined;
     
+    
 
     
     switch (p.source.type.split("/")[0]) {
@@ -118,13 +119,13 @@ function Html5Player(p) {
                 
                 
                 
-    //events are placed
-    $(this.htmlPlayer).on("ended",$.proxy(function() {
+                //events are placed
+                $(this.htmlPlayer).on("ended",$.proxy(function() {
                                 if(this.onEnded)
                                     this.onEnded();
-			},this));
-
-    
+                },this));
+                        
+  
 };
 
 
@@ -186,8 +187,9 @@ Html5Player.prototype.load = function(source)
  */
 Html5Player.prototype.exec = function(time,callback)
 {
-    //Trivial to this player
-    this.popcornPlayer.exec(time,callback);
+    //if popcornPlayer is defined then player type is in the list ['video','audio','image','text']
+    if(this.popcornPlayer)
+        this.popcornPlayer.exec(time,callback);
 }
 
 /**
@@ -195,7 +197,9 @@ Html5Player.prototype.exec = function(time,callback)
  */
 Html5Player.prototype.start =  function()
 {
-    this.popcornPlayer.play();
+    if (this.popcornPlayer) {
+         this.popcornPlayer.play();
+    }
 }
 
 /**
@@ -203,7 +207,7 @@ Html5Player.prototype.start =  function()
  */
 Html5Player.prototype.stop = function()
 {
-    if (this.p.checkType(["video","audio","image","text"])) {
+    if (this.popcornPlayer) {
 	this.popcornPlayer.pause(0);
     }
 }
@@ -213,8 +217,8 @@ Html5Player.prototype.stop = function()
  */
 Html5Player.prototype.pause = function()
 {
-    if (this.p.checkType(["video","audio","image","text"])) {
-			this.popcornPlayer.pause();
+    if (this.popcornPlayer) {
+	this.popcornPlayer.pause();
     }
 }
 
@@ -223,8 +227,8 @@ Html5Player.prototype.pause = function()
  */
 Html5Player.prototype.resume = function()
 {
-    if (this.p.checkType(["video","audio","image","text"])) {
-			this.popcornPlayer.play();
+    if (this.popcornPlayer) {
+	this.popcornPlayer.play();
     }
 }
 
@@ -245,7 +249,7 @@ Html5Player.prototype.abort = function()
  */
 Html5Player.prototype.seek = function(newTime)
 {
-    if (this.p.checkType(["video","audio","image","text"])) {
+    if (this.popcornPlayer) {
 		try {
 			this.popcornPlayer.currentTime(newTime);
 		} catch(e) {
