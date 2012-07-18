@@ -205,7 +205,7 @@ MediaPlayer.prototype.create = function (node) {
                 },this);
                 
                 //if player supports area
-                if(player.exec)
+                if(this.player.exec)
                 {
                     for (i in this.area) {
                             if (this.area[i].end) {
