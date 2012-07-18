@@ -219,7 +219,7 @@ WebNclPlayer.prototype.execute = function (data) {
 	// cria o primeiro contexto (body)
 	this.presentation.context = new ContextPlayer(this.presentation.ncl.body,this.presentation);
 	// inicia a apresentação
-	this.presentation.context.start();
+	//this.presentation.context.start();
 };
 
 // fixRegionBounds
