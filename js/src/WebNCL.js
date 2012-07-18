@@ -25,9 +25,6 @@ function WebNclPlayer (file, div) {
 	this.div = div;
 	
 	this.presentation = {
-                
-		// Timer Manager
-		timerManager: new TimerManager(),
 				
         //Time limit used by events, can be changed by the user
 		TIME_LIMIT: 1000,
@@ -93,19 +90,15 @@ function WebNclPlayer (file, div) {
 	this.presentation.contextsDiv = "contexts" + this.presentation.playerId;
         
 	this.presentation.pause = function() {
-		this.timerManager.pauseAll();
 		this.context.pause();
 	}
 	this.presentation.resume = function() {
-		this.timerManager.resumeAll();
 		this.context.resume();
 	}
 	this.presentation.abort = function() {
-		this.timerManager.stopAll();
 		this.context.abort();
 	}
 	this.presentation.stop = function() {
-		this.timerManager.stopAll();
 		this.context.stop();
 	}
         

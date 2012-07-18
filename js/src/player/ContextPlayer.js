@@ -23,6 +23,8 @@ ContextPlayer.prototype = new Player();
 
 function ContextPlayer (node, presentation) {
 
+	this.timerManager = new TimerManager();
+
 	this.synchronizedPlayers = [];
 	this.loadingPlayers = 0;
 	
@@ -173,6 +175,7 @@ ContextPlayer.prototype.stop = function (nodeInterface) {
 		this.pausedMediaList = [];
 		this.pausedContextList = [];
 		$(this.htmlPlayer).trigger("presentation.onEnd",[nodeInterface]);
+		this.timerManager.stopAll();
 	}
 };
 
@@ -194,6 +197,7 @@ ContextPlayer.prototype.pause = function (nodeInterface) {
 			}
 		}
 		$(this.htmlPlayer).trigger("presentation.onPause",[nodeInterface]);
+		this.timerManager.pauseAll();
 	}
 };
 
@@ -211,6 +215,7 @@ ContextPlayer.prototype.resume = function (nodeInterface) {
 		this.pausedContextList = [];
 		this.pausedMediaList = [];
 		$(this.htmlPlayer).trigger("presentation.onResume",[nodeInterface]);
+		this.timerManager.resumeAll();
 	}
 };
 
@@ -228,6 +233,7 @@ ContextPlayer.prototype.abort = function (nodeInterface) {
 		this.pausedMediaList = [];
 		this.pausedContextList = [];
 		$(this.htmlPlayer).trigger("presentation.onAbort",[nodeInterface]);
+		this.timerManager.stopAll();
 	}
 };
 
