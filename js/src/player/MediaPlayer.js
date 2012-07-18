@@ -317,7 +317,7 @@ MediaPlayer.prototype.__fixPercentageSize = function(name, value){
 		if (buffer.length > 1) {
 			var playerDivValue = (name=="width") ? parseInt($("#"+this.presentation.playerDiv).css("width").split("px")[0]) : parseInt($("#"+this.presentation.playerDiv).css("height").split("px")[0]);
 			var parentValue;
-			if(this.node.descriptor && this.node.descriptor.region){
+			if(this.node.descriptor && this.node.descriptor.region && this.node.descriptor.region._parent){
 				var pai = this.node.descriptor.region._parent;
 				
 				if (name == "width"){
