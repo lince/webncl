@@ -390,6 +390,12 @@ $(document).ready(function() {
 			
 	});
 	
+	// TODO:
+	// CSS3 property "object-position" is currently supported by Opera only.
+	// Uncomment the 3 lines below to make it work for IE, Firefox, Chrome
+	// and Safari when they release a version that supports it.
+	// Note: check if the property names (their prefixes) are correct on these browsers!
+	
 	style +=
 		 '.context, #contexts, #settings {'
 		+'	display: none;'
@@ -400,6 +406,10 @@ $(document).ready(function() {
 		+'	top: 0px;'
 		+'	overflow: hidden;'
 		+'	display: inline;'
+		+'	-o-object-position: 0 0;'		// Opera
+		//+'	-moz-object-position: 0 0;'		// Firefox
+		//+'	-webkit-object-position: 0 0;'	// Chrome/Safari
+		//+'	object-position: 0 0;'			// IE
 		+'}'
 		+'.playerBkg {'
 		+'	position: absolute;'

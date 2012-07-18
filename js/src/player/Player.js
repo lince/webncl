@@ -215,8 +215,33 @@ Player.prototype.setProperty = function (name, value) {
                                     break;
                             }
                             case "fit": {
-                                    // TODO: ver norma (p.44)
-                                    Debugger.warning(Debugger.WARN_NOT_IMPLEMENTED_YET,"setProperty",[name]);
+							
+                                    // TODO: passar esse tratamento para o Html5Player
+									
+									if (value=='meetBest') {
+										Debugger.warning(Debugger.WARN_NOT_IMPLEMENTED_YET,"setProperty",[name]);
+									}									
+									var fit = {
+										fill: 'fill',
+										hidden: 'none',
+										meet: 'contain',
+										meetBest: 'scaleDown',
+										slice: 'cover'
+									};
+									
+									// TODO:
+									// CSS3 property "object-fit" is currently supported by Opera only.
+									// Uncomment the 3 lines below to make it work for IE, Firefox, Chrome
+									// and Safari when they release a version that supports it.
+									// Also, the CSS3 value 'scaleDown' ('meetBest' on NCL) for the 'fit' property is not supported yet.
+									// Note: check if the property names (their prefixes) are correct on these browsers!
+									console.log("Property 'fit' works only on Opera 10.6+");
+									
+									$(this.htmlPlayer).css('-o-object-fit',fit[value]);			// Opera
+									//$(this.htmlPlayer).css('-webkit-object-fit',fit[value]); 	// Chrome/Safari
+									//$(this.htmlPlayer).css('-moz-object-fit',fit[value]);		// Firefox
+									//$(this.htmlPlayer).css('object-fit',fit[value]);			// IE
+
                                     break;
                             }
                             case "style": {
