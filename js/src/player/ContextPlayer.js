@@ -452,6 +452,9 @@ ContextPlayer.prototype.bindLinks = function()
 						
 					conditionDefaultValue = currentCondition.key;
 					conditionUseKey = true;
+				} else {
+					conditionDefaultValue = this.presentation.keys.ENTER;
+					conditionUseKey = true;
 				}
 			}
 
