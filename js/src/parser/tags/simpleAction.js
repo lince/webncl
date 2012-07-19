@@ -62,7 +62,7 @@ Parser.prototype.parseSimpleAction = function (obj,tag,parent,tree) {
 		}
 	}
 	// min
-	values = ["(n�mero inteiro entre 1 e max)"];
+	values = ["(número inteiro entre 1 e max)"];
 	patt = /^\d+$/;
 	if (obj.min!=null) {
 		if (!patt.test(obj.min)) {
@@ -74,7 +74,7 @@ Parser.prototype.parseSimpleAction = function (obj,tag,parent,tree) {
 		}
 	}
 	// max
-	values = ["(n�mero inteiro maior ou igual a min)","unbounded"];
+	values = ["(número inteiro maior ou igual a min)","unbounded"];
 	patt = /^(\d+|unbounded)$/;
 	if (obj.max!=null) {
 		if (!patt.test(obj.max)) {
@@ -99,13 +99,13 @@ Parser.prototype.parseSimpleAction = function (obj,tag,parent,tree) {
 		Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["qualifier",obj.qualifier,values]);
 	}
 	// repeat
-	values = ["(n�mero inteiro positivo)"];
+	values = ["(número inteiro positivo)"];
 	patt = /^\d+$/;
 	if (obj.repeat!=null && !patt.test(obj.repeat)) {
 		Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["repeat",obj.repeat,values]);
 	}
 	// duration
-	values = ["(n�mero real positivo)s"];
+	values = ["(número real positivo)s"];
 	patt = /^(\d+|\d*\.\d+)s$/;
 	if (obj.duration!=null && !patt.test(obj.duration)) {
 		Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["duration",obj.duration,values]);

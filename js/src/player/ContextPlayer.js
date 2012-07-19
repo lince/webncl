@@ -452,9 +452,6 @@ ContextPlayer.prototype.bindLinks = function()
 						
 					conditionDefaultValue = currentCondition.key;
 					conditionUseKey = true;
-				} else {
-					conditionDefaultValue = this.presentation.keys.ENTER;
-					conditionUseKey = true;
 				}
 			}
 
@@ -696,12 +693,16 @@ ContextPlayer.prototype.bindLinks = function()
 							var clistener = cdata[listener];
 							var flag = clistener.flagMap[e.data.eventName]
 							if(nclInterface == flag.bindInterface)
-                                if(!e.which  && !flag.usekey)
-								    clistener.notifyEvent(e.data.eventName);
-								else
-								{
-									if(e.which && flag.keyDefaultValue == e.which)
-										clistener.notifyEvent(e.data.eventName);
+								// For selection conditions we need to check the key
+								// This code maybe redundant
+								if(e.type == 'selection' && flag.useKey) {
+									if (flag.useKey) {
+										if (e.which && flag.keyDefaultValue == e.which) {
+											clistener.notifyEvent(e.data.eventName);
+										}
+									}
+								} else {
+									clistener.notifyEvent(e.data.eventName);
 								}
 							
 						}

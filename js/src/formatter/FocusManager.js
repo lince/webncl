@@ -275,9 +275,7 @@ FocusManager.prototype.keyEvent = function(keyCode)
 				for(var i in currentDescriptor.mediaArray)
 				{
 					currentMedia = currentDescriptor.mediaArray[i];
-					var e = $.Event('selection.onSelection');
-			        e.which = this.presentation.keys.ENTER;
-					$(currentMedia).trigger(e);
+					$(currentMedia).trigger('selection.onSelection');
 				}
 				
 			break;
