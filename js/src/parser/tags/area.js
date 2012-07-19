@@ -21,8 +21,8 @@
 
 Parser.prototype.parseArea = function (obj,tag,parent,tree) {
 	// begin, end
-	values = ["(número inteiro)s"];
-	patt = /^\d+s$/;
+	values = ["(número real)s"];
+	patt = /^(\d+|\d*\.\d+)s$/;
 	if (obj.begin!=null && !patt.test(obj.begin)) {
 		Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["begin",obj.begin,values]);
 	}

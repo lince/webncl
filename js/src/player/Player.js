@@ -281,7 +281,7 @@ Player.prototype.setProperty = function (name, value) {
 
                             case "explicitDur": {
                                     var buffer = value.split("s");
-                                    this.explicitDur = parseInt(buffer[0]);
+                                    this.explicitDur = parseFloat(buffer[0]);
                                     break;
                             }
                             case "baseDeviceRegion":

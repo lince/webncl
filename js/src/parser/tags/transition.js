@@ -26,8 +26,8 @@ Parser.prototype.parseTransition = function (obj,tag,parent,tree) {
 		Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["type",obj.type,values]);
 	}
 	// dur
-	values = ["(número inteiro positivo)s"];
-	patt = /^\d+s$/;
+	values = ["(número real positivo)s"];
+	patt = /^(\d+|\d*\.\d+)s$/;
 	if (obj.dur!=null && !patt.test(obj.dur)) {
 		Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["dur",obj.dur,values]);
 	}

@@ -105,8 +105,8 @@ Parser.prototype.parseSimpleAction = function (obj,tag,parent,tree) {
 		Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["repeat",obj.repeat,values]);
 	}
 	// duration
-	values = ["(n�mero inteiro positivo)s"];
-	patt = /^\d+s$/;
+	values = ["(n�mero real positivo)s"];
+	patt = /^(\d+|\d*\.\d+)s$/;
 	if (obj.duration!=null && !patt.test(obj.duration)) {
 		Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["duration",obj.duration,values]);
 	}

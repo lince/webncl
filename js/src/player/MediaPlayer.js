@@ -112,7 +112,7 @@ MediaPlayer.prototype.create = function (node) {
 		//Seta o valor de expliticDur
 		if (node.descriptor.explicitDur) {
 			vector = node.descriptor.explicitDur.split("s");
-			this.explicitDur = vector[0];
+			this.explicitDur = parseFloat(vector[0]);
 		}
 	}
 	
@@ -120,10 +120,10 @@ MediaPlayer.prototype.create = function (node) {
 	for (i in node.area) {
 		this.area[node.area[i].id] = node.area[i];
 		if (node.area[i].begin) {
-			this.area[node.area[i].id].beginTime = parseInt(node.area[i].begin.split('s')[0]);
+			this.area[node.area[i].id].beginTime = parseFloat(node.area[i].begin.split('s')[0]);
 		}
 		if (node.area[i].end) {
-			this.area[node.area[i].id].endTime = parseInt(node.area[i].end.split('s')[0]);
+			this.area[node.area[i].id].endTime = parseFloat(node.area[i].end.split('s')[0]);
             this.area[node.area[i].id].started = false;
 		}
 	}
@@ -395,7 +395,7 @@ MediaPlayer.prototype.selection = function () {
 
 // applyTransition
 MediaPlayer.prototype.applyTransition = function (transition, flagInOut) {
-	var duration = transition.dur ? parseInt(transition.dur.split("s")[0])*1000 : 1000;
+	var duration = transition.dur ? parseFloat(transition.dur.split("s")[0])*1000 : 1000;
 	var cssBegin={}, cssEnd={}, target="";
 	switch (transition.type) {
 		case "fade": {
