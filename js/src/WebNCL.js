@@ -23,9 +23,12 @@ function WebNclPlayer (file, div) {
 
 	var patt=/[\/]*.+\//g;
 	this.div = div;
-	
+       
 	this.presentation = {
 				
+                 readyToPlay : false,
+                 playRequested : false,
+                                
         //Time limit used by events, can be changed by the user
 		TIME_LIMIT: 1000,
                 
@@ -92,17 +95,28 @@ function WebNclPlayer (file, div) {
 	this.presentation.settingsDiv = "settings" + this.presentation.playerId;
 	this.presentation.contextsDiv = "contexts" + this.presentation.playerId;
         
+	this.presentation.start = function() {
+            if(this.readyToPlay)
+		this.context.start();
+            else
+               this.playRequested = true;
+	}
+        
 	this.presentation.pause = function() {
 		this.context.pause();
 	}
+        
 	this.presentation.resume = function() {
 		this.context.resume();
 	}
+        
 	this.presentation.abort = function() {
 		this.context.abort();
 	}
+        
 	this.presentation.stop = function() {
 		this.context.stop();
+                this.playRequested = false;
 	}
         
         /*
@@ -219,7 +233,10 @@ WebNclPlayer.prototype.execute = function (data) {
 	// cria o primeiro contexto (body)
 	this.presentation.context = new ContextPlayer(this.presentation.ncl.body,this.presentation);
 	// inicia a apresentação
-	//this.presentation.context.start();
+        this.presentation.readyToPlay = true;
+        
+        if (this.presentation.playRequested)
+            this.presentation.context.start();
 };
 
 // fixRegionBounds
@@ -374,6 +391,7 @@ $(document).ready(function() {
 		// todo: demais atributos
 		var src = $(this).attr("src");
 		var id = $(this).attr("id");
+                var autoplay = $(this).attr("autoplay");
 		
 		this.outerHTML = '<div id="'+id+'" class="nclPlayer_'+id+'"> </div>';
 		
@@ -387,6 +405,11 @@ $(document).ready(function() {
 			+'}';
 
 		webNclPlayers.push(new WebNclPlayer(src,id));
+                
+                if(autoplay)
+                {
+                    webNclPlayers[webNclPlayers.length-1].presentation.start();   
+                }
 			
 	});
 	

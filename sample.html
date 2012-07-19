@@ -79,9 +79,9 @@
 		</tr>
 		<tr>
 			<td>
-				<nclplayer id="myPlayer1" src="sample/sample.ncl" width="300px" height="200px"></nclplayer>
+				<nclplayer id="myPlayer1" src="sample/sample.ncl" width="300px" height="200px" autoplay="autoplay"></nclplayer>
 			</td><td>
-				<nclplayer id="myPlayer2" width="300px" height="200px">
+				<nclplayer id="myPlayer2" width="300px" height="200px" autoplay="autoplay">
 					<ncl id="sample" xmlns="http://www.ncl.org.br/NCL3.0/EDTVProfile">
 						<head>
 							<regionBase>
@@ -104,7 +104,10 @@
 		</table>
 	
 		<script>
-			new WebNclPlayer("sample/sample.ncl","myPlayer3");
+			var myPlayer3 = new WebNclPlayer("sample/sample.ncl","myPlayer3");
+                        
+                        //starts presentation
+                        myPlayer3.presentation.start();
 		</script>
 		
 	</body>
