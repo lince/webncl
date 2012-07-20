@@ -63,10 +63,10 @@ function WebNclPlayer (file, div) {
                     },
                 "video" : 
                     {
-                            defaultPlayer: Html5Player
+                            defaultPlayer: Html5Player,
                             //Its possible to choose players for specific file formats
-                            //"mp4": Mp4SpecificPlayer
                     },
+                "video/x-flv": {defaultPlayer: FlowPlayer},
                 "text/css" : undefined,                 //No player - Issue Debbuger.Warning
                 "text/html" : 
                     {
