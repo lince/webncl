@@ -267,27 +267,78 @@ MediaPlayer.prototype.create = function (node) {
 			this.setProperty(node.descriptor.descriptorParam[i].name,node.descriptor.descriptorParam[i].value);
 		}
 	}
+	
+	
+	/* --- Property tags (under <media>) treatment --- */
+	
+	// Preparing to recalculate positions and size in case of property tags of these type.
+	var parentBounds = {
+		left: 0,
+		top: 0,
+		width: parseInt($("#"+this.presentation.playerDiv).css("width").split("px")[0]),
+		height: parseInt($("#"+this.presentation.playerDiv).css("height").split("px")[0])
+	};
+	var regionBounds = {
+		left: null,
+		right: null,
+		top: null,
+		bottom: null,
+		width: null,
+		height: null
+	};
+	if(this.node.descriptor && this.node.descriptor.region) {
+			parentBounds.left = (this.node.descriptor.region._parent.left) ? parseInt(this.node.descriptor.region._parent.left.split("px")[0]) : 0;
+			parentBounds.top = (this.node.descriptor.region._parent.top) ? parseInt(this.node.descriptor.region._parent.top.split("px")[0]) : 0;				
+			parentBounds.width = (this.node.descriptor.region._parent.width) ? parseInt(this.node.descriptor.region._parent.width.split("px")[0]) : parseInt($("#"+this.presentation.playerDiv).css("width").split("px")[0]);
+			parentBounds.height = (this.node.descriptor.region._parent.height) ? parseInt(this.node.descriptor.region._parent.height.split("px")[0]) : parseInt($("#"+this.presentation.playerDiv).css("height").split("px")[0]);
+
+			regionBounds.left = this.node.descriptor.region.left,
+			regionBounds.right = this.node.descriptor.region.right,
+			regionBounds.top = this.node.descriptor.region.top,
+			regionBounds.bottom = this.node.descriptor.region.bottom,
+			regionBounds.width = this.node.descriptor.region.width,
+			regionBounds.height = this.node.descriptor.region.height
+	}
 	for (i in node.property) {
 		// Propriedades da tag <media> (property)
 		var name = node.property[i].name;
 		var value = node.property[i].value;
 		if(value){
-                        // Aqui, se a propriedade for de tamanho, deve ocorrer um tratamento específico, para o caso de o valor ser em porcentagem.
-			// Isto se deve ao fato que o "setProperty" trata valores com porcentagem de uma forma que não é a que desejamos neste caso. 
-			// Por isso, ao final deste bloco de código, "setProperty" é chamado com valores absolutos.
-			if(name == "width" || name == "height"){
-				value = this.__fixPercentageSize(name, value);
+			switch(name){ 
+				case "bounds": {
+					var bounds = value.split(",");
+					regionBounds.left = bounds[0];
+					regionBounds.top = bounds[1];
+					regionBounds.width = bounds[2];
+					regionBounds.height = bounds[3];
+					break;
+				}
+				case "top":
+				case "left":
+				case "bottom":
+				case "right": 
+				case "height":
+				case "width": {
+					regionBounds[name] = value;
+					break;
+				}
+				default:
+					this.setProperty(name,value);
 			}
-			else if(name == "bounds")
-			{
-				var bounds = value.split(",");
-				bounds[2] = this.__fixPercentageSize("width",bounds[2]);
-				bounds[3] = this.__fixPercentageSize("height",bounds[3]);
-				value = bounds.join();
-			}
-			this.setProperty(name,value);
 		}
 	}
+	
+	// Call the same function that is called in the begining for checking region attributes
+	WebNclPlayer.prototype.fixRegionBounds(regionBounds,parentBounds);
+	// Finally, call the setProperty function for each property
+	for(name in regionBounds)
+	{
+		value=regionBounds[name];
+		if(value && value!=null){
+			this.setProperty(name, value);
+		}
+	}
+	/* ----------------------------------------------- */
 	
 	// explicitDur treatment
 	if(this.explicitDur)
@@ -304,30 +355,6 @@ MediaPlayer.prototype.create = function (node) {
 	// Saves the media player using jQuery data function
 	$(this.htmlPlayer).data("player",this);
 };
-
-// Esta função é utilizada para auxiliar no tratamento dos valores em porcentagem de propriedades, retornando um valor absoluto para ser mandado para o "setProperty".
-MediaPlayer.prototype.__fixPercentageSize = function(name, value){
-	if(name == "width" || name == "height"){		
-		var buffer = value.split("%");
-		if (buffer.length > 1) {
-			var playerDivValue = parseInt($("#"+this.presentation.playerDiv).css(name).split("px")[0]);
-			var parentValue;
-			if(this.node.descriptor && this.node.descriptor.region && this.node.descriptor.region._parent){
-				var pai = this.node.descriptor.region._parent;
-				
-				if (name == "width"){
-					parentValue = (pai.width) ? pai.width : playerDivValue;
-				}
-				else if (name == "height"){
-					parentValue = (pai.height) ? pai.height : playerDivValue;
-				}
-			}
-			else parentValue = playerDivValue;
-			return (parseInt(parentValue)*parseFloat(buffer[0])/100).toString();
-		}
-	}
-	return value;
-}
 
 // load
 MediaPlayer.prototype.load = function (source) {
