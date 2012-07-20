@@ -121,11 +121,15 @@ MediaPlayer.prototype.create = function (node) {
 		this.area[node.area[i].id] = node.area[i];
 		if (node.area[i].begin) {
 			this.area[node.area[i].id].beginTime = parseFloat(node.area[i].begin.split('s')[0]);
+		} else {
+			this.area[node.area[i].id].beginTime = 'begin';
 		}
 		if (node.area[i].end) {
 			this.area[node.area[i].id].endTime = parseFloat(node.area[i].end.split('s')[0]);
-            this.area[node.area[i].id].started = false;
+		} else {
+			this.area[node.area[i].id].endTime = 'end';
 		}
+		this.area[node.area[i].id].started = false;
 	}
 	// Verifica o tipo da mídia
 	if (node.type) {
@@ -219,24 +223,24 @@ MediaPlayer.prototype.create = function (node) {
                 if(this.player.exec)
                 {
                     for (i in this.area) {
-                            if (this.area[i].end) {
-                                    eval("this.player.exec(this.area[i].endTime,$.proxy(function() {"+
-                                            "if (this.area['"+i+"'].started) {"+
-                                                    "this.area['"+i+"'].started = false;"+
-                                                    "$(this.htmlPlayer).trigger('stop',[this.area['"+i+"'].id]);"+
-                                            "} else {"+
-                                            "$(this.htmlPlayer).trigger('presentation.onEnd',[this.area['"+i+"'].id]); "+
-                                            "}" +
-                                    "},this));");
-                            }				
-                            if (this.area[i].begin) {
-                                    eval("this.player.exec(this.area[i].beginTime,$.proxy(function() {"+
-                                            "$(this.htmlPlayer).trigger('presentation.onBegin',[this.area['"+i+"'].id]);"+
-                                    "},this));");
-                            }
-                            // TODO: area definida por frames ao invés de tempo
-                    }
-                 }
+					
+						eval("this.player.exec(this.area[i].endTime,$.proxy(function() {"+
+							"if (this.area['"+i+"'].started) {"+
+								"this.area['"+i+"'].started = false;"+
+								"$(this.htmlPlayer).trigger('stop',[this.area['"+i+"'].id]);"+
+							"} else {"+
+								"$(this.htmlPlayer).trigger('presentation.onEnd',[this.area['"+i+"'].id]); "+
+							"}" +
+						"},this));");
+
+						eval("this.player.exec(this.area[i].beginTime,$.proxy(function() {"+
+							"$(this.htmlPlayer).trigger('presentation.onBegin',[this.area['"+i+"'].id]);"+
+						"},this));");
+						
+						// TODO: area definida por frames ao invés de tempo
+						
+					}
+				}
 
 
 	
@@ -538,35 +542,21 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 		this.isPlaying = true;
 		this.isStopped = false;
 		this.show();
-		//if (this.checkType(["video","audio","image","text"])) {
-            //if(this.checkType(["video","audio"]))
-			    //this.parentContext.syncPlayer(this);
 
-                        if(this.player.start)
-                            this.player.start();
-                        else
-                            Debugger.error(Debugger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['start',nodeInterface]);
-                        
-                        //this.popcornPlayer.play();
-			if (nodeInterface && this.area[nodeInterface]._type=="area") {
-				if (this.area[this.area[nodeInterface].id].begin) {
-                                        this.area[this.area[nodeInterface].id].started = true;
-					this.seek(this.area[this.area[nodeInterface].id].beginTime);
-					/*
-                                         * TODO: synchronization
-                                         *
-                                        $(this.htmlPlayer).one("seeked",$.proxy(function() {
-						this.parentContext.notify(this);
-						//TODO: Quando for resolvida a sincronização, remover esse play.
-						this.popcornPlayer.play();
-					},this)); */
-				} else {
-					// TODO (frames)
-				}
-			//} else {
-			//	this.parentContext.notify(this);
+		if(this.player.start)
+			this.player.start();
+		else
+			Debugger.error(Debugger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['start',nodeInterface]);
+			
+		if (nodeInterface) {
+			if (this.area[nodeInterface]._type=="area") {
+				this.area[this.area[nodeInterface].id].started = true;
+				this.seek(this.area[this.area[nodeInterface].id].beginTime);
+			} else {
+				// TODO (frames)
 			}
-		//}
+		}
+			
 		$(this.htmlPlayer).trigger("presentation.onBegin",[nodeInterface]);
 	}
 };
