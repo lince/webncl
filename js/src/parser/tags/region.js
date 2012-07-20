@@ -20,7 +20,6 @@
  */
 
 Parser.prototype.parseRegion = function (obj,tag,parent,tree) {
-	obj._parent=parent;
 	// left, right, top, bottom, height, width
 	attrs = ["left","right","top","bottom","height","width"];
 	values = ["(n�mero inteiro)","(n�mero inteiro)px","(n�mero real)%"];
