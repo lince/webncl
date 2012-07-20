@@ -316,19 +316,24 @@ ContextPlayer.prototype.bindLinks = function()
 					{
 						contextElement : this.htmlPlayer,
 						interfaceId : interfaceId,
-						eventName: eventName
-						
+						eventName: eventName						
 					},
-					function(e)
+					function(e, nclInterface)
 					{
-                        var evento = $.Event(e.data.eventName);
-                        evento.which = e.which;
-						$(e.data.contextElement).trigger(evento,[e.data.interfaceId])
+						/*
+						 * This if will make events that uses interfaces don't propagate
+						 * to the context. I'm not sure this is the right behavior.
+						 */
+						if (nclInterface == undefined) {
+							var evento = $.Event(e.data.eventName);
+                        	evento.which = e.which;
+							$(e.data.contextElement).trigger(evento,[e.data.interfaceId])
+						}
 					
 					});
 							
-						}
-					}
+				}
+			}
 			
 		}
 		
