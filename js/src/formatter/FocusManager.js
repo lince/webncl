@@ -72,8 +72,7 @@ function FocusManager(presentation) {
   */
 FocusManager.prototype.addMedia = function(focusIndex, mediaId)
 {
-
-	if(focusIndex in this.descriptors)
+	if (focusIndex in this.descriptors)
 	{
 		var currentDescriptor = this.descriptors[focusIndex];
 		
@@ -83,10 +82,12 @@ FocusManager.prototype.addMedia = function(focusIndex, mediaId)
 			this.bindMouseEvents(focusIndex, mediaId);
 		}
 
-		if (! (focusIndex in this.focusIndexArray))
+		//if (! (focusIndex in this.focusIndexArray)) {
+		if ($.inArray(focusIndex, this.focusIndexArray) == -1) {
 			this.focusIndexArray.push(focusIndex);
+		}
 		
-		if (!this.currentFocusIndex)
+		if (this.currentFocusIndex == undefined)
 			this.setCurrentFocus(focusIndex);			
 	    else if (this.currentFocusIndex == focusIndex)
 			this.setMediaFocus(mediaId);
@@ -105,48 +106,45 @@ FocusManager.prototype.addMedia = function(focusIndex, mediaId)
  */
 FocusManager.prototype.removeMedia = function(focusIndex, mediaId)
 {
-	if(focusIndex in this.descriptors)
+	if($.inArray(focusIndex, this.focusIndexArray) != -1)
 	{
 		var currentDescriptor = this.descriptors[focusIndex];
 		var mediaIndex = currentDescriptor.mediaArray.indexOf(mediaId);
+		
 		if(mediaIndex != -1)
 		{
 			currentDescriptor.mediaArray.splice(mediaIndex,1);
+			this.removeMediaFocus(mediaId);
 			this.unbindMouseEvents(mediaId);
 		}
+		
+		if(currentDescriptor.mediaArray.length == 0) {
+			this.focusIndexArray.splice(this.focusIndexArray.indexOf(focusIndex),1);
+		}
 						
-		if(focusIndex == this.currentFocusIndex)
-			if(currentDescriptor.mediaArray.length == 0)
-				{
-					this.focusIndexArray.splice(this.focusIndexArray.indexOf(focusIndex),1);
-					
-					if(this.focusIndexArray.length == 0)
-						this.setCurrentFocus(undefined);
-					else
-						{
-							this.focusIndexArray.sort(this.sortFunction);
-							this.setCurrentFocus(this.focusIndexArray[0])
-						}
-					
-				}
-	}
-	
-	
+		if(focusIndex == this.currentFocusIndex) {					
+			if(this.focusIndexArray.length == 0) {
+				this.setCurrentFocus(undefined);
+			} else {
+				this.focusIndexArray.sort(this.sortFunction);					
+				this.setCurrentFocus(this.focusIndexArray[0])
+			}
+		}
+	}	
 };
 
 /*
    Define o foco nas medias do descriptor com focusIndex
  * */
 FocusManager.prototype.setCurrentFocus = function(focusIndex)
-{
-	
+{	
 	//Verificamos em focusIndexArray pois um descritor soh pode receber foco
 	//se tiver medias ativas
-	if(focusIndex == undefined)
-	{
+	if(focusIndex == undefined) {
 		this.currentFocusIndex = focusIndex;
-	} else	if(this.focusIndexArray.indexOf(focusIndex) != -1)
-	{
+		
+	} else	if(this.focusIndexArray.indexOf(focusIndex) != -1) {
+		
 		if(this.currentFocusIndex)
 		{
 			var oldDescriptor = this.descriptors[this.currentFocusIndex];
@@ -156,7 +154,6 @@ FocusManager.prototype.setCurrentFocus = function(focusIndex)
 				this.removeMediaFocus(currentMedia);
 			}
 		}
-		
 		
 		currentDescriptor = this.descriptors[focusIndex];
 		for(var j in currentDescriptor.mediaArray)
@@ -168,7 +165,6 @@ FocusManager.prototype.setCurrentFocus = function(focusIndex)
 		
 		return true;
 	} 
-	
 	return false;
 };
 
