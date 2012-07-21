@@ -88,7 +88,7 @@ FocusManager.prototype.addMedia = function(focusIndex, mediaId)
 		}
 		
 		if (this.currentFocusIndex == undefined)
-			this.setCurrentFocus(focusIndex);			
+			this.__setCurrentFocus(focusIndex);			
 	    else if (this.currentFocusIndex == focusIndex)
 			this.setMediaFocus(mediaId);
 		
@@ -124,10 +124,10 @@ FocusManager.prototype.removeMedia = function(focusIndex, mediaId)
 						
 		if(focusIndex == this.currentFocusIndex) {					
 			if(this.focusIndexArray.length == 0) {
-				this.setCurrentFocus(undefined);
+				this.__setCurrentFocus(undefined);
 			} else {
 				this.focusIndexArray.sort(this.sortFunction);					
-				this.setCurrentFocus(this.focusIndexArray[0])
+				this.__setCurrentFocus(this.focusIndexArray[0])
 			}
 		}
 	}	
@@ -136,6 +136,17 @@ FocusManager.prototype.removeMedia = function(focusIndex, mediaId)
 /*
    Define o foco nas medias do descriptor com focusIndex
  * */
+
+//HACK_FOCUS (begin)
+FocusManager.prototype.__setCurrentFocus = function(focusIndex) {
+	if (this.presentation.settingsNode) {
+		htmlPlayer = this.presentation.settingsNode.htmlPlayer;
+		$(htmlPlayer).trigger('set', ['service.currentFocus', null, null, focusIndex]);
+	} else { 
+		this.setCurrentFocus(focusIndex);
+	}
+}
+
 FocusManager.prototype.setCurrentFocus = function(focusIndex)
 {	
 	//Verificamos em focusIndexArray pois um descritor soh pode receber foco
@@ -167,6 +178,7 @@ FocusManager.prototype.setCurrentFocus = function(focusIndex)
 	} 
 	return false;
 };
+//HACK_FOCUS (end)
 
 /*
    Retorna o descriptor que esta atualmente com o foco
@@ -244,26 +256,26 @@ FocusManager.prototype.keyEvent = function(keyCode)
 
 			case Keys.CURSOR_UP:
 				if(currentDescriptor.self.moveUp)
-					this.setCurrentFocus(currentDescriptor.self.moveUp.focusIndex)
+					this.__setCurrentFocus(currentDescriptor.self.moveUp.focusIndex)
                 
 			break;		
 			
 			case Keys.CURSOR_DOWN:
 				if(currentDescriptor.self.moveDown)
-					this.setCurrentFocus(currentDescriptor.self.moveDown.focusIndex)
+					this.__setCurrentFocus(currentDescriptor.self.moveDown.focusIndex)
 
 
 			break;
 			
 			case Keys.CURSOR_LEFT:
 				if(currentDescriptor.self.moveLeft)
-					this.setCurrentFocus(currentDescriptor.self.moveLeft.focusIndex)
+					this.__setCurrentFocus(currentDescriptor.self.moveLeft.focusIndex)
 					
 			break;
 			
 			case Keys.CURSOR_RIGHT:
 				if(currentDescriptor.self.moveRight)
-					this.setCurrentFocus(currentDescriptor.self.moveRight.focusIndex)
+					this.__setCurrentFocus(currentDescriptor.self.moveRight.focusIndex)
 				
 			break;					
 			
@@ -298,7 +310,7 @@ FocusManager.prototype.bindMouseEvents = function(focusIndex, mediaId)
     },this))
     
     $(mediaId).on('mouseover',{focusIndex: focusIndex}, $.proxy(function(event){
-        this.setCurrentFocus(event.data.focusIndex);
+        this.__setCurrentFocus(event.data.focusIndex);
     },this))
 };
 

@@ -147,9 +147,12 @@ MediaPlayer.prototype.create = function (node) {
 		this.region = "#" + this.presentation.playerDiv;
 	}
 	
+//HACK_FOCUS (begin)
+	if (this.type == 'application/x-ginga-settings') {
+		this.presentation.settingsNode = this;
+	}
+//HACK_FOCUS (end)
 
-	
-	
 	// ----- REFER -----	
 	if (node.refer && (node.instance!="new")) {
 		return;

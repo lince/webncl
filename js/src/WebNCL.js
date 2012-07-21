@@ -31,6 +31,10 @@ function WebNclPlayer (file, div) {
                                 
         //Time limit used by events, can be changed by the user
 		TIME_LIMIT: 1000,
+		
+//HACK_FOCUS (begin)
+		settingsNode : undefined,
+//HACK_FOCUS (end)
                 
 		playerId: ++WebNclPlayer.playerCount,
 		playerDiv: div,
@@ -155,7 +159,7 @@ function WebNclPlayer (file, div) {
             POWER               :	65,		/* a */
             REWIND              :	83,		/* s */
             EJECT               :	68,		/* d */
-            MENU				:   80
+            MENU				:   77
         }
         
         //Despite the key codes defined above, an array should be defined
