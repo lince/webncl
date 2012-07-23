@@ -285,17 +285,17 @@ ContextPlayer.prototype.bindLinks = function()
 		var currentPort = ports[i];
 		var interfaceDefined = currentPort['interface'] || undefined;
 
-		if(currentPort.component._type == 'media' && interfaceDefined)
-		{
+		//if(currentPort.component._type == 'media' && interfaceDefined)
+		//{
 			/*
 			 	 TODO: encadear eventos de atribuicao quando a nodeInterface da media esta definida
 				 attribution.onBeginAttribution
 				 attribution.onEndAttribution
 			 */
-			console.warn("Eventos de atribuicao para propriedades referenciadas por portas nao foi implementado");
+			//console.warn("Eventos de atribuicao para propriedades referenciadas por portas nao foi implementado");
 	
 			
-		} else {
+		//} else {
 			
 			//Caso contrario (componente eh contexto) ou a nodeInterface nao esta definida
 			var currentComponentElement  = "#"+this.presentation.getDivId(currentPort.component.id);
@@ -316,15 +316,12 @@ ContextPlayer.prototype.bindLinks = function()
 					{
 						contextElement : this.htmlPlayer,
 						interfaceId : interfaceId,
-						eventName: eventName						
+						eventName: eventName,
+						portInterface: currentPort["interface"]
 					},
 					function(e, nclInterface)
 					{
-						/*
-						 * This if will make events that uses interfaces don't propagate
-						 * to the context. I'm not sure this is the right behavior.
-						 */
-						if (nclInterface == undefined) {
+						if (nclInterface == e.data.portInterface) {
 							var evento = $.Event(e.data.eventName);
                         	evento.which = e.which;
 							$(e.data.contextElement).trigger(evento,[e.data.interfaceId])
@@ -335,7 +332,7 @@ ContextPlayer.prototype.bindLinks = function()
 				}
 			}
 			
-		}
+		//}
 		
 	}
 	
