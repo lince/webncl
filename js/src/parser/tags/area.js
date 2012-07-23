@@ -32,6 +32,14 @@ Parser.prototype.parseArea = function (obj,tag,parent,tree) {
 	if (parent.type=="application/x-ginga-time" && (obj.begin==null && obj.end==null)) {
 		Debugger.error(Debugger.ERR_MISSING_ATTR,tag,["begin","end"]);
 	}
+	if (obj.begin!=null && obj.end!=null) {
+		var begin = parseFloat(obj.begin.split('s')[0]);
+		var end = parseFloat(obj.end.split('s')[0]);
+		if (begin > end) {
+			Debugger.warning(Debugger.WARN_INVALID_AREA,tag,["begin","end"]);
+			obj._ignore = true;
+		}
+	}
 	// first, last
 	values = ["(número inteiro)"];
 	patt = /^\d+$/;

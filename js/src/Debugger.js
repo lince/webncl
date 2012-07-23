@@ -27,7 +27,8 @@ var Debugger = {
 	WARN_INVALID_HEAD_STRUCTURE:		102,	// Estrutura do cabeçalho inválida
 	WARN_INVALID_REGION_DIMENSIONS:	103,	// Dimensões de região inválidas
 	WARN_DUPLICATED_ZINDEX:				104,	// zIndex duplicado
-	WARN_NOT_IMPLEMENTED_YET:			105,	// Recurso não implementado ainda
+	WARN_INVALID_AREA:					105,		// Area invalida
+	WARN_NOT_IMPLEMENTED_YET:			106,	// Recurso não implementado ainda
 	
 	// Errors
 	ERR_MISSING_ATTR:						201,	// Atributo obrigatório faltando
@@ -56,7 +57,8 @@ var Debugger = {
 		102: "Estrutura do cabeçalho inválida",
 		103: "Dimensões de região inválidas",
 		104: "zIndex duplicado",
-		105: "Recurso não implementado ainda",
+		105: "Areaa invalida",
+		106: "Recurso não implementado ainda",
                 
 		201: "Atributo obrigatório faltando",
 		202: "Atributo obrigatório faltando (um desses)",
