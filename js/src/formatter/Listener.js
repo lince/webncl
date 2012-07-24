@@ -114,7 +114,7 @@ Listener.prototype.notifyEvent = function(conditionName)
 			}
 			break;
 		
-		case NclPlayer.listenerType.OR:
+		case Listener.listenerType.OR:
 			if((new Date().valueOf() - this.last.valueOf()) > this.presentation.TIME_LIMIT)
 			{
 				this.last = new Date();

@@ -37,14 +37,14 @@ function ContextPlayer (node, p) {
 	//this.synchronizedPlayers = [];
 	//this.loadingPlayers = 0;
         
-        this.syncingMediaList = [];
-        this.syncingContextList = [];
-        this.syncingObjects = 0;
+    this.syncingMediaList = [];
+    this.syncingContextList = [];
+    this.syncingObjects = 0;
         
-        this.playingMediaList = [];
-        this.playingContextList = [];
+    this.playingMediaList = [];
+    this.playingContextList = [];
 	
-        this.pausedMediaList = [];
+    this.pausedMediaList = [];
 	this.pausedContextList = [];
         
 	this.isCreated = false;
@@ -301,18 +301,17 @@ ContextPlayer.prototype.bindLinks = function()
 		var currentPort = ports[i];
 		var interfaceDefined = currentPort['interface'] || undefined;
 
-		if(currentPort.component._type == 'media' && interfaceDefined)
-		{
+		//if(currentPort.component._type == 'media' && interfaceDefined)
+		//{
 			/*
 			 	 TODO: encadear eventos de atribuicao quando a nodeInterface da media esta definida
 				 attribution.onBeginAttribution
 				 attribution.onEndAttribution
 			 */
-                        Debugger.warning(Debugger.WARN_NOT_IMPLEMENTED_YET,"context",['attribution.onBeginAttribution','attribution.onEndAttribution']);
 			//console.warn("Eventos de atribuicao para propriedades referenciadas por portas nao foi implementado");
 	
 			
-		} else {
+		//} else {
 			
 			//Caso contrario (componente eh contexto) ou a nodeInterface nao esta definida
 			var currentComponentElement  = "#"+this.presentation.getDivId(currentPort.component.id);
@@ -333,21 +332,23 @@ ContextPlayer.prototype.bindLinks = function()
 					{
 						contextElement : this.htmlPlayer,
 						interfaceId : interfaceId,
-						eventName: eventName
-						
+						eventName: eventName,
+						portInterface: currentPort["interface"]
 					},
-					function(e)
+					function(e, nclInterface)
 					{
-                                                var evento = $.Event(e.data.eventName);
-                                                evento.which = e.which;
-						$(e.data.contextElement).trigger(evento,[e.data.interfaceId])
+						if (nclInterface == e.data.portInterface) {
+							var evento = $.Event(e.data.eventName);
+                        	evento.which = e.which;
+							$(e.data.contextElement).trigger(evento,[e.data.interfaceId])
+						}
 					
 					});
 							
-						}
-					}
+				}
+			}
 			
-		}
+		//}
 		
 	}
 	
@@ -710,12 +711,16 @@ ContextPlayer.prototype.bindLinks = function()
 							var clistener = cdata[listener];
 							var flag = clistener.flagMap[e.data.eventName]
 							if(nclInterface == flag.bindInterface)
-                                if(!e.which  && !flag.usekey)
-								    clistener.notifyEvent(e.data.eventName);
-								else
-								{
-									if(e.which && flag.keyDefaultValue == e.which)
-										clistener.notifyEvent(e.data.eventName);
+								// For selection conditions we need to check the key
+								// This code maybe redundant
+								if(e.type == 'selection' && flag.useKey) {
+									if (flag.useKey) {
+										if (e.which && flag.keyDefaultValue == e.which) {
+											clistener.notifyEvent(e.data.eventName);
+										}
+									}
+								} else {
+									clistener.notifyEvent(e.data.eventName);
 								}
 							
 						}

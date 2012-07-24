@@ -28,7 +28,7 @@ Parser.prototype.parseMedia = function (obj,tag,parent,tree) {
 	// type, src
 	values = [
 		"text/html","text/plain","text/css","text/xml","image/bmp","image/png","image/mng","image/gif","image/jpeg",
-		"audio/basic","audio/mp3","audio/mp2","audio/mpeg","audio/mpeg4","video/mpeg","application/x-ginga-NCLua",
+		"audio/basic","audio/mp3","audio/mp2","audio/mpeg","audio/mpeg4","video/mpeg","video/x-flv", "application/x-ginga-NCLua",
 		"application/x-ginga-NCLet","application/x-ginga-settings","application/x-ginga-time","applications/x-ginga-NCL",
 		"application/x-ncl-NCL","application/x-ncl-NCLua","application/x-ncl-NCLet","application/x-ncl-settings",
 		"application/x-ncl-time"

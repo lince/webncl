@@ -9,7 +9,7 @@ For NCL demos visit the site: [http://webncl.org](http://webncl.org)
 # DEPENDENCIES
 -------------------------------------------------------
 ## To run
- - popcorn.js = 1.1.2 (http://popcornjs.org)
+ - popcorn.js > 1.1.2 (http://popcornjs.org)
  - jquery > 1.7.1 (http://jquery.org)
  
 ## To build

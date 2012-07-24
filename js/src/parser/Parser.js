@@ -162,7 +162,10 @@ Parser.prototype.createNode = function (parent, tagName, parentNode, tree) {
 		if (tagName == "ncl") {
 			parser.parseNCL(node,tagName,parentNode,tree);
 		} else {
-			parser["parse"+tagName[0].toUpperCase()+tagName.slice(1,tagName.length)](node,tagName,parentNode,tree);
+			// TODO check why tagName[0] is undefined
+			if (tagName[0]){
+				parser["parse"+tagName[0].toUpperCase()+tagName.slice(1,tagName.length)](node,tagName,parentNode,tree);
+			}
 		}
 	});
 	return ($.inArray(tagName,Parser.isNotArray)==-1 ? nodes : nodes[0]);
@@ -195,12 +198,12 @@ Parser.prototype.parseAttributes = function (nodeXml, nodeObj) {
 	}
 	// !
 	for (attr in attrs.required) {
-		var index = foundAttrs.indexOf(attrs.required[attr]);
+		var index = $.inArray(attrs.required[attr],foundAttrs); 
 		if (index == -1) {
 			Debugger.error(Debugger.ERR_MISSING_ATTR,nodeType,[attrs.required[attr]]);
 		} else {
 			foundAttrs[index] = 0;
-			while (index = foundAttrs.indexOf(attrs.required[attr]) != -1) {
+			while (index = $.inArray(attrs.required[attr],foundAttrs) != -1) {
 				Debugger.error(Debugger.ERR_TOO_MANY_ATTRS,nodeType,[attrs.required[attr]]);
 				foundAttrs[index] = 0;
 			}
@@ -208,10 +211,10 @@ Parser.prototype.parseAttributes = function (nodeXml, nodeObj) {
 	}
 	// ?
 	for (attr in attrs.optional) {
-		var index = foundAttrs.indexOf(attrs.optional[attr]);
+		var index = $.inArray(attrs.optional[attr],foundAttrs); 
 		if (index != -1) {
 			foundAttrs[index] = 0;
-			while (index = foundAttrs.indexOf(attrs.required[attr]) != -1) {
+			while (index = $.inArray(attrs.optional[attr],foundAttrs) != -1) {
 				Debugger.error(Debugger.ERR_TOO_MANY_ATTRS,nodeType,[attrs.required[attr]]);
 				foundAttrs[index] = 0;
 			}
@@ -220,11 +223,11 @@ Parser.prototype.parseAttributes = function (nodeXml, nodeObj) {
 	// !1
 	var oneFound = attrs.oneOf.length==0;
 	for (attr in attrs.oneOf) {
-		var index = foundAttrs.indexOf(attrs.oneOf[attr]);
+		var index = $.inArray(attrs.oneOf[attr],foundAttrs);
 		if (index != -1) {
 			oneFound = true;
 			foundAttrs[index] = 0;
-			while (index = foundAttrs.indexOf(attrs.oneOf[attr]) != -1) {
+			while (index = $.inArray(attrs.oneOf[attr],foundAttrs) != -1) {
 				Debugger.error(Debugger.ERR_TOO_MANY_ATTRS,nodeType,[attrs.oneOf[attr]]);
 				foundAttrs[index] = 0;
 			}

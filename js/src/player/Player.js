@@ -65,7 +65,34 @@ Player.prototype.bindEvents = function () {
 		}
 	},this));
 	$(this.htmlPlayer).on("set",$.proxy(function(event,nodeInterface,callback,args,value) {
-		this.setProperty(nodeInterface,value);
+		switch(nodeInterface){
+			// On dynamic repositioning, the % value for position is calculated based on the media's current dimension.
+				// (top/bottom values are calculated based on the current height value and left/right values are calculated based on the current width value).
+			case "top":
+			case "bottom":
+			case "height": {
+					value = this.calculatePercentageValue("height", value);
+					this.setProperty(nodeInterface,value);
+					break;
+			}
+			case "left":
+			case "right": 
+			case "width": {
+					value = this.calculatePercentageValue("width", value);
+					this.setProperty(nodeInterface,value);
+					break;
+			}
+			case "bounds": {
+					var bounds = value.split(",");
+					this.setProperty("left", this.calculatePercentageValue("width",bounds[0]));
+					this.setProperty("top", this.calculatePercentageValue("height",bounds[1]));
+					this.setProperty("width", this.calculatePercentageValue("width",bounds[2]));
+					this.setProperty("height", this.calculatePercentageValue("height",bounds[3]));
+					break;
+			}
+			default: 
+					this.setProperty(nodeInterface,value);
+		}
 		if (callback) {
 			callback(args);
 		}
@@ -80,6 +107,16 @@ Player.prototype.bindEvents = function () {
 		this.selection();
 	},this));
 };
+
+// function to get the current value of a property from css and to return its absolute value, given a % value.
+Player.prototype.calculatePercentageValue = function(propertyName, value){
+	var buffer = value.toString().split("%");
+	if (buffer.length > 1) {
+			var currentValue = $(this.htmlPlayerBkg).css(propertyName);
+			value = parseInt(parseInt(currentValue)*parseFloat(buffer[0])/100);
+	}
+	return value;
+}
 
 // setProperty
 Player.prototype.setProperty = function (name, value) {
@@ -105,21 +142,29 @@ Player.prototype.setProperty = function (name, value) {
             if (value != null) {
 
                     switch (name) {
-
                             // POSITION/DIMENSION
 
                             case "top":
                             case "left":
                             case "bottom":
                             case "right": {
-                                    // TODO: %
-                                    $(this.htmlPlayerBkg).css(name,value);
+									var buffer=value.toString().split("%");
+									if (buffer.length > 1)
+										console.warn("Warning: Percentage position value was passed to 'setProperty' function. The value is being ignored.");
+									else{
+										if(name=="right")
+											$(this.htmlPlayerBkg).css("left","auto");
+										if(name=="bottom")
+											$(this.htmlPlayerBkg).css("top","auto");									
+										$(this.htmlPlayerBkg).css(name,value);
+									}
                                     break;
                             }
                             case "height":
                             case "width": {
-                                    var buffer = value.split("%");
+                                    var buffer = value.toString().split("%");
                                     if (buffer.length > 1) {
+											console.warn("Warning: Percentage size value being calculated in 'setProperty' function.");
                                             var currentValue = $(this.htmlPlayerBkg).css(name);
                                             value = parseInt(parseInt(currentValue)*parseFloat(buffer[0])/100);
                                     }
