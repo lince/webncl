@@ -87,10 +87,11 @@ FocusManager.prototype.addMedia = function(focusIndex, mediaId)
 			this.focusIndexArray.push(focusIndex);
 		}
 		
-		if (this.currentFocusIndex == undefined)
-			this.__setCurrentFocus(focusIndex);			
-	    else if (this.currentFocusIndex == focusIndex)
+		if (this.currentFocusIndex == undefined) {
+			this.__setCurrentFocus(focusIndex);		
+		} else if (this.currentFocusIndex == focusIndex) {
 			this.setMediaFocus(mediaId);
+		}
 		
 	}
 };
@@ -122,7 +123,7 @@ FocusManager.prototype.removeMedia = function(focusIndex, mediaId)
 			this.focusIndexArray.splice(this.focusIndexArray.indexOf(focusIndex),1);
 		}
 						
-		if(focusIndex == this.currentFocusIndex) {					
+		if(focusIndex == this.currentFocusIndex) {
 			if(this.focusIndexArray.length == 0) {
 				this.__setCurrentFocus(undefined);
 			} else {
@@ -139,7 +140,7 @@ FocusManager.prototype.removeMedia = function(focusIndex, mediaId)
 
 //HACK_FOCUS (begin)
 FocusManager.prototype.__setCurrentFocus = function(focusIndex) {
-	if (this.presentation.settingsNode) {
+	if (this.presentation.settingsNode && focusIndex != undefined) {
 		htmlPlayer = this.presentation.settingsNode.htmlPlayer;
 		$(htmlPlayer).trigger('set', ['service.currentFocus', null, null, focusIndex]);
 	} else { 
@@ -152,7 +153,7 @@ FocusManager.prototype.setCurrentFocus = function(focusIndex)
 	//Verificamos em focusIndexArray pois um descritor soh pode receber foco
 	//se tiver medias ativas
 	if(focusIndex == undefined) {
-		this.currentFocusIndex = focusIndex;
+		this.currentFocusIndex = undefined;
 		
 	} else	if(this.focusIndexArray.indexOf(focusIndex) != -1) {
 		
