@@ -194,7 +194,7 @@ function WebNclPlayer (file, div) {
 			dataType: "xml",
 			success: $.proxy(function (data) {
 				// TODO: checar a sintaxe do arquivo XML
-				//Debugger.checkFile(file); ???
+				//Logger.checkFile(file); ???
 				this.execute(data);
 			},this)
 			// TODO: checar se o arquivo XML foi aberto com sucesso
@@ -227,7 +227,7 @@ WebNclPlayer.prototype.execute = function (data) {
 	this.presentation.parser = new Parser();
 	this.presentation.ncl = this.presentation.parser.parse(data);
 	console.log('Player "'+this.div+'" loaded in ' + (new Date() - t) + 'ms');
-	this.presentation.focusManager = new FocusManager(this.presentation);
+	this.presentation.inputManager = new InputManager(this.presentation);
 	this.presentation.systemSettings = new SystemSettings(this.presentation);
 	
 	var $playerDiv = $("#"+this.presentation.playerDiv);

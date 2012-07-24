@@ -102,7 +102,7 @@ function Parser () {
 							src.obj[src.attr] = this.map[id].target.obj;
 						}
 					} else {
-						Debugger.error(Debugger.ERR_INVALID_ID_REFERENCE,src.type,[src.attr,src.obj[src.attr],src.type]);
+						Logger.error(Logger.ERR_INVALID_ID_REFERENCE,src.type,[src.attr,src.obj[src.attr],src.type]);
 					}
 				}
 			}
@@ -192,7 +192,7 @@ Parser.prototype.parseAttributes = function (nodeXml, nodeObj) {
 		if ($(nodeXml).attr(attrs.reference_target[attr])) {
 			var type = attrs.reference_target[attr]=="focusIndex" ? "focusIndex" : nodeType;
 			if (!this.referenceMap.addTarget(nodeObj,$(nodeXml).attr(attrs.reference_target[attr]),$(nodeXml).parent().attr("id"),type)) {
-				Debugger.error(Debugger.ERR_DUPLICATED_ID,nodeType,[attrs.reference_target[attr],$(nodeXml).attr(attrs.reference_target[attr]),$(nodeXml).parent().attr("id")]);
+				Logger.error(Logger.ERR_DUPLICATED_ID,nodeType,[attrs.reference_target[attr],$(nodeXml).attr(attrs.reference_target[attr]),$(nodeXml).parent().attr("id")]);
 			}
 		}
 	}
@@ -200,11 +200,11 @@ Parser.prototype.parseAttributes = function (nodeXml, nodeObj) {
 	for (attr in attrs.required) {
 		var index = $.inArray(attrs.required[attr],foundAttrs); 
 		if (index == -1) {
-			Debugger.error(Debugger.ERR_MISSING_ATTR,nodeType,[attrs.required[attr]]);
+			Logger.error(Logger.ERR_MISSING_ATTR,nodeType,[attrs.required[attr]]);
 		} else {
 			foundAttrs[index] = 0;
 			while (index = $.inArray(attrs.required[attr],foundAttrs) != -1) {
-				Debugger.error(Debugger.ERR_TOO_MANY_ATTRS,nodeType,[attrs.required[attr]]);
+				Logger.error(Logger.ERR_TOO_MANY_ATTRS,nodeType,[attrs.required[attr]]);
 				foundAttrs[index] = 0;
 			}
 		}
@@ -215,7 +215,7 @@ Parser.prototype.parseAttributes = function (nodeXml, nodeObj) {
 		if (index != -1) {
 			foundAttrs[index] = 0;
 			while (index = $.inArray(attrs.optional[attr],foundAttrs) != -1) {
-				Debugger.error(Debugger.ERR_TOO_MANY_ATTRS,nodeType,[attrs.required[attr]]);
+				Logger.error(Logger.ERR_TOO_MANY_ATTRS,nodeType,[attrs.required[attr]]);
 				foundAttrs[index] = 0;
 			}
 		}
@@ -228,18 +228,18 @@ Parser.prototype.parseAttributes = function (nodeXml, nodeObj) {
 			oneFound = true;
 			foundAttrs[index] = 0;
 			while (index = $.inArray(attrs.oneOf[attr],foundAttrs) != -1) {
-				Debugger.error(Debugger.ERR_TOO_MANY_ATTRS,nodeType,[attrs.oneOf[attr]]);
+				Logger.error(Logger.ERR_TOO_MANY_ATTRS,nodeType,[attrs.oneOf[attr]]);
 				foundAttrs[index] = 0;
 			}
 		}
 	}
 	if (!oneFound) {
-		Debugger.error(Debugger.ERR_MISSING_ATTR_ONEOF,nodeType,attrs.oneOf);
+		Logger.error(Logger.ERR_MISSING_ATTR_ONEOF,nodeType,attrs.oneOf);
 	}
 	// Atributos inválidos
 	for (attr in foundAttrs) {
 		if (foundAttrs[attr] != 0) {
-			Debugger.warning(Debugger.WARN_INVALID_ATTR,nodeType,[foundAttrs[attr]]);
+			Logger.warning(Logger.WARN_INVALID_ATTR,nodeType,[foundAttrs[attr]]);
 		}
 	}
 };
@@ -264,24 +264,24 @@ Parser.prototype.parseContent = function (nodeXml,nodeObj) {
 	// ?
 	for (var tag in tags.optional) {
 		if (tagCount[tags.optional[tag]] > 1) {
-			Debugger.error(Debugger.ERR_TOO_MANY_TAGS,nodeType,[tags.optional[tag]]);
+			Logger.error(Logger.ERR_TOO_MANY_TAGS,nodeType,[tags.optional[tag]]);
 		}
 		tagCount[tags.optional[tag]] = 0;
 	}
 	// 1
 	for (var tag in tags.one) {
 		if (tagCount[tags.one[tag]] > 1) {
-			Debugger.error(Debugger.ERR_TOO_MANY_TAGS,nodeType,[tags.one[tag]]);
+			Logger.error(Logger.ERR_TOO_MANY_TAGS,nodeType,[tags.one[tag]]);
 		}
 		if (tagCount[tags.one[tag]] == 0) {
-			Debugger.error(Debugger.ERR_MISSING_TAG,nodeType,[tags.one[tag]]);
+			Logger.error(Logger.ERR_MISSING_TAG,nodeType,[tags.one[tag]]);
 		}
 		tagCount[tags.one[tag]] = 0;
 	}
 	// +
 	for (var tag in tags.plus) {
 		if (tagCount[tags.plus[tag]] == 0) {
-			Debugger.error(Debugger.ERR_MISSING_TAG,nodeType,[tags.plus[tag]]);
+			Logger.error(Logger.ERR_MISSING_TAG,nodeType,[tags.plus[tag]]);
 		}
 		tagCount[tags.plus[tag]] = 0;
 	}
@@ -294,7 +294,7 @@ Parser.prototype.parseContent = function (nodeXml,nodeObj) {
 		tagCount[tags.plusOneOf[tag]] = 0;
 	}
 	if (!atLeastOne) {
-		Debugger.error(Debugger.ERR_MISSING_TAG_ONEOF,nodeType,tags.plusOneOf);
+		Logger.error(Logger.ERR_MISSING_TAG_ONEOF,nodeType,tags.plusOneOf);
 	}
 	// *
 	for (var tag in tags.star) {
@@ -304,7 +304,7 @@ Parser.prototype.parseContent = function (nodeXml,nodeObj) {
 	if (tags.custom.length > 0) {
 		tags.validate(tagCount,errors=[]);
 		for (err in errors) {
-			Debugger.error(errors[err].code,nodeType,errors[err].params);
+			Logger.error(errors[err].code,nodeType,errors[err].params);
 		}
 		for (var tag in tags.custom) {
 			tagCount[tags.custom[tag]] = 0;
@@ -313,7 +313,7 @@ Parser.prototype.parseContent = function (nodeXml,nodeObj) {
 	// Tags inválidas
 	for (var tag in tagCount) {
 		if (tagCount[tag] > 0) {
-			Debugger.warning(Debugger.WARN_INVALID_TAG,nodeType,[tag]);
+			Logger.warning(Logger.WARN_INVALID_TAG,nodeType,[tag]);
 		}
 	}
 };

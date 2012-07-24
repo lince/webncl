@@ -23,7 +23,7 @@ Parser.prototype.parseMedia = function (obj,tag,parent,tree) {
 	// instance
 	values = ["new","instSame","gradSame"];
 	if (obj.instance!=null && jQuery.inArray(obj.instance,values)==-1) {
-		Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["instance",obj.instance,values]);
+		Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["instance",obj.instance,values]);
 	}
 	// type, src
 	values = [
@@ -40,7 +40,7 @@ Parser.prototype.parseMedia = function (obj,tag,parent,tree) {
                 obj.type = obj.type.toLowerCase();
 
 		if (jQuery.inArray(obj.type,values)==-1) {
-			Debugger.error(ERR_INVALID_ATTR_VALUE,tag,["type",obj.type,values]);
+			Logger.error(ERR_INVALID_ATTR_VALUE,tag,["type",obj.type,values]);
 		} else if (obj.src!=null) {
 			var ext = obj.src.split(".");
 
@@ -50,97 +50,97 @@ Parser.prototype.parseMedia = function (obj,tag,parent,tree) {
 			switch (obj.type) {
 				case "text/html": {
 					if (ext!="htm" && ext!="html") {
-						Debugger.error(Debugger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"text/html",["htm","html"]]);
+						Logger.error(Logger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"text/html",["htm","html"]]);
 					}
 					break;
 				}
 				case "text/plain": {
 					if (ext!="txt") {
-						Debugger.error(Debugger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"text/plain",["txt"]]);
+						Logger.error(Logger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"text/plain",["txt"]]);
 					}
 					break;
 				}
 				case "text/css": {
 					if (ext!="css") {
-						Debugger.error(Debugger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"text/css",["css"]]);
+						Logger.error(Logger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"text/css",["css"]]);
 					}
 					break;
 				}
 				case "text/xml": {
 					if (ext!="xml") {
-						Debugger.error(Debugger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"text/xml",["xml"]]);
+						Logger.error(Logger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"text/xml",["xml"]]);
 					}
 					break;
 				}
 				case "image/bmp": {
 					if (ext!="bmp") {
-						Debugger.error(Debugger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"image/bmp",["bmp"]]);
+						Logger.error(Logger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"image/bmp",["bmp"]]);
 					}
 					break;
 				}
 				case "image/png": {
 					if (ext!="png") {
-						Debugger.error(Debugger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"image/png",["png"]]);
+						Logger.error(Logger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"image/png",["png"]]);
 					}
 					break;
 				}
 				case "image/gif": {
 					if (ext!="gif") {
-						Debugger.error(Debugger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"image/gif",["gif"]]);
+						Logger.error(Logger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"image/gif",["gif"]]);
 					}
 					break;
 				}
 				case "image/jpeg": {
 					if (ext!="jpg" && ext!="jpeg") {
-						Debugger.error(Debugger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"image/jpeg",["jpg","jpeg"]]);
+						Logger.error(Logger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"image/jpeg",["jpg","jpeg"]]);
 					}
 					break;
 				}
 				case "audio/basic": {
 					if (ext!="wav") {
-						Debugger.error(Debugger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"audio/basic",["wav"]]);
+						Logger.error(Logger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"audio/basic",["wav"]]);
 					}
 					break;
 				}
 				case "audio/mp3": {
 					if (ext!="mp3") {
-						Debugger.error(Debugger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"audio/mp3",["mp3"]]);
+						Logger.error(Logger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"audio/mp3",["mp3"]]);
 					}
 					break;
 				}
 				case "audio/mp2": {
 					if (ext!="mp2") {
-						Debugger.error(Debugger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"audio/mp2",["mp2"]]);
+						Logger.error(Logger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"audio/mp2",["mp2"]]);
 					}
 					break;
 				}
 				case "audio/mpeg": {
 					if (ext!="mpeg" && ext!="mpg") {
-						Debugger.error(Debugger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"audio/mpeg",["mpeg","mpg"]]);
+						Logger.error(Logger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"audio/mpeg",["mpeg","mpg"]]);
 					}
 					break;
 				}
 				case "audio/mpeg4": {
 					if (ext!="mp4" && ext!="mpg4") {
-						Debugger.error(Debugger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"audio/mpeg4",["mp4","mpg4"]]);
+						Logger.error(Logger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"audio/mpeg4",["mp4","mpg4"]]);
 					}
 					break;
 				}
 				case "video/mpeg": {
 					if (ext!="mpeg" && ext!="mpg") {
-						Debugger.error(Debugger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"video/mpeg",["mpeg","mpg"]]);
+						Logger.error(Logger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"video/mpeg",["mpeg","mpg"]]);
 					}
 					break;
 				}
 				case "application/x-ginga-NCLua": {
 					if (ext!="lua") {
-						Debugger.error(Debugger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"application/x-ginga-NCLua",["lua"]]);
+						Logger.error(Logger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"application/x-ginga-NCLua",["lua"]]);
 					}
 					break;
 				}
 				case "application/x-ginga-NCLet": {
 					if (ext!="class" && ext!="jar") {
-						Debugger.error(Debugger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"application/x-ginga-NCLet",["class","jar"]]);
+						Logger.error(Logger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"application/x-ginga-NCLet",["class","jar"]]);
 					}
 					break;
 				}

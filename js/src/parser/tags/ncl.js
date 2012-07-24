@@ -27,6 +27,6 @@ Parser.prototype.parseNCL = function (obj,tag,parent,tree) {
 		"http://www.ncl.org.br/NCL3.0/CausalConnectorProfile"
 	];
 	if (obj.xmlns!=null && jQuery.inArray(obj.xmlns,values)==-1) {
-		Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["xmlns",obj.xmlns,values]);
+		Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["xmlns",obj.xmlns,values]);
 	}
 };

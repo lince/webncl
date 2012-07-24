@@ -30,7 +30,7 @@ Parser.prototype.parseRegion = function (obj,tag,parent,tree) {
 		if (value != null) {
 			patt = /^(\d+|\d*\.\d+)px$|^(\d+|\d*\.\d+)%$|^(\d+|\d*\.\d+)$/;
 			if (!patt.test(value)) {
-				Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,[attr,value,values]);
+				Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,[attr,value,values]);
 			}
 		}
 	}
@@ -39,7 +39,7 @@ Parser.prototype.parseRegion = function (obj,tag,parent,tree) {
 		if (isFinite(obj.left) && isFinite(obj.right) && isFinite(obj.width) && isFinite(parent.width)) {
 			var soma = parseInt(obj.left) + parseInt(obj.right) + parseInt(obj.width);
 			if (soma!=parent.width) {
-				Debugger.warning(Debugger.WARN_INVALID_REGION_DIMENSIONS,"region",[["left","right","width"],soma,parent.width]);
+				Logger.warning(Logger.WARN_INVALID_REGION_DIMENSIONS,"region",[["left","right","width"],soma,parent.width]);
 			}
 		}
 	}
@@ -48,7 +48,7 @@ Parser.prototype.parseRegion = function (obj,tag,parent,tree) {
 		if (isFinite(obj.top) && isFinite(obj.bottom) && isFinite(obj.height) && isFinite(parent.height)) {
 			var soma = parseInt(obj.top) + parseInt(obj.bottom) + parseInt(obj.height);
 			if (soma!=parent.height) {
-				Debugger.warning(Debugger.WARN_INVALID_REGION_DIMENSIONS,"region",[["top","bottom","height"],soma,parent.height]);
+				Logger.warning(Logger.WARN_INVALID_REGION_DIMENSIONS,"region",[["top","bottom","height"],soma,parent.height]);
 			}
 		}
 	}
@@ -56,7 +56,7 @@ Parser.prototype.parseRegion = function (obj,tag,parent,tree) {
 	values = ["n�mero inteiro entre 0 e 255"];
 	patt = /^\d+$/;
 	if (obj.zIndex!=null && (!patt.test(obj.zIndex) || obj.zIndex<0 || obj.zIndex>255)) {
-		Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["zIndex",obj.zIndex,values]);
+		Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["zIndex",obj.zIndex,values]);
 	} else {
 		if (!this.uniqueTable["zIndex"]) {
 			this.uniqueTable["zIndex"] = [];
@@ -64,7 +64,7 @@ Parser.prototype.parseRegion = function (obj,tag,parent,tree) {
 		if (this.uniqueTable["zIndex"][obj.zIndex]) {
 			if (!this.uniqueTable["zIndex"][obj.zIndex].duplicated) {
 				this.uniqueTable["zIndex"][obj.zIndex].duplicated = true;
-				Debugger.warning(Debugger.WARN_DUPLICATED_ZINDEX,"region",[obj.zIndex]);
+				Logger.warning(Logger.WARN_DUPLICATED_ZINDEX,"region",[obj.zIndex]);
 			}
 		} else {
 			this.uniqueTable["zIndex"][obj.zIndex] = {

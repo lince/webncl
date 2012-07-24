@@ -218,7 +218,7 @@ Player.prototype.setProperty = function (name, value) {
                                             value = buffer[0] / 100;
                                     }
                                     // TODO (0.0-1.0)
-                                    Debugger.warning(Debugger.WARN_NOT_IMPLEMENTED_YET,"setProperty",[name]);
+                                    Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"setProperty",[name]);
                                     break;
                             }
 
@@ -243,12 +243,12 @@ Player.prototype.setProperty = function (name, value) {
                                     this.isVisible = value=="true"?true:false;
                                     if (this.isVisible) {
                                             if(this.node.descriptor){
-                                                    this.presentation.focusManager.addMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
+                                                    this.presentation.inputManager.addMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
                                             }
                                             $(this.htmlPlayerBkg).css("display","inline");
                                     } else {
                                             if(this.node.descriptor){
-                                                    this.presentation.focusManager.removeMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
+                                                    this.presentation.inputManager.removeMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
                                             }
                                             $(this.htmlPlayerBkg).css("display","none");
                                     }
@@ -256,7 +256,7 @@ Player.prototype.setProperty = function (name, value) {
                             }
                             case "scroll": {
                                     // TODO: ver norma (p.44)
-                                    Debugger.warning(Debugger.WARN_NOT_IMPLEMENTED_YET,"setProperty",[name]);
+                                    Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"setProperty",[name]);
                                     break;
                             }
                             case "fit": {
@@ -264,7 +264,7 @@ Player.prototype.setProperty = function (name, value) {
                                     // TODO: passar esse tratamento para o Html5Player
 									
 									if (value=='meetBest') {
-										Debugger.warning(Debugger.WARN_NOT_IMPLEMENTED_YET,"setProperty",[name]);
+										Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"setProperty",[name]);
 									}									
 									var fit = {
 										fill: 'fill',
@@ -291,7 +291,7 @@ Player.prototype.setProperty = function (name, value) {
                             }
                             case "style": {
                                     // TODO: url de um arquivo css
-                                    Debugger.warning(Debugger.WARN_NOT_IMPLEMENTED_YET,"setProperty",[name]);
+                                    Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"setProperty",[name]);
                                     break;
                             }
 
@@ -336,7 +336,7 @@ Player.prototype.setProperty = function (name, value) {
                             case "playerLife":		// keep/close
                             case "reusePlayer": {	// true/false
                                     // TODO
-                                    Debugger.warning(Debugger.WARN_NOT_IMPLEMENTED_YET,"property",[name]);
+                                    Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"property",[name]);
                                     break;
                             }
 
@@ -365,7 +365,7 @@ Player.prototype.setProperty = function (name, value) {
                             case "transOutSubtype":
                             case "transOutVertRepeat": {
                                     // TODO
-                                    Debugger.warning(Debugger.WARN_NOT_IMPLEMENTED_YET,"property",[name]);
+                                    Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"property",[name]);
                                     break;
                             }
 
@@ -392,7 +392,7 @@ Player.prototype.setProperty = function (name, value) {
             if(this.player.setProperty)
                 this.player.setProperty(name,value);
             else
-                Debugger.error(Debugger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['setProperty',name,value]);
+                Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['setProperty',name,value]);
         }
         
         $(this.htmlPlayer).trigger("attribution.onEndAttribution",[name]);

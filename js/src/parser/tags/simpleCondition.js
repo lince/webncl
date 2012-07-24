@@ -23,11 +23,11 @@ Parser.prototype.parseSimpleCondition = function (obj,tag,parent,tree) {
 	// role
 	values = ["onBegin","onEnd","onAbort","onPause","onResume","onSelection","onBeginAttribution","onEndAttribution"];
 	if (obj.role!=null && jQuery.inArray(obj.role,values)==-1) {
-		Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["role",obj.role,values]);
+		Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["role",obj.role,values]);
 	}
 	if (obj.role!=null) {
 		if (jQuery.inArray(obj.role,values)==-1) {
-			Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["role",obj.role,values]);
+			Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["role",obj.role,values]);
 		} else {
 			var connectorID = tree.split("causalConnector#")[1].split(">")[0];
 			if (!this.uniqueTable["id#"+connectorID]) {
@@ -36,7 +36,7 @@ Parser.prototype.parseSimpleCondition = function (obj,tag,parent,tree) {
 			if (this.uniqueTable["id#"+connectorID][obj.role]) {
 				if (!this.uniqueTable["id#"+connectorID][obj.role].duplicated) {
 					this.uniqueTable["id#"+connectorID][obj.role].duplicated = true;
-					Debugger.error(Debugger.ERR_DUPLICATED_ATTR,"role",[obj.role,connectorID,["simpleAction","simpleCondition","attributeAssessment"]]);
+					Logger.error(Logger.ERR_DUPLICATED_ATTR,"role",[obj.role,connectorID,["simpleAction","simpleCondition","attributeAssessment"]]);
 				}
 			} else {
 				this.uniqueTable["id#"+connectorID][obj.role] = {
@@ -48,12 +48,12 @@ Parser.prototype.parseSimpleCondition = function (obj,tag,parent,tree) {
 	// transition
 	values = ["starts","stops","pauses","resumes","aborts"];
 	if (obj.transition!=null && jQuery.inArray(obj.transition,values)==-1) {
-		Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["transition",obj.transition,values]);
+		Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["transition",obj.transition,values]);
 	}
 	// eventType
 	values = ["presentation","selection","attribution"];
 	if (obj.eventType!=null && jQuery.inArray(obj.eventType,values)==-1) {
-		Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["eventType",obj.eventType,values]);
+		Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["eventType",obj.eventType,values]);
 	}
 	// key
 	values = [
@@ -63,17 +63,17 @@ Parser.prototype.parseSimpleCondition = function (obj,tag,parent,tree) {
 	];
 	patt = /^([0-9A-Z]|\*|\$[A-Za-z_][0-9A-Za-z_]*|#|MENU|INFO|GUIDE|CURSOR_DOWN|CURSOR_LEFT|CURSOR_RIGHT|CURSOR_UP|CHANNEL_DOWN|CHANNEL_UP|VOLUME_DOWN|VOLUME_UP|ENTER|RED|GREEN|YELLOW|BLUE|BACK|EXIT|POWER|REWIND|STOP|EJECT|PLAY|RECORD|PAUSE)$/;
 	if (obj.key!=null && !patt.test(obj.key)) {
-		Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["key",obj.key,values]);
+		Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["key",obj.key,values]);
 	}
 	// min
 	values = ["(n�mero inteiro entre 1 e max)"];
 	patt = /^\d+$/;
 	if (obj.min!=null) {
 		if (!patt.test(obj.min)) {
-			Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["min",obj.min,values]);
+			Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["min",obj.min,values]);
 		} else {
 			if (parseInt(obj.min)<1 || (obj.max!=null && obj.max!="unbounded" && parseInt(obj.max)<parseInt(obj.min))) {
-				Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["min",obj.min,values]);
+				Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["min",obj.min,values]);
 			}
 		}
 	}
@@ -82,11 +82,11 @@ Parser.prototype.parseSimpleCondition = function (obj,tag,parent,tree) {
 	patt = /^(\d+|unbounded)$/;
 	if (obj.max!=null) {
 		if (!patt.test(obj.max)) {
-			Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["max",obj.max,values]);
+			Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["max",obj.max,values]);
 		} else {
 			if (obj.max!="unbounded") {
 				if (parseInt(obj.max)<1 || (obj.min!=null && parseInt(obj.max)<parseInt(obj.min))) {
-					Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["max",obj.max,values]);
+					Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["max",obj.max,values]);
 				}
 			}
 		}
@@ -95,11 +95,11 @@ Parser.prototype.parseSimpleCondition = function (obj,tag,parent,tree) {
 	values = ["and","or"];
 	if (obj.qualifier==null) {
 		if (obj.min!=null && parseInt(obj.min)>1) {
-			Debugger.error(Debugger.ERR_MISSING_ATTR,tag,["qualifier"]);
+			Logger.error(Logger.ERR_MISSING_ATTR,tag,["qualifier"]);
 		} else if (obj.max!=null && (obj.max=="unbounded" || parseInt(obj.max)>1)) {
-			Debugger.error(Debugger.ERR_MISSING_ATTR,tag,["qualifier"]);
+			Logger.error(Logger.ERR_MISSING_ATTR,tag,["qualifier"]);
 		}
 	} else if (jQuery.inArray(obj.qualifier,values)==-1) {
-		Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["qualifier",obj.qualifier,values]);
+		Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["qualifier",obj.qualifier,values]);
 	}
 };

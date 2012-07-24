@@ -25,10 +25,10 @@
 
 /**
  * Classe que mantem as configuracoes gerais do NCl sendo tocado.
- * Deve ser instanciada somente depois que o FocusManager e outras
+ * Deve ser instanciada somente depois que o InputManager e outras
  * classes foram instanciadas
  * @param {Object} presentation Estrutura que contem objetos 
- * 							    como FocusManager, o proprio SystemSettings,
+ * 							    como InputManager, o proprio SystemSettings,
  * 				 			    entre outras configuracoes.
  * @constructor
  */
@@ -46,13 +46,13 @@ function SystemSettings(presentation)
 	
 	//Mapa das funcoes de set de algumas propriedadees
 	this.setMap=	{
-		'service.currentFocus': $.proxy(presentation.focusManager.setCurrentFocus,presentation.focusManager)
+		'service.currentFocus': $.proxy(presentation.inputManager.setCurrentFocus,presentation.inputManager)
 	}
 	
 	//Mapa das funcoes de get de algumas propriedades
 	//(devem ser as mesmas que possuem funcao de set)
 	this.getMap= {
-		'service.currentFocus': $.proxy(presentation.focusManager.getCurrentFocus,presentation.focusManager)
+		'service.currentFocus': $.proxy(presentation.inputManager.getCurrentFocus,presentation.inputManager)
 	}
 	
 

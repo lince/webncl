@@ -151,11 +151,11 @@ ContextPlayer.prototype.startPort = function (port) {
 		case "context": {
 			// component = context -> nodeInterface = port
 			if (!this.context[port.component.id]) {
-				Debugger.error(Debugger.ERR_INVALID_CONTEXT_REFERENCE,"port",[port.id,"component",port.component.id]);
+				Logger.error(Logger.ERR_INVALID_CONTEXT_REFERENCE,"port",[port.id,"component",port.component.id]);
 			} else if (port.nodeInterface) {
 				this.context[port.component.id].create();
 				if (!this.context[port.component.id].port[port.nodeInterface.id]) {
-					Debugger.error(Debugger.ERR_INVALID_CONTEXT_REFERENCE,"port",[port.id,"interface",port.nodeInterface.id]);
+					Logger.error(Logger.ERR_INVALID_CONTEXT_REFERENCE,"port",[port.id,"interface",port.nodeInterface.id]);
 				} else {
 					this.context[port.component.id].start(port.nodeInterface.id);
 				}

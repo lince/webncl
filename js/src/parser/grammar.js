@@ -44,31 +44,31 @@ Parser.nclStructureMap = {
 				var c2 = count["valueAssessment"];
 				if (c1 == 0) {
 					errors.push({
-						code: Debugger.ERR_MISSING_TAG,
+						code: Logger.ERR_MISSING_TAG,
 						params: ["attributeAssessment"]
 					});
 				}
 				if (c1 < 2 && c2 == 0) {
 					errors.push({
-						code: Debugger.ERR_MISSING_TAG_ONEOF,
+						code: Logger.ERR_MISSING_TAG_ONEOF,
 						params: ["attributeAssessment","valueAssessment"]
 					});
 				}
 				if (c1 == 2 && c2 > 0) {
 					errors.push({
-						code: Debugger.ERR_TOO_MANY_TAGS_ONEOF,
+						code: Logger.ERR_TOO_MANY_TAGS_ONEOF,
 						params: ["attributeAssessment","valueAssessment"]
 					});
 				}
 				if (c1 > 2) {
 					errors.push({
-						code: Debugger.ERR_TOO_MANY_TAGS,
+						code: Logger.ERR_TOO_MANY_TAGS,
 						params: ["attributeAssessment"]
 					});
 				}
 				if (c2 > 1) {
 					errors.push({
-						code: Debugger.ERR_TOO_MANY_TAGS,
+						code: Logger.ERR_TOO_MANY_TAGS,
 						params: ["valueAssessment"]
 					});
 				}
@@ -133,44 +133,44 @@ Parser.nclStructureMap = {
 				// Condições
 				if (count["simpleCondition"]==0 && count["compoundCondition"]==0) {
 					errors.push({
-						code: Debugger.ERR_MISSING_TAG_ONEOF,
+						code: Logger.ERR_MISSING_TAG_ONEOF,
 						params: ["simpleCondition","compoundCondition"]
 					});
 				} else if (count["simpleCondition"]>0 && count["compoundCondition"]>0) {
 					errors.push({
-						code: Debugger.ERR_TOO_MANY_TAGS_ONEOF,
+						code: Logger.ERR_TOO_MANY_TAGS_ONEOF,
 						params: ["simpleCondition","compoundCondition"]
 					});
 				} else if (count["simpleCondition"]>1) {
 					errors.push({
-						code: Debugger.ERR_TOO_MANY_TAGS,
+						code: Logger.ERR_TOO_MANY_TAGS,
 						params: ["simpleCondition"]
 					});
 				} else if (count["compoundCondition"]>1) {
 					errors.push({
-						code: Debugger.ERR_TOO_MANY_TAGS,
+						code: Logger.ERR_TOO_MANY_TAGS,
 						params: ["compoundCondition"]
 					});
 				}
 				// Ações
 				if (count["simpleAction"]==0 && count["compoundAction"]==0) {
 					errors.push({
-						code: Debugger.ERR_MISSING_TAG_ONEOF,
+						code: Logger.ERR_MISSING_TAG_ONEOF,
 						params: ["simpleAction","compoundAction"]
 					});
 				} else if (count["simpleAction"]>0 && count["compoundAction"]>0) {
 					errors.push({
-						code: Debugger.ERR_TOO_MANY_TAGS_ONEOF,
+						code: Logger.ERR_TOO_MANY_TAGS_ONEOF,
 						params: ["simpleAction","compoundAction"]
 					});
 				} else if (count["simpleAction"]>1) {
 					errors.push({
-						code: Debugger.ERR_TOO_MANY_TAGS,
+						code: Logger.ERR_TOO_MANY_TAGS,
 						params: ["simpleAction"]
 					});
 				} else if (count["compoundAction"]>1) {
 					errors.push({
-						code: Debugger.ERR_TOO_MANY_TAGS,
+						code: Logger.ERR_TOO_MANY_TAGS,
 						params: ["compoundAction"]
 					});
 				}

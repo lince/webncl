@@ -75,17 +75,17 @@ function Html5Player(p) {
 					}
 					case "application/x-ginga-NCLua": {
 							// type = application/x-ginga-NCLua
-							Debugger.warning(Debugger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
+							Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
 							break;
 					}
 					case "application/x-ginga-NCLet": {
 							// type = application/x-ginga-NCLet
-							Debugger.warning(Debugger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
+							Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
 							break;
 					}
 					case "application/x-ginga-time": {
 							// type = application/x-ginga-time
-							Debugger.warning(Debugger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
+							Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
 							break;
 					}
 			}
@@ -101,12 +101,12 @@ function Html5Player(p) {
 					}
 					case "text/css": {
 							// type = text/css
-							Debugger.warning(Debugger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
+							Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
 							break;
 					}
 					case "text/xml": {
 							// type = text/xml
-							Debugger.warning(Debugger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
+							Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
 							break;
 					}
 			}

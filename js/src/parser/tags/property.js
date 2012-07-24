@@ -34,7 +34,7 @@ Parser.prototype.parseProperty = function (obj,tag,parent,tree) {
 	if (obj.name!=null && jQuery.inArray(obj.name,values)==-1) {
 		patt = /^system\.(returnBitRate|screenSize|screenGraphicSize|audioType|devNumber|classType|info)\(\d+\)$/;
 		if (!patt.test(obj.name)) {
-			//Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["name",obj.name,values]);
+			//Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["name",obj.name,values]);
 		}
 	}	
 };

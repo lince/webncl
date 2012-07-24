@@ -31,6 +31,6 @@ Parser.prototype.parseDescriptorParam = function (obj,tag,parent,tree) {
 		"transOutVertRepeat","transparency","trebleLevel","visible","width","zIndex"
 	];
 	if (obj.name!=null && jQuery.inArray(obj.name,values)==-1) {
-		Debugger.error(Debugger.ERR_INVALID_ATTR_VALUE,tag,["name",obj.name,values]);
+		Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["name",obj.name,values]);
 	}	
 };

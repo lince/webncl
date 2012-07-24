@@ -20,7 +20,7 @@
  */
 
 /**
- * @fileoverview Define a classe FocusManager
+ * @fileoverview Define a classe InputManager
  */
 
 /**
@@ -29,11 +29,11 @@
  * classes foram instanciadas
  * Tambem eh responsavel por tratar os eventos de tecla nao relacionados com o foco
  * @param {Object} presentation Estrutura que contem objetos 
- * 				   como FocusManager, o proprio SystemSettings,
+ * 				   como InputManager, o proprio SystemSettings,
  * 				   entre outras configuracoes.
  * @constructor
  */
-function FocusManager(presentation) {
+function InputManager(presentation) {
 
     this.presentation = presentation;
 
@@ -70,7 +70,7 @@ function FocusManager(presentation) {
  	o seu focusIndex
 
   */
-FocusManager.prototype.addMedia = function(focusIndex, mediaId)
+InputManager.prototype.addMedia = function(focusIndex, mediaId)
 {
 	if (focusIndex in this.descriptors)
 	{
@@ -105,7 +105,7 @@ FocusManager.prototype.addMedia = function(focusIndex, mediaId)
  	e currentFocusIndex eh setado com undefined
  
  */
-FocusManager.prototype.removeMedia = function(focusIndex, mediaId)
+InputManager.prototype.removeMedia = function(focusIndex, mediaId)
 {
 	if($.inArray(focusIndex, this.focusIndexArray) != -1)
 	{
@@ -139,7 +139,7 @@ FocusManager.prototype.removeMedia = function(focusIndex, mediaId)
  * */
 
 //HACK_FOCUS (begin)
-FocusManager.prototype.__setCurrentFocus = function(focusIndex) {
+InputManager.prototype.__setCurrentFocus = function(focusIndex) {
 	if (this.presentation.settingsNode && focusIndex != undefined) {
 		htmlPlayer = this.presentation.settingsNode.htmlPlayer;
 		$(htmlPlayer).trigger('set', ['service.currentFocus', null, null, focusIndex]);
@@ -148,7 +148,7 @@ FocusManager.prototype.__setCurrentFocus = function(focusIndex) {
 	}
 }
 
-FocusManager.prototype.setCurrentFocus = function(focusIndex)
+InputManager.prototype.setCurrentFocus = function(focusIndex)
 {	
 	//Verificamos em focusIndexArray pois um descritor soh pode receber foco
 	//se tiver medias ativas
@@ -184,7 +184,7 @@ FocusManager.prototype.setCurrentFocus = function(focusIndex)
 /*
    Retorna o descriptor que esta atualmente com o foco
  * */
-FocusManager.prototype.getCurrentFocus = function()
+InputManager.prototype.getCurrentFocus = function()
 {
 	return this.currentFocusIndex;
 };
@@ -193,7 +193,7 @@ FocusManager.prototype.getCurrentFocus = function()
  
  	Chama a funcao que define o foco em uma media
  * */
-FocusManager.prototype.setMediaFocus = function(mediaId)
+InputManager.prototype.setMediaFocus = function(mediaId)
 {
 	$(mediaId).trigger('focus');
 };
@@ -202,7 +202,7 @@ FocusManager.prototype.setMediaFocus = function(mediaId)
  
  	Chama a funcao que retira o foco de uma media
  * */
-FocusManager.prototype.removeMediaFocus = function(mediaId)
+InputManager.prototype.removeMediaFocus = function(mediaId)
 {
 	$(mediaId).trigger('blur');
 };
@@ -213,7 +213,7 @@ FocusManager.prototype.removeMediaFocus = function(mediaId)
  	
  	Funcao que faz o bind do evento keydown
  * */
-FocusManager.prototype.bindKeyDown = function()
+InputManager.prototype.bindKeyDown = function()
 {
 	$('#'+this.presentation.playerDiv).on('keydown', $.proxy(function(event){
 	
@@ -232,7 +232,7 @@ FocusManager.prototype.bindKeyDown = function()
  	Funcao que faz o unbind do evento keydown
  * */	
 
-FocusManager.prototype.unbindKeyDown=  function()
+InputManager.prototype.unbindKeyDown=  function()
 {
 	$(window).off('keydown');
 };
@@ -244,7 +244,7 @@ FocusManager.prototype.unbindKeyDown=  function()
     Trata eventos de teclas realizando a movimentacao entre os Descriptors
  * */
 
-FocusManager.prototype.keyEvent = function(keyCode)
+InputManager.prototype.keyEvent = function(keyCode)
 {
     this.triggerKeyEvents(keyCode);
 
@@ -301,7 +301,7 @@ FocusManager.prototype.keyEvent = function(keyCode)
     
     Funcao que faz os binds dos evento click e mouseenter
  * */
-FocusManager.prototype.bindMouseEvents = function(focusIndex, mediaId)
+InputManager.prototype.bindMouseEvents = function(focusIndex, mediaId)
 {
     $(mediaId).css("cursor","pointer");
     
@@ -321,28 +321,28 @@ FocusManager.prototype.bindMouseEvents = function(focusIndex, mediaId)
     Funcao que faz o unbind dos eventos click e mouseenter
  * */   
 
-FocusManager.prototype.unbindMouseEvents=  function(mediaId)
+InputManager.prototype.unbindMouseEvents=  function(mediaId)
 {
     $(mediaId).off('click');
     $(mediaId).off('mouseover');
     $(mediaId).css("cursor","default");
 };
 
-FocusManager.prototype.enableKeys = function(mediaId)
+InputManager.prototype.enableKeys = function(mediaId)
 {
     if(mediaId)
         if(mediaId in this.presentation.keyEvents)
             this.presentation.keyEvents[mediaId] = true;
 };
 
-FocusManager.prototype.disableKeys = function(mediaId)
+InputManager.prototype.disableKeys = function(mediaId)
 {
     if(mediaId)
         if(mediaId in this.presentation.keyEvents)
             this.presentation.keyEvents[mediaId] = false;
 };
 
-FocusManager.prototype.triggerKeyEvents = function(whichKey)
+InputManager.prototype.triggerKeyEvents = function(whichKey)
 {
 	var enabledMedias = [];
     for(var mediaId in this.presentation.keyEvents)
@@ -363,24 +363,24 @@ FocusManager.prototype.triggerKeyEvents = function(whichKey)
 
 
 //Mantem a informacao de qual objeto possui o foco atualmente
-FocusManager.prototype.currentFocusIndex = undefined;
+InputManager.prototype.currentFocusIndex = undefined;
 
 //Mantem referencias para os descritores que possuem focusIndex
-FocusManager.prototype.descriptors = {};
+InputManager.prototype.descriptors = {};
 
 //Mantem informacao dos descriptors com medias ativas
-FocusManager.prototype.focusIndexArray = [];
+InputManager.prototype.focusIndexArray = [];
 
 
 
 /*
- * Funcoes estaticas da classe FocusManager
+ * Funcoes estaticas da classe InputManager
  * */
 
 /*
   Rotina de ordenacao utilizada no metodo array.sort()
  * */
-FocusManager.sortFunction=  function(a,b)
+InputManager.sortFunction=  function(a,b)
 {
 	a  = String(a).toLowerCase();
 	b  = String(b).toLowerCase();

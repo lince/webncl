@@ -202,13 +202,13 @@ MediaPlayer.prototype.create = function (node) {
                             }
                         else
                             {
-                                Debugger.error(Debugger.ERR_MEDIAPLAYER_NOPLAYER,this.type,['no defaultPlayer or extension player']);
+                                Logger.error(Logger.ERR_MEDIAPLAYER_NOPLAYER,this.type,['no defaultPlayer or extension player']);
                                 this.player = {};
                             }
                     }
                 else
                     {
-                        Debugger.error(Debugger.ERR_MEDIAPLAYER_NOPLAYER,this.type);
+                        Logger.error(Logger.ERR_MEDIAPLAYER_NOPLAYER,this.type);
                         this.player = {};
                     }
                 
@@ -403,7 +403,7 @@ MediaPlayer.prototype.load = function (source) {
         if(this.player.load)
             this.player.load(source);
         else
-            Debugger.error(Debugger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['load',source]);
+            Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['load',source]);
 };
 
 // focus
@@ -421,7 +421,7 @@ MediaPlayer.prototype.focus = function () {
 				$(this.htmlPlayerBkg).css("border",border);
 			} else if (borderWidth < 0) {
 				// TODO
-				Debugger.warning(Debugger.WARN_NOT_IMPLEMENTED_YET,"border",[borderWidth]);
+				Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"border",[borderWidth]);
 			}
 			if (this.node.descriptor.focusSrc) {
 				this.load(this.node.descriptor.focusSrc);
@@ -550,7 +550,7 @@ MediaPlayer.prototype.applyTransition = function (transition, flagInOut) {
 			} else {
 				// diamond
 				// TODO
-				Debugger.warning(Debugger.WARN_NOT_IMPLEMENTED_YET,"transition",[transition.type,transition.subtype]);
+				Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"transition",[transition.type,transition.subtype]);
 			}
 			break;
 		}
@@ -558,7 +558,7 @@ MediaPlayer.prototype.applyTransition = function (transition, flagInOut) {
 		case "clockWipe": {
 			// snakeWipe, clockWipe
 			// TODO
-			Debugger.warning(Debugger.WARN_NOT_IMPLEMENTED_YET,"transition",[transition.type]);
+			Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"transition",[transition.type]);
 			break;
 		}
 	}
@@ -598,9 +598,9 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 // e iniciado do lugar onde foi pedido (A maquina virtual
 // comporta-se assim no caso de ancoras), nao sei se eh o funcionamento oficial
 	if (this.isStopped) {
-        this.presentation.focusManager.enableKeys(this.htmlPlayer);
+        this.presentation.inputManager.enableKeys(this.htmlPlayer);
 		if(this.node.descriptor){
-			this.presentation.focusManager.addMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
+			this.presentation.inputManager.addMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
 		}
 		this.isPlaying = true;
 		this.isStopped = false;
@@ -609,7 +609,7 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 		if(this.player.start)
 			this.player.start();
 		else
-			Debugger.error(Debugger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['start',nodeInterface]);
+			Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['start',nodeInterface]);
 			
 		if (nodeInterface) {
 			if (this.area[nodeInterface]._type=="area") {
@@ -628,9 +628,9 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 MediaPlayer.prototype.stop = function (nodeInterface) {
 	if (!this.isStopped) {
 
-                this.presentation.focusManager.disableKeys(this.htmlPlayer);
+                this.presentation.inputManager.disableKeys(this.htmlPlayer);
 		if(this.node.descriptor){
-			this.presentation.focusManager.removeMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
+			this.presentation.inputManager.removeMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
 		}
 
 		this.isPlaying = false;
@@ -640,7 +640,7 @@ MediaPlayer.prototype.stop = function (nodeInterface) {
                 if(this.player.stop)
                     this.player.stop();
                 else
-                    Debugger.error(Debugger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['stop',nodeInterface]);
+                    Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['stop',nodeInterface]);
                 
 		$(this.htmlPlayer).trigger("presentation.onEnd",[nodeInterface]);
 	}
@@ -655,7 +655,7 @@ MediaPlayer.prototype.pause = function (nodeInterface) {
                 if(this.player.pause)
                     this.player.pause()
                 else
-                    Debugger.error(Debugger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['pause',nodeInterface]);
+                    Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['pause',nodeInterface]);
                 
 		$(this.htmlPlayer).trigger("presentation.onPause",[nodeInterface]);
 	}
@@ -670,7 +670,7 @@ MediaPlayer.prototype.resume = function (nodeInterface) {
                 if(this.player.resume)
                     this.player.resume();
                 else
-                    Debugger.error(Debugger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['resume',nodeInterface]);
+                    Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['resume',nodeInterface]);
                 
 		$(this.htmlPlayer).trigger("presentation.onResume",[nodeInterface]);
 	}
@@ -680,7 +680,7 @@ MediaPlayer.prototype.resume = function (nodeInterface) {
 MediaPlayer.prototype.abort = function (nodeInterface) {
 	if (!this.isStopped) {
 		if(this.node.descriptor){
-			this.presentation.focusManager.removeMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
+			this.presentation.inputManager.removeMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
 		}
 		this.isPlaying = false;
 		this.isStopped = true;
@@ -689,7 +689,7 @@ MediaPlayer.prototype.abort = function (nodeInterface) {
                 if(this.player.abort)
                     this.player.abort();
                 else
-                    Debugger.error(Debugger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['abort',nodeInterface]);
+                    Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['abort',nodeInterface]);
                         
                 
 		$(this.htmlPlayer).trigger("presentation.onAbort",[nodeInterface]);
@@ -700,7 +700,7 @@ MediaPlayer.prototype.seek = function (newTime) {
         if(this.player.seek)
             this.player.seek(newTime);
         else
-            Debugger.error(Debugger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['seek',newTime]);
+            Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['seek',newTime]);
                 
 };
 
@@ -710,7 +710,7 @@ MediaPlayer.prototype.seekAndPlay = function (newTime) {
                 if(this.player.seekAndPlay)
                 	this.player.seekAndPlay(newTime);
                 else
-                        Debugger.error(Debugger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['seekAndPlay',newTime]);
+                        Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['seekAndPlay',newTime]);
                 
 	}
 };
