@@ -275,40 +275,72 @@ MediaPlayer.prototype.create = function (node) {
 	
 	
 	/* --- Property tags (under <media>) treatment --- */
-	
-	// Preparing to recalculate positions and size in case of property tags of these type.
-	var parentBounds = {
-		left: 0,
-		top: 0,
-		width: parseInt($("#"+this.presentation.playerDiv).css("width").split("px")[0]),
-		height: parseInt($("#"+this.presentation.playerDiv).css("height").split("px")[0])
-	};
-	var regionBounds = {
-		left: null,
-		right: null,
-		top: null,
-		bottom: null,
-		width: null,
-		height: null
-	};
-	if(this.node.descriptor && this.node.descriptor.region) {
-			parentBounds.left = (this.node.descriptor.region._parent.left) ? parseInt(this.node.descriptor.region._parent.left.split("px")[0]) : 0;
-			parentBounds.top = (this.node.descriptor.region._parent.top) ? parseInt(this.node.descriptor.region._parent.top.split("px")[0]) : 0;				
-			parentBounds.width = (this.node.descriptor.region._parent.width) ? parseInt(this.node.descriptor.region._parent.width.split("px")[0]) : parseInt($("#"+this.presentation.playerDiv).css("width").split("px")[0]);
-			parentBounds.height = (this.node.descriptor.region._parent.height) ? parseInt(this.node.descriptor.region._parent.height.split("px")[0]) : parseInt($("#"+this.presentation.playerDiv).css("height").split("px")[0]);
 
-			regionBounds.left = this.node.descriptor.region.left,
-			regionBounds.right = this.node.descriptor.region.right,
-			regionBounds.top = this.node.descriptor.region.top,
-			regionBounds.bottom = this.node.descriptor.region.bottom,
-			regionBounds.width = this.node.descriptor.region.width,
-			regionBounds.height = this.node.descriptor.region.height
+	var boundsProperties = [];
+	for(i in node.property)
+	{
+		if(node.property[i].value){
+			switch(node.property[i].name){ 
+				case "bounds":
+				case "top":
+				case "left":
+				case "bottom":
+				case "right": 
+				case "height":
+				case "width": {
+					//save in boundProperties for later use
+					boundsProperties.push({
+						name: node.property[i].name, 
+						value: node.property[i].value
+					});
+					break;
+				}
+				default:
+					//set other properties
+					this.setProperty(node.property[i].name,node.property[i].value);
+			}
+		}
+		
 	}
-	for (i in node.property) {
-		// Propriedades da tag <media> (property)
-		var name = node.property[i].name;
-		var value = node.property[i].value;
-		if(value){
+	// if there is at least one bound property, there is a lot of work to do
+	if(boundsProperties.length > 0) {
+		
+		// Preparing to recalculate positions and size due to the presence of property tags of these type.
+		
+		// Create structures to pass as arguments to the fixRegionBounds function
+		var parentBounds = {
+			left: 0,
+			top: 0,
+			width: parseInt($("#"+this.presentation.playerDiv).css("width").split("px")[0]),
+			height: parseInt($("#"+this.presentation.playerDiv).css("height").split("px")[0])
+		};
+		var regionBounds = {
+			left: null,
+			right: null,
+			top: null,
+			bottom: null,
+			width: null,
+			height: null
+		};
+		
+		// Set initial values as found on region and region._parent
+		if(this.node.descriptor && this.node.descriptor.region) {
+				parentBounds.left = (this.node.descriptor.region._parent.left) ? parseInt(this.node.descriptor.region._parent.left.split("px")[0]) : 0;
+				parentBounds.top = (this.node.descriptor.region._parent.top) ? parseInt(this.node.descriptor.region._parent.top.split("px")[0]) : 0;				
+				parentBounds.width = (this.node.descriptor.region._parent.width) ? parseInt(this.node.descriptor.region._parent.width.split("px")[0]) : parseInt($("#"+this.presentation.playerDiv).css("width").split("px")[0]);
+				parentBounds.height = (this.node.descriptor.region._parent.height) ? parseInt(this.node.descriptor.region._parent.height.split("px")[0]) : parseInt($("#"+this.presentation.playerDiv).css("height").split("px")[0]);		
+				
+				// In this case, the region is already fixed, so we should get the relative value for left and top as initial values, so we can fix the bounds again
+				regionBounds.left = (this.node.descriptor.region.left.split("px")[0] - parentBounds.left).toString();
+				regionBounds.top = (this.node.descriptor.region.top.split("px")[0] - parentBounds.top).toString();
+				regionBounds.width = this.node.descriptor.region.width,
+				regionBounds.height = this.node.descriptor.region.height
+				
+		}
+		// Overwrite the regionBounds structure with values found in the property tags
+		for (i in boundsProperties) {
+			var name = boundsProperties[i].name;
+			var value = boundsProperties[i].value;
 			switch(name){ 
 				case "bounds": {
 					var bounds = value.split(",");
@@ -327,21 +359,20 @@ MediaPlayer.prototype.create = function (node) {
 					regionBounds[name] = value;
 					break;
 				}
-				default:
-					this.setProperty(name,value);
 			}
 		}
-	}
-	
-	// Call the same function that is called in the begining for checking region attributes
-	WebNclPlayer.prototype.fixRegionBounds(regionBounds,parentBounds);
-	// Finally, call the setProperty function for each property
-	for(name in regionBounds)
-	{
-		value=regionBounds[name];
-		if(value && value!=null){
-			this.setProperty(name, value);
+		// Call the same function that is called in the begining for checking region attributes
+		WebNclPlayer.prototype.fixRegionBounds(regionBounds,parentBounds);
+		
+		// Finally, call the setProperty function for each property
+		for(name in regionBounds)
+		{
+			value=regionBounds[name];
+			if(value && value!=null){
+				this.setProperty(name, value);
+			}
 		}
+	
 	}
 	/* ----------------------------------------------- */
 	
