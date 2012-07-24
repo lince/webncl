@@ -91,32 +91,45 @@ function WebNclPlayer (file, div) {
 
 	};
 	
-	this.presentation.bodyDiv = "body" + this.presentation.playerId;
-	this.presentation.settingsDiv = "settings" + this.presentation.playerId;
-	this.presentation.contextsDiv = "contexts" + this.presentation.playerId;
+        var a = this.presentation.playerId;
+	this.presentation.bodyDiv = "wncl_body" + a;
+	this.presentation.settingsDiv = "wncl_settings" + a;
+	this.presentation.contextsDiv = "wncl_contexts" + a;
+        this.presentation.loadingDiv = "wncl_loading" + a;
+        this.presentation.playDiv = 'wncl_play'+a;
+        this.presentation.endDiv = 'wncl_end'+a;
         
 	this.presentation.start = function() {
             if(this.readyToPlay)
+            {
 		this.context.start();
+                $('#'+this.playDiv).hide();
+                $('#'+this.endDiv).hide();
+            }
             else
                this.playRequested = true;
 	}
         
 	this.presentation.pause = function() {
 		this.context.pause();
+                $('#'+this.playDiv).show();
 	}
         
 	this.presentation.resume = function() {
 		this.context.resume();
+                $('#'+this.playDiv).hide();
+                $('#'+this.endDiv).hide();
 	}
         
 	this.presentation.abort = function() {
 		this.context.abort();
+                $('#'+this.endDiv).show();
 	}
         
 	this.presentation.stop = function() {
 		this.context.stop();
                 this.playRequested = false;
+                $('#'+this.endDiv).show();
 	}
         
         /*
@@ -211,32 +224,67 @@ WebNclPlayer.prototype.execute = function (data) {
 	console.log('Player "'+this.div+'" loaded in ' + (new Date() - t) + 'ms');
 	this.presentation.focusManager = new FocusManager(this.presentation);
 	this.presentation.systemSettings = new SystemSettings(this.presentation);
-	// cria métodos para manipulação da apresentação
 	
+	var $playerDiv = $("#"+this.presentation.playerDiv);
 	// cálculo da posição real de cada região
 	for (rb in this.presentation.ncl.head.regionBase) {
 		for (i in this.presentation.ncl.head.regionBase[rb].region) {
 			var bounds = {
 				left: 0,
 				top: 0,
-				width: parseInt($("#"+this.presentation.playerDiv).css("width").split("px")[0]),
-				height: parseInt($("#"+this.presentation.playerDiv).css("height").split("px")[0])
+				width: parseInt($playerDiv.css("width").split("px")[0]),
+				height: parseInt($playerDiv.css("height").split("px")[0])
 			};
 			this.fixRegionBounds(this.presentation.ncl.head.regionBase[rb].region[i],bounds);
 		}
 	}
-    // torna a div selecionavel
-    $('#'+this.presentation.playerDiv).attr('tabindex',this.presentation.playerId);
+        
+        // torna a div selecionavel
+        $playerDiv.attr('tabindex',this.presentation.playerId);
+
+        // cria as divs de interface 
+        $playerDiv.append("<div id='" + this.presentation.loadindDiv + "' class='wncl_BlackDiv' style='display:none;'><image src='images/loader1.gif' width='32' height='32' style='position:relative; left: 50%; top: 50%; margin-top: -16px; margin-left:-16px'/></div>");
+        $playerDiv.append("<div id='" + this.presentation.playDiv + "' class='wncl_BlackDiv wncl_clickMe' ><image src='images/play.png' width='48' height='48' style='position:relative; left: 50%; top: 50%; margin-top: -24px; margin-left:-24px'/></div>");
+        $playerDiv.append("<div id='" + this.presentation.endDiv + "' class='wncl_BlackDiv wncl_clickMe' style='display:none;'><image src='images/replay.png' width='48' height='48' style='position:relative; left: 50%; top: 50%; margin-top: -24px; margin-left:-24px'/></div>");
+       
+        
 	// cria as divs iniciais
-	$("#"+this.presentation.playerDiv).append("<div id='" + this.presentation.settingsDiv + "'></div>");
-	$("#"+this.presentation.playerDiv).append("<div id='" + this.presentation.contextsDiv + "'></div>");
+	$playerDiv.append("<div id='" + this.presentation.settingsDiv + "'></div>");
+	$playerDiv.append("<div id='" + this.presentation.contextsDiv + "'></div>");
+        
 	// cria o primeiro contexto (body)
 	this.presentation.context = new ContextPlayer(this.presentation.ncl.body,this.presentation);
-	// inicia a apresentação
+	
+        // TODO: tratar evento de onEnd do contexto
+        
+        //$(this.presentation.context.htmlPlayer).on('presentation.onEnd presentation.onAbort',$.proxy(function(){
+        //    this.presentation.stop();
+        //},this));
+
+        // eventos para cada div de interface
+        
+        //start div
+        $('#'+this.presentation.playDiv).on("click",$.proxy(function(){
+            if(this.presentation.context.isStopped)
+                this.presentation.start();
+            else
+                {
+                    if(!this.presentation.context.isPlaying)
+                        this.presentation.resume();
+                }
+        },this));
+        
+        //end div
+        $('#'+this.presentation.endDiv).on("click",$.proxy(function(){
+            this.presentation.start();
+        },this));
+        
+        
+        // inicia a apresentação
         this.presentation.readyToPlay = true;
         
         if (this.presentation.playRequested)
-            this.presentation.context.start();
+            this.presentation.start();
 };
 
 // fixRegionBounds
@@ -438,7 +486,18 @@ $(document).ready(function() {
 		+'	position: absolute;'
 		+'	overflow: hidden;'
 		+'	display: none;'
-		+'}';
+		+'}'
+                +'.wncl_BlackDiv {'
+                +'    position:absolute;'
+                +'    width:100%;'
+                +'    height:100%;'
+                +'    z-index: 999;'
+                +'    background-color:rgba(0,0,0,0.8);'
+                +'}'
+                +'.wncl_clickMe {'
+                +'    cursor:pointer;'
+                +'}'
+                ;
 		
 	$('<style>').text(style).appendTo('head');
 

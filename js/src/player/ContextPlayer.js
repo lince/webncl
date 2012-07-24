@@ -21,32 +21,44 @@
 
 ContextPlayer.prototype = new Player();
 
-function ContextPlayer (node, presentation) {
+function ContextPlayer (node, p) {
 
 	this.timerManager = new TimerManager();
-
-	this.synchronizedPlayers = [];
-	this.loadingPlayers = 0;
 	
 	this.handlers = {};
 	this.node = node;
 	this.media = [];
 	this.context = [];
 	this.port = [];
-	this.pausedMediaList = [];
+        this.presentation = p.presentation || p;
+        this.parentContext = p;
+
+        
+	//this.synchronizedPlayers = [];
+	//this.loadingPlayers = 0;
+        
+        this.syncingMediaList = [];
+        this.syncingContextList = [];
+        this.syncingObjects = 0;
+        
+        this.playingMediaList = [];
+        this.playingContextList = [];
+	
+        this.pausedMediaList = [];
 	this.pausedContextList = [];
+        
 	this.isCreated = false;
 	this.htmlPlayer = "";
 	this.isPlaying = false;
 	this.isStopped = true;
-	this.presentation = presentation;
+
 	
 	if (node.id) {
-		this.htmlPlayer = presentation.getDivId(node.id);
+		this.htmlPlayer = this.presentation.getDivId(node.id);
 	} else {
-		this.htmlPlayer = presentation.bodyDiv;
+		this.htmlPlayer = this.presentation.bodyDiv;
 	}
-	$("#"+presentation.contextsDiv).append("<div class='context' id='"+this.htmlPlayer+"'></div>");
+	$("#"+this.presentation.contextsDiv).append("<div class='context' id='"+this.htmlPlayer+"'></div>");
 	this.htmlPlayer = "#" + this.htmlPlayer;
 	$(this.htmlPlayer).data("player",this);
 	$(this.htmlPlayer).data("property",[]);	
@@ -66,17 +78,19 @@ ContextPlayer.prototype.eventType = {
 	"onEndAttribution": "attribution"
 };
 
-ContextPlayer.prototype.syncPlayer = function (player) {
-	this.synchronizedPlayers.push(player.popcornPlayer);
+//== Synchronization Functions Start ==
+
+/*ContextPlayer.prototype.syncPlayer = function (mediaPlayer) {
+	this.synchronizedPlayers.push(mediaPlayer.popcornPlayer);
 	this.loadingPlayers++;
 };
 
-ContextPlayer.prototype.notify = function (player) {
-	if (player) {
-		if (player.popcornPlayer.readyState() >= 2) {
+ContextPlayer.prototype.notify = function (mediaPlayer) {
+	if (mediaPlayer) {
+		if (mediaPlayer.popcornPlayer.readyState() >= 2) {
 			this.notify();
 		} else {
-			$(player.htmlPlayer).one("canplaythrough",$.proxy(function() {
+			$(mediaPlayer.htmlPlayer).one("canplaythrough",$.proxy(function() {
 				this.notify();
 			},this));
 		}
@@ -88,6 +102,8 @@ ContextPlayer.prototype.notify = function (player) {
 		}
 	}
 };
+*/
+//== Synchronization Functions End ==
 
 // create
 ContextPlayer.prototype.create = function () {
@@ -97,7 +113,7 @@ ContextPlayer.prototype.create = function () {
 			this.media[this.node.media[i].id] = new MediaPlayer(this.node.media[i],this);
 		}
 		for (i in this.node.context) {
-			this.context[this.node.context[i].id] = new ContextPlayer(this.node.context[i],this.presentation);
+			this.context[this.node.context[i].id] = new ContextPlayer(this.node.context[i],this);
 		}
 		for (i in this.node.port) {
 			this.port[this.node.port[i].id] = this.node.port[i];
@@ -253,7 +269,7 @@ ContextPlayer.createLocalParamMap = function (bindParam) {
 };
 
 // executeTriggerArray
-//	triggerArray[i][0] = bindComponent
+// triggerArray[i][0] = bindComponent
 // triggerArray[i][1] = actionName
 // triggerArray[i][2] = parâmetros do trigger
 ContextPlayer.executeTriggerArray = function (triggerArray) {
@@ -292,7 +308,8 @@ ContextPlayer.prototype.bindLinks = function()
 				 attribution.onBeginAttribution
 				 attribution.onEndAttribution
 			 */
-			console.warn("Eventos de atribuicao para propriedades referenciadas por portas nao foi implementado");
+                        Debugger.warning(Debugger.WARN_NOT_IMPLEMENTED_YET,"context",['attribution.onBeginAttribution','attribution.onEndAttribution']);
+			//console.warn("Eventos de atribuicao para propriedades referenciadas por portas nao foi implementado");
 	
 			
 		} else {
@@ -321,8 +338,8 @@ ContextPlayer.prototype.bindLinks = function()
 					},
 					function(e)
 					{
-                        var evento = $.Event(e.data.eventName);
-                        evento.which = e.which;
+                                                var evento = $.Event(e.data.eventName);
+                                                evento.which = e.which;
 						$(e.data.contextElement).trigger(evento,[e.data.interfaceId])
 					
 					});
