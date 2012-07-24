@@ -95,91 +95,58 @@ function WebNclPlayer (file, div) {
 
 	};
 	
-        var a = this.presentation.playerId;
+	var a = this.presentation.playerId;
 	this.presentation.bodyDiv = "wncl_body" + a;
 	this.presentation.settingsDiv = "wncl_settings" + a;
 	this.presentation.contextsDiv = "wncl_contexts" + a;
-        this.presentation.loadingDiv = "wncl_loading" + a;
-        this.presentation.playDiv = 'wncl_play'+a;
-        this.presentation.endDiv = 'wncl_end'+a;
+	this.presentation.loadingDiv = "wncl_loading" + a;
+	this.presentation.playDiv = 'wncl_play'+a;
+	this.presentation.endDiv = 'wncl_end'+a;
         
-	this.presentation.start = function() {
-            if(this.readyToPlay)
-            {
-		this.context.start();
-                $('#'+this.playDiv).hide();
-                $('#'+this.endDiv).hide();
-            }
-            else
-               this.playRequested = true;
-	}
-        
-	this.presentation.pause = function() {
-		this.context.pause();
-                $('#'+this.playDiv).show();
-	}
-        
-	this.presentation.resume = function() {
-		this.context.resume();
-                $('#'+this.playDiv).hide();
-                $('#'+this.endDiv).hide();
-	}
-        
-	this.presentation.abort = function() {
-		this.context.abort();
-                $('#'+this.endDiv).show();
-	}
-        
-	this.presentation.stop = function() {
-		this.context.stop();
-                this.playRequested = false;
-                $('#'+this.endDiv).show();
-	}
-        
-        /*
-         * Keys mapping declaration
-         * They can be redefined by the user
-         **/
-        
-        this.presentation.keys = {
-            CURSOR_UP           :	38, 	/* arrow up */
-            CURSOR_DOWN         : 	40,		/* arrow down */
-            CURSOR_LEFT         :	37,		/* arrow left */
-            CURSOR_RIGHT        :	39,		/* arrow right */
-            ENTER               :	13,		/* enter */
-            RED                 :   81,  	/* q */
-            GREEN               :   87,		/* w */
-            YELLOW              :   69,		/* e */
-            BLUE                :   82,		/* r */
-            KEY_0               :   96,		/* 0 */
-            KEY_1               :   97,		/* 1 */
-            KEY_2               :   98,		/* 2 */
-            KEY_3               :   99,		/* 3 */
-            KEY_4               :   100,	/* 4 */
-            KEY_5               :   101,	/* 5 */
-            KEY_6               :   102,	/* 6 */
-            KEY_7               :   103,	/* 7 */
-            KEY_8               :   104,	/* 8 */
-            KEY_9               :   105,	/* 9 */
-
-            BACK                :	90,		/* z */
-            EXIT                :	88,		/* x */
-            PLAY                :	67,		/* c */
-            STOP                :	86,		/* v */
-            PAUSE               :	66,		/* b */
-            RECORD              :	78,		/* n */
-
-            POWER               :	65,		/* a */
-            REWIND              :	83,		/* s */
-            EJECT               :	68,		/* d */
-            MENU				:   77
-        }
-        
-        //Despite the key codes defined above, an array should be defined
-        //with the codes that are going to be processed by the event handler
-        //User can redefine this array to avoid player from processing some key events
-        this.presentation.keys.allCodes = [13,37,38,39,40,81,87,69,82,96,97,98,99,100,101,102,103,104,105,90,88,67,86,66,78,65,83,68];
+	/*
+	 * Keys mapping declaration
+	 * They can be redefined by the user
+	 **/
 	
+	this.presentation.keys = {
+		CURSOR_UP           :	38, 	/* arrow up */
+		CURSOR_DOWN         : 	40,		/* arrow down */
+		CURSOR_LEFT         :	37,		/* arrow left */
+		CURSOR_RIGHT        :	39,		/* arrow right */
+		ENTER               :	13,		/* enter */
+		RED                 :   81,  	/* q */
+		GREEN               :   87,		/* w */
+		YELLOW              :   69,		/* e */
+		BLUE                :   82,		/* r */
+		KEY_0               :   96,		/* 0 */
+		KEY_1               :   97,		/* 1 */
+		KEY_2               :   98,		/* 2 */
+		KEY_3               :   99,		/* 3 */
+		KEY_4               :   100,	/* 4 */
+		KEY_5               :   101,	/* 5 */
+		KEY_6               :   102,	/* 6 */
+		KEY_7               :   103,	/* 7 */
+		KEY_8               :   104,	/* 8 */
+		KEY_9               :   105,	/* 9 */
+
+		BACK                :	90,		/* z */
+		EXIT                :	88,		/* x */
+		PLAY                :	67,		/* c */
+		STOP                :	86,		/* v */
+		PAUSE               :	66,		/* b */
+		RECORD              :	78,		/* n */
+
+		POWER               :	65,		/* a */
+		REWIND              :	83,		/* s */
+		EJECT               :	68,		/* d */
+		MENU				:   77
+	}
+	
+	//Despite the key codes defined above, an array should be defined
+	//with the codes that are going to be processed by the event handler
+	//User can redefine this array to avoid player from processing some key events
+	this.presentation.keys.allCodes = [13,37,38,39,40,81,87,69,82,96,97,98,99,100,101,102,103,104,105,90,88,67,86,66,78,65,83,68];
+
 
 
 	/*
@@ -259,37 +226,36 @@ WebNclPlayer.prototype.execute = function (data) {
         
 	// cria o primeiro contexto (body)
 	this.presentation.context = new ContextPlayer(this.presentation.ncl.body,this.presentation);
-	
-        // TODO: tratar evento de onEnd do contexto
-        
-        //$(this.presentation.context.htmlPlayer).on('presentation.onEnd presentation.onAbort',$.proxy(function(){
-        //    this.presentation.stop();
-        //},this));
 
-        // eventos para cada div de interface
-        
-        //start div
-        $('#'+this.presentation.playDiv).on("click",$.proxy(function(){
-            if(this.presentation.context.isStopped)
-                this.presentation.start();
-            else
-                {
-                    if(!this.presentation.context.isPlaying)
-                        this.presentation.resume();
-                }
-        },this));
-        
-        //end div
-        $('#'+this.presentation.endDiv).on("click",$.proxy(function(){
-            this.presentation.start();
-        },this));
-        
-        
-        // inicia a apresentação
-        this.presentation.readyToPlay = true;
-        
-        if (this.presentation.playRequested)
-            this.presentation.start();
+	// TODO: tratar evento de onEnd do contexto
+	
+	//$(this.presentation.context.htmlPlayer).on('presentation.onEnd presentation.onAbort',$.proxy(function(){
+	//    this.presentation.stop();
+	//},this));
+
+	// eventos para cada div de interface
+	
+	//start div
+	$('#'+this.presentation.playDiv).on("click",$.proxy(function(){
+		if (this.presentation.context.isStopped) {
+			this.start();
+		} else if (!this.presentation.context.isPlaying) {
+			this.resume();
+		}
+	},this));
+	
+	//end div
+	$('#'+this.presentation.endDiv).on("click",$.proxy(function(){
+		this.start();
+	},this));
+	
+	
+	// inicia a apresentação
+	this.presentation.readyToPlay = true;
+	
+	if (this.presentation.playRequested)
+		this.start();
+
 };
 
 // fixRegionBounds
@@ -429,6 +395,103 @@ WebNclPlayer.prototype.fixRegionBounds = function (node, parentBounds) {
 	
 };
 
+/****** PLAYER CONTROL API *****/
+
+// destroy
+WebNclPlayer.prototype.destroy = function() {
+	// TODO
+}
+
+// start
+WebNclPlayer.prototype.start = function() {
+	if (this.presentation.readyToPlay) {
+		this.presentation.context.start();
+		$('#'+this.presentation.playDiv).hide();
+		$('#'+this.presentation.endDiv).hide();	
+	} else {
+		this.presentation.playRequested = true;
+	}
+}
+
+// pause
+WebNclPlayer.prototype.pause = function() {
+	this.presentation.context.pause();
+	$('#'+this.presentation.playDiv).show();
+}
+
+// resume
+WebNclPlayer.prototype.resume = function() {
+	this.presentation.context.resume();
+	$('#'+this.presentation.playDiv).hide();
+	$('#'+this.presentation.endDiv).hide();
+}
+        
+// abort
+WebNclPlayer.prototype.abort = function() {
+	this.presentation.context.abort();
+	$('#'+this.presentation.endDiv).show();
+}
+
+// stop
+WebNclPlayer.prototype.stop = function() {
+	this.presentation.context.stop();
+	this.presentation.playRequested = false;
+	$('#'+this.presentation.endDiv).show();
+}
+
+// triggerEvent
+WebNclPlayer.prototype.triggerEvent = function (event,nodeId,nodeInterface) {
+	$("#"+this.presentation.getDivId(nodeId)).trigger(event,[nodeInterface]);
+};
+
+// setProperty
+WebNclPlayer.prototype.setProperty = function (nodeId,name,value) {
+	$("#"+this.presentation.getDivId(nodeId)).trigger('set',[name,null,null,value]);
+};
+
+// keyPress
+WebNclPlayer.prototype.keyPress = function (key) {
+	// TODO
+	this.presentation.inputManager.triggerKeyEvents(key); // not working!
+};
+
+// postEvent
+WebNclPlayer.prototype.postEvent = function (event) {
+	if (!event['class'] || event['class'] == 'ncl') {
+		if (!event.type || event.type == 'presentation') {
+			// presentation event
+			if (event.component) {
+				this.triggerEvent(event.action,event.component,event.area);
+			} else {
+				switch (event.action) {
+					case 'start': this.start(); break;
+					case 'pause': this.pause(); break;
+					case 'resume': this.resume(); break;
+					case 'abort': this.abort(); break;
+					case 'stop': this.stop(); break;
+				}
+			}
+		} else if (event.type == 'attribution') {
+			// attribution event
+			this.setProperty(event.component,event.property,event.value);
+		}
+	} else if (event['class'] == 'key') {
+		if (!event.type || event.type == 'press') {
+			// key press
+			this.keyPress(event.key);
+		}
+		/*
+		else if (event.type == 'release')
+		{
+			// key release
+			// nothing?
+		}
+		*/
+	}
+};
+
+/******************************/
+
 WebNclPlayer.prototype.triggerEvent = function (event,nodeId,nodeInterface) {
 	$("#"+this.presentation.getDivId(nodeId)).trigger(event,[nodeInterface]);
 };
@@ -444,7 +507,7 @@ $(document).ready(function() {
 		// todo: demais atributos
 		var src = $(this).attr("src");
 		var id = $(this).attr("id");
-                var autoplay = $(this).attr("autoplay");
+		var autoplay = $(this).attr("autoplay");
 		
 		this.outerHTML = '<div id="'+id+'" class="nclPlayer_'+id+'"> </div>';
 		
@@ -459,10 +522,9 @@ $(document).ready(function() {
 
 		webNclPlayers.push(new WebNclPlayer(src,id));
                 
-                if(autoplay)
-                {
-                    webNclPlayers[webNclPlayers.length-1].presentation.start();   
-                }
+		if (autoplay) {
+			webNclPlayers[webNclPlayers.length-1].start();   
+		}
 			
 	});
 	
@@ -492,17 +554,17 @@ $(document).ready(function() {
 		+'	overflow: hidden;'
 		+'	display: none;'
 		+'}'
-                +'.wncl_BlackDiv {'
-                +'    position:absolute;'
-                +'    width:100%;'
-                +'    height:100%;'
-                +'    z-index: 999;'
-                +'    background-color:rgba(0,0,0,0.8);'
-                +'}'
-                +'.wncl_clickMe {'
-                +'    cursor:pointer;'
-                +'}'
-                ;
+		+'.wncl_BlackDiv {'
+		+'    position:absolute;'
+		+'    width:100%;'
+		+'    height:100%;'
+		+'    z-index: 999;'
+		+'    background-color:rgba(0,0,0,0.8);'
+		+'}'
+		+'.wncl_clickMe {'
+		+'    cursor:pointer;'
+		+'}'
+		;
 		
 	$('<style>').text(style).appendTo('head');
 
