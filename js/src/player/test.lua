@@ -1,1 +1,2 @@
-canvas.initialaze;
+canvas.initialaze();
+
