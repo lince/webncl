@@ -135,12 +135,24 @@ function Html5Player(p) {
 };
 
 /**
+ * Called when the player needs to unload its sources
+ * (Precedes calls to unload, excepting the first call)
+ */
+Html5Player.prototype.unload = function()
+{
+	     //erases older content
+        $(this.htmlPlayer).empty();   
+}
+
+/**
  * Called when the player need to load (or reload) it sources 
+ * After the first time it's called, MediaPlayer.js will precede
+ * every call to load() with a call to unload() 
+ * 
  */
 Html5Player.prototype.load = function(source)
 {
-        //erases older content
-        $(this.htmlPlayer).empty();   
+ 
         
 		var filename = source.substr(0, source.lastIndexOf('.'));
 

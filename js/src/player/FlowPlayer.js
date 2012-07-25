@@ -39,13 +39,25 @@ function FlowPlayer(p) {
 };
 
 /**
+ * Called when the player needs to unload its sources
+ * (Precedes calls to unload, excepting the first call)
+ */
+Html5Player.prototype.unload = function()
+{
+	     //erases older content
+        $(this.htmlPlayer).empty();   
+}
+
+/**
  * Called when the player need to load (or reload) it sources 
+ * After the first time it's called, MediaPlayer.js will precede
+ * every call to load() with a call to unload() 
+ * 
  */
 FlowPlayer.prototype.load = function(source)
 {
 	console.log (this.p)
-      //erases older content
-      $(this.htmlPlayer).empty();
+
       this.flowPlayer = $f(this.p.id, "http://releases.flowplayer.org/swf/flowplayer-3.2.12.swf", {
     	  clip: { autoPlay: false, autoBuffering: true, url: source, scaling: 'scale'},
     	  play: {replayLabel: null, label: null, opacity: 0 },

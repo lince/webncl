@@ -185,6 +185,8 @@ MediaPlayer.prototype.create = function (node) {
 
                                 createElement: $.proxy(this.createElement,this),
                                 checkType: $.proxy(this.checkType,this),
+								getProperty: $.proxy(this.getProperty,this),
+								setProperty: $.proxy(this.setProperty,this),
                                 
                               media:{
                                 areas: this.area  
@@ -414,10 +416,18 @@ MediaPlayer.prototype.create = function (node) {
 // load
 MediaPlayer.prototype.load = function (source) {
 
+
         //Recalculates the url based on presentation path
 		source = this.presentation.path + source;
         //TODO: Needs to deal with other types (create a new media player )
-        
+
+        //Calls specific player unload function
+        if(this.player.unload)
+            this.player.unload(source);
+        else
+            Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['load',source]);
+
+
         //Calls specific player load function
         if(this.player.load)
             this.player.load(source);
@@ -425,7 +435,6 @@ MediaPlayer.prototype.load = function (source) {
             Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['load',source]);
 };
 
-// unload
 
 
 // focus
@@ -632,13 +641,19 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 		if (nodeInterface) {
 			if (this.area[nodeInterface]._type=="area") {
 				this.area[this.area[nodeInterface].id].started = true;
-				this.seek(this.area[this.area[nodeInterface].id].beginTime);
 				this.playingArea = nodeInterface;
-				if(this.player.start)
-					this.player.start();
+				var t =  this.area[this.area[nodeInterface].id].beginTime;
+				if(t != 'begin')
+					this.seekAndPlay(this.area[this.area[nodeInterface].id].beginTime);
 				else
-					Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['start',nodeInterface]);
-
+					{
+						if(this.player.start)
+							this.player.start();
+						else
+							Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['start',nodeInterface]);
+					}
+				
+				
 
 			} else {
 				// TODO (frames)
@@ -740,11 +755,11 @@ MediaPlayer.prototype.seek = function (newTime) {
 
 // seekAndPlay
 MediaPlayer.prototype.seekAndPlay = function (newTime) {
-	if (this.isStopped) {
+//	if (this.isStopped) {
                 if(this.player.seekAndPlay)
                 	this.player.seekAndPlay(newTime);
                 else
                         Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['seekAndPlay',newTime]);
                 
-	}
+//	}
 };

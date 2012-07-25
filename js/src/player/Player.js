@@ -122,7 +122,7 @@ Player.prototype.calculatePercentageValue = function(propertyName, value){
 Player.prototype.getProperty = function(name)
 {
 	//tries to get a system property
-	var v = this.systemSettings.getPropertyValue(name);
+	var v = this.presentation.systemSettings.getPropertyValue(name);
 
 	if(v)
 	{
