@@ -30,9 +30,9 @@ function MediaPlayer (node, parentContext) {
 	this.type = "";
 	this.htmlPlayer = "";
 	this.htmlPlayerBkg = ""; 
-        this.player = undefined;
-        this.playerName = undefined;
-        this.playerSettings = undefined;
+    this.player = undefined;
+    this.playerName = undefined;
+    this.playerSettings = undefined;
 	this.area = [];
 	this.transIn = [];
 	this.transOut = [];
@@ -40,12 +40,13 @@ function MediaPlayer (node, parentContext) {
 	this.isStopped = true;
 	this.isVisible = true;
 	this.isFocused = false;
+	this.playingArea = undefined;
 	this.explicitDur = undefined;
 	this.opacity = 1;	
 	this.node = node;
 	this.presentation = parentContext.presentation;
 	this.parentContext = parentContext;
-        this.divId =  this.presentation.getDivId(node.id);
+    this.divId =  this.presentation.getDivId(node.id);
 	this.create(node);
 
 
@@ -227,6 +228,19 @@ MediaPlayer.prototype.create = function (node) {
                 //if player supports area
                 if(this.player.exec)
                 {
+					
+					//onEnd trigger
+					this.player.exec('end',$.proxy(function() {
+						if(!this.playingArea)
+							this.stop();
+						else
+						{
+							$(this.htmlPlayer).trigger('presentation.onEnd');
+							this.playingArea = undefined;
+						}
+						//the stop action is going to be dealed by the area event listener
+                },this));
+					
                     for (i in this.area) {
 					
 						eval("this.player.exec(this.area[i].endTime,$.proxy(function() {"+
@@ -245,6 +259,8 @@ MediaPlayer.prototype.create = function (node) {
 						// TODO: area definida por frames ao invés de tempo
 						
 					}
+				} else {
+						Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['exec']);
 				}
 
 
@@ -380,6 +396,9 @@ MediaPlayer.prototype.create = function (node) {
 	if(this.explicitDur)
 	{
                 //explicitDur will not work unless player implements exec
+				//TODO: All areas that don't define an end should
+				//have the same end defined by explicitDur. This seens
+				//to be ignored here
 		if(this.player.exec)
                     this.player.exec(this.explicitDur,$.proxy(function() {
                          this.stop();
@@ -396,7 +415,7 @@ MediaPlayer.prototype.create = function (node) {
 MediaPlayer.prototype.load = function (source) {
 
         //Recalculates the url based on presentation path
-	source = this.presentation.path + source;
+		source = this.presentation.path + source;
         //TODO: Needs to deal with other types (create a new media player )
         
         //Calls specific player load function
@@ -405,6 +424,9 @@ MediaPlayer.prototype.load = function (source) {
         else
             Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['load',source]);
 };
+
+// unload
+
 
 // focus
 MediaPlayer.prototype.focus = function () {
@@ -606,18 +628,30 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 		this.isStopped = false;
 		this.show();
 
-		if(this.player.start)
-			this.player.start();
-		else
-			Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['start',nodeInterface]);
-			
+
 		if (nodeInterface) {
 			if (this.area[nodeInterface]._type=="area") {
 				this.area[this.area[nodeInterface].id].started = true;
 				this.seek(this.area[this.area[nodeInterface].id].beginTime);
+				this.playingArea = nodeInterface;
+				if(this.player.start)
+					this.player.start();
+				else
+					Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['start',nodeInterface]);
+
+
 			} else {
 				// TODO (frames)
 			}
+		} else {
+			
+			this.playingArea = undefined;
+			if(this.player.start)
+				this.player.start();
+			else
+				Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['start',nodeInterface]);
+
+			
 		}
 			
 		$(this.htmlPlayer).trigger("presentation.onBegin",[nodeInterface]);

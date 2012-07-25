@@ -101,7 +101,7 @@ SystemSettings.prototype.getPropertyValue = function(property)
     {
     	return this.getMap[property]();
     } else {
-    	return ''
+    	return undefined;
     }
 	
 };

@@ -32,7 +32,7 @@ function Html5Player(p) {
     this.p = p;
     this.popcornPlayer  = undefined;
     this.htmlPlayer = "#" + p.id;
-	this.onEndedExec = undefined;
+
     
     /*
      * User defined properties
@@ -130,17 +130,9 @@ function Html5Player(p) {
 		} while (!this.popcornPlayer);
 	} 
 	
-	//events are placed
-	$(this.htmlPlayer).on("ended",$.proxy(function() {
-		this.onEndedCallback();
-	},this));
+
 
 };
-
-Html5Player.prototype.onEndedCallback = function() {
-	if (this.onEndedExec) this.onEndedExec();
-	if (this.onEnded) this.onEnded();
-}
 
 /**
  * Called when the player need to load (or reload) it sources 
@@ -204,15 +196,18 @@ Html5Player.prototype.load = function(source)
  */
 Html5Player.prototype.exec = function(time,callback)
 {
+	//This function can be called more than
+	//once with the times 'begin' and 'end'.
+	//This way, the handler for these times
+	//must set a new event listener for each
+	//call
+	
     //if popcornPlayer is defined then player type is in the list ['video','audio','image','text']
     if(this.popcornPlayer) {
 		if (time == 'begin') {
 			$(this.htmlPlayer).on('play',callback);
 		} else if (time == 'end') {
-			// The player already defines a call back function for the 'ended' popcorn event,
-			// which is the 'this.onEnded()' method, so we can't define another callback for
-			// the same event.
-			this.onEndedExec = callback;
+			$(this.htmlPlayer).on('ended',callback);
 		} else {
 			this.popcornPlayer.cue(time,callback);
 		}

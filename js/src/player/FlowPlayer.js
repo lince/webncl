@@ -32,16 +32,11 @@ function FlowPlayer(p) {
     this.p = p;
     this.htmlPlayer = "#" + p.id;
     this.flowPlayer = undefined;
-	this.onEndedExec = undefined;
     
 	p.createElement("<div class='player' id='" + p.id + "'></div>");	
 
 
 };
-
-FlowPlayer.prototype.onEndedCallback = function() {
-	if (this.onEndedExec) this.onEndedExec();
-}
 
 /**
  * Called when the player need to load (or reload) it sources 
@@ -57,8 +52,7 @@ FlowPlayer.prototype.load = function(source)
     	  canvas: { background: '#000000', backgroundGradient: 'none',},
     	  plugins: {controls: null}
       });
-  	  this.flowPlayer.onFinish($.proxy(function() {
-		this.onEndedCallback();}));
+  
       //$(this.htmlPlayer).append("<script language='JavaScript'> $f('" + p.id + "', 'http://releases.flowplayer.org/swf/flowplayer-3.2.12.swf','" + source + "'); </script>");
         
 }
@@ -69,11 +63,21 @@ FlowPlayer.prototype.load = function(source)
  */
 FlowPlayer.prototype.exec = function(time,callback)
 {	
+	//This function can be called more than
+	//once with the times 'begin' and 'end'.
+	//This way, the handler for these times
+	//must set a new event listener for each
+	//call
+	//As documented bellow:
+	//http://flowplayer.org/documentation/api/index.html#events
+	//the calls onStart and onFinish works 
+	//the way we need
+	
 	if (time=='begin'){
 		this.flowPlayer.onStart(callback);
 	}
 	else if (time == 'end'){
-		this.onEndedExec = callback;
+		this.flowPlayer.onFinish(callback);
 	}
 	else{
 		this.flowPlayer.onCuepoint(time,callback);
