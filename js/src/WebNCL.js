@@ -26,8 +26,8 @@ function WebNclPlayer (file, div) {
        
 	this.presentation = {
 				
-                 readyToPlay : false,
-                 playRequested : false,
+		 readyToPlay : false,
+		 playRequested : false,
                                 
         //Time limit used by events, can be changed by the user
 		TIME_LIMIT: 1000,
@@ -399,7 +399,7 @@ WebNclPlayer.prototype.fixRegionBounds = function (node, parentBounds) {
 
 // destroy
 WebNclPlayer.prototype.destroy = function() {
-	// TODO
+	document.getElementById(this.div).outerHTML = '';
 }
 
 // start
@@ -451,8 +451,7 @@ WebNclPlayer.prototype.setProperty = function (nodeId,name,value) {
 
 // keyPress
 WebNclPlayer.prototype.keyPress = function (key) {
-	// TODO
-	this.presentation.inputManager.triggerKeyEvents(key); // not working!
+	this.presentation.inputManager.keyEvent(key);
 };
 
 // postEvent
@@ -469,6 +468,7 @@ WebNclPlayer.prototype.postEvent = function (event) {
 					case 'resume': this.resume(); break;
 					case 'abort': this.abort(); break;
 					case 'stop': this.stop(); break;
+					case 'destroy': this.destroy(); break;
 				}
 			}
 		} else if (event.type == 'attribution') {
