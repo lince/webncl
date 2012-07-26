@@ -80,7 +80,7 @@ function WebNclPlayer (file, div) {
                     {
                             defaultPlayer: Html5Player
                     },
-                "application/x-ginga-NCLua" : undefined,
+                "application/x-ginga-NCLua" : { defaultPlayer: LuaPlayer},
                 "application/x-ginga-NCLet" : undefined,
                 "application/x-ginga-settings" : {
                             defaultPlayer: Html5Player
