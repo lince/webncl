@@ -27,7 +27,6 @@ Parser.prototype.parseArea = function (obj,tag,parent,tree) {
 	values = ["(número real)s","HH:MM:SS"];
 	patt1 = /^(\d+|\d*\.\d+)s$/;
 	patt2 = /^\d+:\d+:\d+(\.\d+)?$/;
-	var format = 0;
 	// 'attrs' array is used to parse both 'begin' and 'end' in a loop, since they are very similar:
 	// 1. validates 'begin' and 'end' properties
 	// 2. creates 'beginTime' and 'endTime' properties, which are used by MediaPlayer
@@ -36,7 +35,7 @@ Parser.prototype.parseArea = function (obj,tag,parent,tree) {
 		obj[attr+'Time'] = ''; // beginTime and endTime
 		if (obj[attr] != null) {
 			// format: 0=invalid, 1='real number', 2='HH:MM:SS'
-			format = patt1.test(obj[attr]) ? 1 : (patt2.test(obj[attr]) ? 2 : 0);
+			var format = patt1.test(obj[attr]) ? 1 : (patt2.test(obj[attr]) ? 2 : 0);
 			if (format == 0) {
 				Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,[attr,obj[attr],values]);
 				obj[attr+'Time'] = 'invalid'; // just for debugging, it's not used

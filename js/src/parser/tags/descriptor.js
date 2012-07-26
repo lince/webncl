@@ -21,11 +21,33 @@
 
 Parser.prototype.parseDescriptor = function (obj,tag,parent,tree) {
 	// explicitDur
-	values = ["(número real)s"];
-	patt = /^(\d+|\d*\.\d+)s$/;
-	if (obj.explicitDur!=null && !patt.test(obj.explicitDur)) {
-		Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["explicitDur",obj.explicitDur,values]);
+	values = ["(número real)s","HH:MM:SS"];
+	patt1 = /^(\d+|\d*\.\d+)s$/;
+	patt2 = /^\d+:\d+:\d+(\.\d+)?$/;
+	if (obj.explicitDur != null) {
+		// format: 0=invalid, 1='real number', 2='HH:MM:SS'
+		var format = patt1.test(obj.explicitDur) ? 1 : (patt2.test(obj.explicitDur) ? 2 : 0);
+		if (format == 0) {
+			Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["explicitDur",obj.explicitDur,values]);
+		} else {
+			if (format == 1) {
+				// removes the 's' from the end of the string
+				obj.explicitDur = parseFloat(obj.explicitDur.split('s')[0]);
+			} else {
+				// calculates the number of seconds from the 'HH:MM:SS' format
+				var arr = obj.explicitDur.split(':');
+				var h = parseFloat(arr[0]);
+				var m = parseFloat(arr[1]);
+				var s = parseFloat(arr[2]);
+				if (m>=60 || s>=60) { // ncl handbook also says that hours must be in [0,23] interval, but it's not necessary
+					Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["explicitDur",obj.explicitDur,values]);
+				} else {
+					obj.explicitDur = parseFloat(h)*3600 + parseFloat(m)*60 + parseFloat(s);
+				}
+			}
+		}
 	}
+	
 	// freeze
 	values = ["true","false"];
 	if (obj.freeze!=null && jQuery.inArray(obj.freeze,values)==-1) {

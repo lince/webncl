@@ -111,10 +111,7 @@ MediaPlayer.prototype.create = function (node) {
 		this.transOut = node.descriptor.transOut;
 		
 		//Seta o valor de expliticDur
-		if (node.descriptor.explicitDur) {
-			vector = node.descriptor.explicitDur.split("s");
-			this.explicitDur = parseFloat(vector[0]);
-		}
+		this.explicitDur = node.descriptor.explicitDur;
 	}
 	
 	// Cria as áreas
