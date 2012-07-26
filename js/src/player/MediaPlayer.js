@@ -121,16 +121,6 @@ MediaPlayer.prototype.create = function (node) {
 	for (i in node.area) {
 		if (!node.area[i]._ignore) {
 			this.area[node.area[i].id] = node.area[i];
-			if (node.area[i].begin) {
-				this.area[node.area[i].id].beginTime = parseFloat(node.area[i].begin.split('s')[0]);
-			} else {
-				this.area[node.area[i].id].beginTime = 'begin';
-			}
-			if (node.area[i].end) {
-				this.area[node.area[i].id].endTime = parseFloat(node.area[i].end.split('s')[0]);
-			} else {
-				this.area[node.area[i].id].endTime = 'end';
-			}
 			this.area[node.area[i].id].started = false;
 		}
 	}
