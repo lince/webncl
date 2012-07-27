@@ -203,7 +203,7 @@ LuaPlayer.prototype.bindlibs = function() {
 			},
 
 			"get" : function(key){
-				persist.recoverField(key);
+				return persist.recoverField(key);
 			}
 
 	};

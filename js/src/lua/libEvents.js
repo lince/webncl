@@ -19,6 +19,7 @@ libEvents.prototype.post = function(evt){
 
 	//importing from webncl.js
 	console.log(evt);
+	console.log(this.player);
 	if (evt.str['class'] == 'key') {
 		this.player.postEvent(evt);	
 	}
