@@ -34,7 +34,7 @@ function Html5Player(p) {
     this.htmlPlayer = "#" + p.id;
 	
 	this.durationMap = {};
-	//this.endCallbacks = [];
+	this.endCallbacks = [];
 
     /*
      * User defined properties
@@ -221,8 +221,7 @@ Html5Player.prototype.exec = function(time,callback)
 		if (time == 'begin') {
 			$(this.htmlPlayer).on('play',callback);
 		} else if (time == 'end') {
-			//console.log('binding on end');
-			//this.endCallbacks.push(callback);
+			this.endCallbacks.push(callback);
 			$(this.htmlPlayer).on('ended',callback);
 		} else {
 			this.popcornPlayer.cue(time,callback);
@@ -327,14 +326,10 @@ Html5Player.prototype.seekAndPlay = function(newTime)
  */
 Html5Player.prototype.stopCallback = function (t) {
 	if (this.duration == t) {
-		//console.log('stopping');
 		this.stop();
-		/*
-		console.log(this.endCallbacks);
 		for (i in this.endCallbacks) {
 			this.endCallbacks[i]();
 		}
-		*/
 	}
 }
 Html5Player.prototype.setProperty = function(name,value) {

@@ -374,22 +374,7 @@ MediaPlayer.prototype.create = function (node) {
 	
 	}
 	/* ----------------------------------------------- */
-	
-	/* REMOVER
-	// explicitDur treatment
-	if(this.explicitDur)
-	{
-                //explicitDur will not work unless player implements exec
-				//TODO: All areas that don't define an end should
-				//have the same end defined by explicitDur. This seens
-				//to be ignored here
-		if(this.player.exec)
-                    this.player.exec(this.explicitDur,$.proxy(function() {
-                         this.stop();
-                    },this));
-	}
-	*/
-	
+		
 	// Bind events
 	this.bindEvents();
 	// Saves the media player using jQuery data function
