@@ -36,6 +36,9 @@ function LuaPlayer(p) {
 	this.p = p;
 	this.htmlPlayer = "#" + p.id;
 	this.luajscode = undefined;
+	this.persitent = new libPersistent(false);
+	this.canvas = undefined;
+	this.events = new libEvents(p);
 
 	p.createElement("<div class='player' id='" + p.id + "'></div>");
 
@@ -71,6 +74,8 @@ LuaPlayer.prototype.load = function(source) {
 			console.log('error to load file');
 		}
 	});
+	
+	this.bindlibs();
 
 }
 
@@ -132,4 +137,84 @@ LuaPlayer.prototype.seek = function(newTime) {
 LuaPlayer.prototype.seekAndPlay = function(newTime) {
 	console.log('seek and play lua');
 
+}
+
+LuaPlayer.prototype.bindlibs = function() {
+
+	lua_libs["canvas"] = {
+
+			"attrSize": function(){
+				canvas.attrSize();
+			},
+
+			"attrColor" : function(r,g,b,mode){
+				canvas.attrColor(r,g,b,mode);
+			},
+
+			"attrClip" : function(x,y,w,h){
+				canvas.attrClip(x,y,w,h);
+
+			},
+
+			"drawLine" : function(x1,y1,x2,y2){
+				canvas.drawLine(x1,y1,x2,y2);
+
+			},
+
+			"drawRect" : function(x,y,w,h){
+				canvas.drawRect(x,y,w,h);
+
+			},
+
+			"attrText" : function(face,size,style){
+				canvas.attrText(face,size,style);
+
+			},
+
+			"drawText" : function(x, y, text){
+				canvas.drawText(x, y, text);
+
+			},
+
+			"measureText" : function(text){
+				canvas.measureTextLua(text);
+
+			},
+
+			"attrCrop" : function(ctxDestiny, x, y, w, h){
+				canvas.attrCrop(ctxDestiny, x, y, w, h);
+
+			},
+
+			"compose" : function(ctxDestiny){
+				canvas.compose(ctxDestiny);
+
+			}
+
+	};
+	
+	persist = this.persitent;
+
+	lua_libs["persistent"] = {
+
+			"set" : function(prefix, key, value){
+				persist.storeField(prefix, key, value);
+				
+			},
+
+			"get" : function(key){
+				persist.recoverField(key);
+			}
+
+	};
+	
+	events = this.events;
+	
+	lua_libs["event"] = {
+			"post" : function(evnt) {
+				events.post(evnt);
+			}
+	}
+	
+	
 }

@@ -13,9 +13,9 @@
 	
 	<body>
 		
-		<port id="pVideo1" component="video1" />
+		<port id="plua" component="luascript" />
 		
-		<media id="video1" descriptor="dTV" src="test.lua" />
+		<media id="luascript" descriptor="dTV" src="test.lua" />
 		
 	</body>
 </ncl>

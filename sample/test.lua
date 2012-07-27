@@ -1,2 +1,2 @@
 print (1+3);
-canvas.test();
+event.post({ class='key', type='press', key='0' });
