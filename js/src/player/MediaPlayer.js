@@ -173,6 +173,7 @@ MediaPlayer.prototype.create = function (node) {
                                 checkType: $.proxy(this.checkType,this),
 								getProperty: $.proxy(this.getProperty,this),
 								setProperty: $.proxy(this.setProperty,this),
+                                postEvent: this.presentation.postEvent,
                                 
                               media:{
                                 areas: this.area  
