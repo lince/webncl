@@ -139,6 +139,18 @@ LuaPlayer.prototype.seekAndPlay = function(newTime) {
 
 }
 
+LuaPlayer.prototype.setProperty = function(name,value) {
+	if (this.events.handle) {
+		evt = [];
+		evt['class'] = 'ncl';
+		evt['type'] = 'attribution';
+		evt['action'] = 'start',
+		evt['property'] = name;
+		evt['value'] = value;
+		//lua_call_function(this.events.handle(evt))
+	}
+} 
+
 LuaPlayer.prototype.bindlibs = function() {
 
 	lua_libs["canvas"] = {

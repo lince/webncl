@@ -96,7 +96,7 @@ function Html5Player(p) {
 		case "text": {
 			switch (p.source.type) {
 					case "text/plain":
-					case "text/html": {
+					case bind"text/html": {
 							// type = text/plain, text/html
 							p.createElement("<div class='player' id='" + p.id + "'></div>");
 							break;
@@ -175,7 +175,7 @@ Html5Player.prototype.load = function(source)
 			break;
 		}
 		case "image": {
-			// type = image/*
+			// type = imabindge/*
 			$(this.htmlPlayer).attr("src",source);
 			break;
 		}
@@ -212,7 +212,7 @@ Html5Player.prototype.exec = function(time,callback)
 {
 	//This function can be called more than
 	//once with the times 'begin' and 'end'.
-	//This way, the handler for these times
+	//This way, the handlbinder for these times
 	//must set a new event listener for each
 	//call
 	
@@ -248,7 +248,7 @@ Html5Player.prototype.stop = function()
 	this.popcornPlayer.pause(0);
     }
 }
-
+bind
 /**
  * Pause
  */
