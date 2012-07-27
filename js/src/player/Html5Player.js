@@ -32,8 +32,10 @@ function Html5Player(p) {
     this.p = p;
     this.popcornPlayer  = undefined;
     this.htmlPlayer = "#" + p.id;
+	
+	this.durationMap = {};
+	//this.endCallbacks = [];
 
-    
     /*
      * User defined properties
      
@@ -219,6 +221,8 @@ Html5Player.prototype.exec = function(time,callback)
 		if (time == 'begin') {
 			$(this.htmlPlayer).on('play',callback);
 		} else if (time == 'end') {
+			//console.log('binding on end');
+			//this.endCallbacks.push(callback);
 			$(this.htmlPlayer).on('ended',callback);
 		} else {
 			this.popcornPlayer.cue(time,callback);
@@ -315,4 +319,38 @@ Html5Player.prototype.seekAndPlay = function(newTime)
 		} else if(this.p.checkType(["image","text"])) {
 				this.popcornPlayer.currentTime(newTime);
 		}
+}
+
+
+/**
+ * setProperty
+ */
+Html5Player.prototype.stopCallback = function (t) {
+	if (this.duration == t) {
+		//console.log('stopping');
+		this.stop();
+		/*
+		console.log(this.endCallbacks);
+		for (i in this.endCallbacks) {
+			this.endCallbacks[i]();
+		}
+		*/
+	}
+}
+Html5Player.prototype.setProperty = function(name,value) {
+	if (name == 'explicitDur') {
+		this.duration = value;
+		if (!this.durationMap[value]) {
+			this.durationMap[value] = true;
+			/*
+			eval('this.exec(value,$.proxy(function() {'+
+				'if (this.duration == ' + value + ')'+
+					'this.stop();'+
+			'},this));');
+			*/
+			eval('this.exec(value,$.proxy(function() {'+
+				'this.stopCallback(' + value + ');'+
+			'},this));');
+		}
+	}
 }

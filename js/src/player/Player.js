@@ -344,7 +344,8 @@ Player.prototype.setProperty = function (name, value) {
                             // ???
 
                             case "explicitDur": {
-                                    this.explicitDur = value;
+									if (p == undefined)
+										this.player.setProperty(name,value);
                                     break;
                             }
                             case "baseDeviceRegion":

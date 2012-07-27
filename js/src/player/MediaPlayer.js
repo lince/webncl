@@ -153,7 +153,6 @@ MediaPlayer.prototype.create = function (node) {
 		
                 // Creates media player
                 var mediaPlayers = this.presentation.mediaPlayers;
-                
                 if(mediaPlayers[this.type])
                     {
                         //creates the playerSettings data structure
@@ -178,8 +177,6 @@ MediaPlayer.prototype.create = function (node) {
                               media:{
                                 areas: this.area  
                               }
-                                
-
 
                         }
                        
@@ -208,11 +205,6 @@ MediaPlayer.prototype.create = function (node) {
                 //presetup (construtor)
 		this.load(node.src);
                 //possetup( needed ?? )
-                
-                
-                this.player.onEnded = $.proxy(function() {
-                        this.stop();
-                },this);
                 
                 //if player supports area
                 if(this.player.exec)
@@ -261,6 +253,8 @@ MediaPlayer.prototype.create = function (node) {
 	// Cria as propriedades
 	$(this.htmlPlayer).data("property",[]);
 	if (node.descriptor) {
+		if (node.descriptor.explicitDur)
+			this.setProperty("explicitDur",node.descriptor.explicitDur);
 		if (node.descriptor.region) {
 			// Propriedades da tag <region> (atributos)
 			this.setProperty("zIndex",node.descriptor.region.zIndex);
@@ -381,6 +375,7 @@ MediaPlayer.prototype.create = function (node) {
 	}
 	/* ----------------------------------------------- */
 	
+	/* REMOVER
 	// explicitDur treatment
 	if(this.explicitDur)
 	{
@@ -393,6 +388,7 @@ MediaPlayer.prototype.create = function (node) {
                          this.stop();
                     },this));
 	}
+	*/
 	
 	// Bind events
 	this.bindEvents();
