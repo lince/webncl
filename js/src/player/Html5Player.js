@@ -96,7 +96,7 @@ function Html5Player(p) {
 		case "text": {
 			switch (p.source.type) {
 					case "text/plain":
-					case bind"text/html": {
+					case "text/html": {
 							// type = text/plain, text/html
 							p.createElement("<div class='player' id='" + p.id + "'></div>");
 							break;
@@ -248,7 +248,7 @@ Html5Player.prototype.stop = function()
 	this.popcornPlayer.pause(0);
     }
 }
-bind
+
 /**
  * Pause
  */
