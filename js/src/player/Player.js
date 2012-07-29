@@ -167,8 +167,11 @@ Player.prototype.setProperty = function (name, value) {
         
 	//as Player.propertyAction.IGNORE = 0
 	//its ok to test p_action
-	if(!p_action || p_action == this.playerSettings.OVERLOAD)
+
+
+	if(!p_action || p_action == Player.propertyAction.OVERLOAD)
         {
+
             if (value != null) {
 
                     switch (name) {
@@ -400,10 +403,13 @@ Player.prototype.setProperty = function (name, value) {
 
 
             }
-        }
+        } else {
+				//override case
+				if(this.player.setProperty)
+				    this.player.setProperty(name,value);
+				else
+				    Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['setProperty',name,value]);	
+
+		}
         
-
-        
-
-
 };
