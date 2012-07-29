@@ -165,7 +165,7 @@ Html5Player.prototype.load = function(source)
 			$(this.htmlPlayer).append("<source type='audio/mpeg' src='" + filename + ".mp3'></source>");
 			$(this.htmlPlayer).append("<source type='audio/ogg' src='" + filename + ".ogg'></source>");
 			break;
-		
+
 		case "image": 
 			// type = image/*
 			$(this.htmlPlayer).attr("src",source);
@@ -204,7 +204,7 @@ Html5Player.prototype.exec = function(time,callback)
 {
 	//This function can be called more than
 	//once with the times 'begin' and 'end'.
-	//This way, the handler for these times
+	//This way, the handlbinder for these times
 	//must set a new event listener for each
 	//call
 	

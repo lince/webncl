@@ -93,6 +93,14 @@ LuaPlayer.prototype.exec = function(time, callback) {
 LuaPlayer.prototype.start = function() {
 	console.log('start lua');
 	lua_call(this.luajscode);
+	
+	if (this.events.handlers) {
+		var evt = lua_newtable();
+		evt.str['class'] = 'ncl';
+		evt.str['type'] = 'presentation';
+		evt.str['action'] = 'start';
+		this.callHandlers(evt);
+	}
 }
 
 /**
@@ -100,6 +108,14 @@ LuaPlayer.prototype.start = function() {
  */
 LuaPlayer.prototype.stop = function() {
 	console.log('stop lua');
+	
+	if (this.events.handlers) {
+		var evt = lua_newtable();
+		evt.str['class'] = 'ncl';
+		evt.str['type'] = 'presentation';
+		evt.str['action'] = 'stop';
+		this.callHandlers(evt);
+	}
 }
 
 /**
@@ -107,6 +123,14 @@ LuaPlayer.prototype.stop = function() {
  */
 LuaPlayer.prototype.pause = function() {
 	console.log('pause lua');
+	
+	if (this.events.handlers) {
+		var evt = lua_newtable();
+		evt.str['class'] = 'ncl';
+		evt.str['type'] = 'presentation';
+		evt.str['action'] = 'pause';
+		this.callHandlers(evt);
+	}
 }
 
 /**
@@ -114,6 +138,14 @@ LuaPlayer.prototype.pause = function() {
  */
 LuaPlayer.prototype.resume = function() {
 	console.log('resume lua');
+	
+	if (this.events.handlers) {
+		var evt = lua_newtable();
+		evt.str['class'] = 'ncl';
+		evt.str['type'] = 'presentation';
+		evt.str['action'] = 'resume';
+		this.callHandlers(evt);
+	}
 }
 
 /**
@@ -121,6 +153,14 @@ LuaPlayer.prototype.resume = function() {
  */
 LuaPlayer.prototype.abort = function() {
 	console.log('abort lua');
+	
+	if (this.events.handlers) {
+		var evt = lua_newtable();
+		evt.str['class'] = 'ncl';
+		evt.str['type'] = 'presentation';
+		evt.str['action'] = 'abort';
+		this.callHandlers(evt);
+	}
 }
 
 /**
@@ -128,7 +168,7 @@ LuaPlayer.prototype.abort = function() {
  */
 LuaPlayer.prototype.seek = function(newTime) {
 	console.log('seek lua');
-
+	this.callHandlers();
 }
 
 /**
@@ -138,6 +178,19 @@ LuaPlayer.prototype.seekAndPlay = function(newTime) {
 	console.log('seek and play lua');
 
 }
+
+LuaPlayer.prototype.setProperty = function(name,value) {
+	
+	if (this.events.handlers) {
+		var evt = lua_newtable();
+		evt.str['class'] = 'ncl';
+		evt.str['type'] = 'attribution';
+		evt.str['action'] = 'start';
+		evt.str['property'] = name;
+		evt.str['value'] = value;
+		this.callHandlers(evt);
+	}
+} 
 
 LuaPlayer.prototype.bindlibs = function() {
 
@@ -203,7 +256,7 @@ LuaPlayer.prototype.bindlibs = function() {
 			},
 
 			"get" : function(key){
-				persist.recoverField(key);
+				return persist.recoverField(key);
 			}
 
 	};
@@ -213,8 +266,19 @@ LuaPlayer.prototype.bindlibs = function() {
 	lua_libs["event"] = {
 			"post" : function(evnt) {
 				events.post(evnt);
+			},
+			"register" : function(handler) {
+				events.register(handler);
+			},
+			"unregister" : function(handler) {
+				events.unregister(handler);
 			}
 	}
 	
 	
+}
+
+//TODO call all the handlers registered in their correct positions
+LuaPlayer.prototype.callHandlers = function (evt) {
+	this.events.handlers(evt);
 }
