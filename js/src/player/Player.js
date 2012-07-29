@@ -32,6 +32,14 @@ function Player () {
 
 }
 
+// constants
+Player.propertyAction =
+{
+    IGNORE:0,
+    OVERRIDE:1,
+    OVERLOAD:2
+};
+
 // bindEvents
 Player.prototype.bindEvents = function () {
 	$(this.htmlPlayer).on("start",$.proxy(function(event,nodeInterface,callback,args) {
@@ -70,26 +78,26 @@ Player.prototype.bindEvents = function () {
 				// (top/bottom values are calculated based on the current height value and left/right values are calculated based on the current width value).
 			case "top":
 			case "bottom":
-			case "height": {
+			case "height": 
 					value = this.calculatePercentageValue("height", value);
 					this.setProperty(nodeInterface,value);
 					break;
-			}
+			
 			case "left":
 			case "right": 
-			case "width": {
+			case "width": 
 					value = this.calculatePercentageValue("width", value);
 					this.setProperty(nodeInterface,value);
 					break;
-			}
-			case "bounds": {
+			
+			case "bounds": 
 					var bounds = value.split(",");
 					this.setProperty("left", this.calculatePercentageValue("width",bounds[0]));
 					this.setProperty("top", this.calculatePercentageValue("height",bounds[1]));
 					this.setProperty("width", this.calculatePercentageValue("width",bounds[2]));
 					this.setProperty("height", this.calculatePercentageValue("height",bounds[3]));
 					break;
-			}
+			
 			default: 
 					this.setProperty(nodeInterface,value);
 		}
@@ -116,7 +124,7 @@ Player.prototype.calculatePercentageValue = function(propertyName, value){
 			value = parseInt(parseInt(currentValue)*parseFloat(buffer[0])/100);
 	}
 	return value;
-}
+};
 
 // getProperty
 Player.prototype.getProperty = function(name)
@@ -135,7 +143,7 @@ Player.prototype.getProperty = function(name)
 	}
         
     
-}
+};
 
 // setProperty
 Player.prototype.setProperty = function (name, value) {
@@ -143,20 +151,23 @@ Player.prototype.setProperty = function (name, value) {
 	// TODO: verify events
 	$(this.htmlPlayer).trigger("attribution.onBeginAttribution",[name]);
 
-        //save property data
+    //save property data
 	var property = $(this.htmlPlayer).data("property");
 	property[name] = value ? value : "";
 	$(this.htmlPlayer).data("property",property);
 
-        var p = undefined;
-        // handle user defined player
-        if(this.player && this.player.propertyMap)
-            p = this.player.propertyMap[name];
-         
-        //if media player does not override default property set function (or if media
-        //player doesn't define information related to property 'name')
+	//handle user defined player
+	var p = this.playerSettings.onChangeProperty || undefined;
+	var p_action = Player.propertyAction.IGNORE;
+	if(p)
+		p_action = (p.propertyMap[name] != undefined) ? p.propertyMap[name] : p.defaultAction;
+
+	//if media player does not override default property set function (or if media
+	//player doesn't define information related to property 'name')
         
-	if(!p)
+	//as Player.propertyAction.IGNORE = 0
+	//its ok to test p_action
+	if(!p_action || p_action == this.playerSettings.OVERLOAD)
         {
             if (value != null) {
 
@@ -166,7 +177,7 @@ Player.prototype.setProperty = function (name, value) {
                             case "top":
                             case "left":
                             case "bottom":
-                            case "right": {
+                            case "right": 
 									var buffer=value.toString().split("%");
 									if (buffer.length > 1)
 										console.warn("Warning: Percentage position value was passed to 'setProperty' function. The value is being ignored.");
@@ -178,9 +189,9 @@ Player.prototype.setProperty = function (name, value) {
 										$(this.htmlPlayerBkg).css(name,value);
 									}
                                     break;
-                            }
+                            
                             case "height":
-                            case "width": {
+                            case "width": 
                                     var buffer = value.toString().split("%");
                                     if (buffer.length > 1) {
 											console.warn("Warning: Percentage size value being calculated in 'setProperty' function.");
@@ -190,48 +201,46 @@ Player.prototype.setProperty = function (name, value) {
                                     $(this.htmlPlayer).css(name,value);
                                     $(this.htmlPlayerBkg).css(name,value);
                                     break;
-                            }
-                            case "location": {
+                            
+                            case "location": 
                                     var location = value.split(",");
                                     this.setProperty("left",bounds[0]);
                                     this.setProperty("top",bounds[1]);
                                     return;
-                            }
-                            case "size": {
+                            
+                            case "size": 
                                     var size = value.split(",");
                                     this.setProperty("width",bounds[0]);
                                     this.setProperty("height",bounds[1]);
                                     return;
-                            }
-                            case "bounds": {
+                            
+                            case "bounds": 
                                     var bounds = value.split(",");
                                     this.setProperty("left",bounds[0]);
                                     this.setProperty("top",bounds[1]);
                                     this.setProperty("width",bounds[2]);
                                     this.setProperty("height",bounds[3]);
                                     return;
-                            }
-                            case "zIndex": {
-                                    $(this.htmlPlayer).css("z-index",value)
-                                    $(this.htmlPlayerBkg).css("z-index",value)
-                                    break;
-                            }
+                            
+                            case "zIndex": 
+                                $(this.htmlPlayer).css("z-index",value)
+                                $(this.htmlPlayerBkg).css("z-index",value)
+                                break;
+                            
 
                             // SOUND
 
-                            case "soundLevel": {
-                                    if (this.checkType(["video","audio"])) {
-                                            var buffer = value.split("%");
-                                            if (buffer.length > 1) {
-                                                    value = buffer[0] / 100;
-                                            }
-                                            this.popcornPlayer.volume(value);
-                                    }
-                                    break;
-                            }
+                            case "soundLevel":
+								var buffer = value.split("%");
+									if (buffer.length > 1) {
+										value = buffer[0] / 100;
+									}
+
+                                break;
+                            
                             case "balanceLevel":
                             case "bassLevel":
-                            case "trebleLevel": {
+                            case "trebleLevel": 
                                     var buffer = value.split("%");
                                     if (buffer.length > 1) {
                                             value = buffer[0] / 100;
@@ -239,15 +248,15 @@ Player.prototype.setProperty = function (name, value) {
                                     // TODO (0.0-1.0)
                                     Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"setProperty",[name]);
                                     break;
-                            }
+                            
 
                             // VISIBILITY
 
-                            case "background": {
+                            case "background": 
                                     $(this.htmlPlayerBkg).css("background-color",value);
                                     break;
-                            }
-                            case "transparency": {
+                            
+                            case "transparency": 
                                     var buffer = value.split("%");
                                     if (buffer.length > 1) {
                                             value = parseInt(buffer[0]) / 100;
@@ -257,8 +266,8 @@ Player.prototype.setProperty = function (name, value) {
                                     this.opacity = 1 - value;
                                     $(this.htmlPlayer).css("opacity",this.opacity);
                                     break;
-                            }
-                            case "visible": {
+                            
+                            case "visible": 
                                     this.isVisible = value=="true"?true:false;
                                     if (this.isVisible) {
                                             if(this.node.descriptor){
@@ -272,92 +281,66 @@ Player.prototype.setProperty = function (name, value) {
                                             $(this.htmlPlayerBkg).css("display","none");
                                     }
                                     break;
-                            }
-                            case "scroll": {
+                            
+                            case "scroll": 
                                     // TODO: ver norma (p.44)
                                     Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"setProperty",[name]);
                                     break;
-                            }
-                            case "fit": {
+                            
+                            case "fit": 
 							
-                                    // TODO: passar esse tratamento para o Html5Player
-									
-									if (value=='meetBest') {
-										Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"setProperty",[name]);
-									}									
-									var fit = {
-										fill: 'fill',
-										hidden: 'none',
-										meet: 'contain',
-										meetBest: 'scaleDown',
-										slice: 'cover'
-									};
-									
-									// TODO:
-									// CSS3 property "object-fit" is currently supported by Opera only.
-									// Uncomment the 3 lines below to make it work for IE, Firefox, Chrome
-									// and Safari when they release a version that supports it.
-									// Also, the CSS3 value 'scaleDown' ('meetBest' on NCL) for the 'fit' property is not supported yet.
-									// Note: check if the property names (their prefixes) are correct on these browsers!
-									console.log("Property 'fit' works only on Opera 10.6+");
-									
-									$(this.htmlPlayer).css('-o-object-fit',fit[value]);			// Opera
-									//$(this.htmlPlayer).css('-webkit-object-fit',fit[value]); 	// Chrome/Safari
-									//$(this.htmlPlayer).css('-moz-object-fit',fit[value]);		// Firefox
-									//$(this.htmlPlayer).css('object-fit',fit[value]);			// IE
-
                                     break;
-                            }
-                            case "style": {
+                            
+                            case "style": 
                                     // TODO: url de um arquivo css
                                     Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"setProperty",[name]);
                                     break;
-                            }
+                            
 
                             // FONT
 
-                            case "fontColor": {
+                            case "fontColor": 
                                     $(this.htmlPlayer).css("color",value);
                                     break;
-                            }
-                            case "fontFamily": {
+                            
+                            case "fontFamily": 
                                     $(this.htmlPlayer).css("font-family",value);
                                     break;
-                            }
-                            case "fontStyle": {
+                            
+                            case "fontStyle": 
                                     $(this.htmlPlayer).css("font-style",value);
                                     break;
-                            }
-                            case "fontSize": {
+                            
+                            case "fontSize": 
                                     $(this.htmlPlayer).css("font-size",value);
                                     break;
-                            }
-                            case "fontVariant": {
+                            
+                            case "fontVariant": 
                                     $(this.htmlPlayer).css("font-variant",value);
                                     break;
-                            }
-                            case "fontWeight": {
+                            
+                            case "fontWeight": 
                                     $(this.htmlPlayer).css("font-weight",value);
                                     break;
-                            }
+                            
 
                             // ???
 
-                            case "explicitDur": {
-									if (p == undefined)
+                            case "explicitDur": 
+									if (!p_action)
 										this.player.setProperty(name,value);
                                     break;
-                            }
+                            
                             case "baseDeviceRegion":
                             case "deviceClass":
                             case "plan":
                             case "player":
                             case "playerLife":		// keep/close
-                            case "reusePlayer": {	// true/false
+                            case "reusePlayer": 	// true/false
                                     // TODO
                                     Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"property",[name]);
                                     break;
-                            }
+                            
 
                             // TRANSITION
 
@@ -382,11 +365,11 @@ Player.prototype.setProperty = function (name, value) {
                             case "transOutType":
                             case "transOutStartProgress":
                             case "transOutSubtype":
-                            case "transOutVertRepeat": {
+                            case "transOutVertRepeat":
                                     // TODO
                                     Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"property",[name]);
                                     break;
-                            }
+                            
 
                             // SETTINGS
 
@@ -394,27 +377,32 @@ Player.prototype.setProperty = function (name, value) {
                             case "default.focusBorderColor":
                             case "default.selBorderColor":
                             case "default.focusBorderWidth":
-                            case "default.focusBorderTransparency": {
+                            case "default.focusBorderTransparency": 
                                     if (this.checkType(["application"])) {
                                             this.presentation.systemSettings.setPropertyValue(name,value);
                                     }
-                            }
-
+                            break;
+						
                     }
+
+
+			//user defined 
+			if(p_action == Player.propertyAction.OVERLOAD)
+			{
+				if(this.player.setProperty)
+				    this.player.setProperty(name,value);
+				else
+				    Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['setProperty',name,value]);
+			}
+		
+			//onEndAttribution is triggered automatically 
+			$(this.htmlPlayer).trigger("attribution.onEndAttribution",[name]);
+
 
             }
         }
         
-        //user defined 
-        if(p != undefined)
-        {
-            if(this.player.setProperty)
-                this.player.setProperty(name,value);
-            else
-                Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['setProperty',name,value]);
-        }
-        
-        $(this.htmlPlayer).trigger("attribution.onEndAttribution",[name]);
+
         
 
 

@@ -36,84 +36,76 @@ function Html5Player(p) {
 	this.durationMap = {};
 	this.endCallbacks = [];
 
-    /*
-     * User defined properties
-     
-     this.propertyMap = 
-    {
-       "propertyname" : override true / false 
-    }
-    
-    if propertyName is in this.propertyMap then Player.js will
-    call a function name setProperty in this player.
-    if the value is true than this player override default setProperty behavior
-    if the value is false than this player adds some functionality
-     
-     
-     */
+    p.onChangeProperty.propertyMap =
+	{
+
+		'soundLevel' : Player.propertyAction.OVERLOAD,
+		'fit': Player.propertyAction.OVERLOAD
+
+	};
+    //overloading we don't need to trigger onEndAttribution event
 
     switch (p.source.type.split("/")[0]) {
-		case "video": {
+		case "video": 
 			// type = video/*
 			p.createElement("<video class='player' poster='images/loading.gif' id='" + p.id + "'></video>");	
 			break;
-		}
-		case "audio": {
+		
+		case "audio": 
 			// type = audio/*
 			p.createElement("<audio class='player' id='" + p.id+ "'></audio>");
 			break;
-		}
-		case "image": {
+		
+		case "image": 
 			// type = image/*
 			p.createElement("<img class='player' id='" + p.id + "'></img>");
 			break;
-		}
-		case "application": {
+		
+		case "application": 
 			switch (p.source.type) {
-					case "application/x-ginga-settings": {
+					case "application/x-ginga-settings": 
 							// type = application/x-ginga-settings
 							 p.createElement("<div class='player' id='" + p.id + "'></div>");
 							break;
-					}
-					case "application/x-ginga-NCLua": {
+					
+					case "application/x-ginga-NCLua": 
 							// type = application/x-ginga-NCLua
 							Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
 							break;
-					}
-					case "application/x-ginga-NCLet": {
+					
+					case "application/x-ginga-NCLet": 
 							// type = application/x-ginga-NCLet
 							Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
 							break;
-					}
-					case "application/x-ginga-time": {
+					
+					case "application/x-ginga-time": 
 							// type = application/x-ginga-time
 							Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
 							break;
-					}
+					
 			}
 			break;
-		}
-		case "text": {
+		
+		case "text": 
 			switch (p.source.type) {
 					case "text/plain":
-					case "text/html": {
+					case "text/html": 
 							// type = text/plain, text/html
 							p.createElement("<div class='player' id='" + p.id + "'></div>");
 							break;
-					}
-					case "text/css": {
+					
+					case "text/css": 
 							// type = text/css
 							Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
 							break;
-					}
-					case "text/xml": {
+					
+					case "text/xml": 
 							// type = text/xml
 							Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
 							break;
-					}
-			}
-			break;
+
 		}
+		break;
 	}
 
 
@@ -134,7 +126,7 @@ function Html5Player(p) {
 	
 
 
-};
+}
 
 /**
  * Called when the player needs to unload its sources
@@ -144,7 +136,7 @@ Html5Player.prototype.unload = function()
 {
 	     //erases older content
         $(this.htmlPlayer).empty();   
-}
+};
 
 /**
  * Called when the player need to load (or reload) it sources 
@@ -161,30 +153,30 @@ Html5Player.prototype.load = function(source)
         
         //load a new content base on file type
 	switch (this.p.source.type.split("/")[0]) {
-		case "video": {
+		case "video": 
 			// type = video/*
 			$(this.htmlPlayer).append("<source type='video/webm' src='" + filename + ".webm'></source>");
 			$(this.htmlPlayer).append("<source type='video/ogg' src='" + filename + ".ogg'></source>");
 			$(this.htmlPlayer).append("<source type='video/mp4' src='" + filename + ".mp4'></source>");
 			break;
-		}
-		case "audio": {
+		
+		case "audio": 
 			// type = audio/*
 			$(this.htmlPlayer).append("<source type='audio/mpeg' src='" + filename + ".mp3'></source>");
 			$(this.htmlPlayer).append("<source type='audio/ogg' src='" + filename + ".ogg'></source>");
 			break;
-		}
-		case "image": {
+		
+		case "image": 
 			// type = image/*
 			$(this.htmlPlayer).attr("src",source);
 			break;
-		}
-		case "application": {
+		
+		case "application": 
 			// type = application/*
 			// não faz nada
             break;
-		}
-		case "text": {
+		
+		case "text": 
 			if (this.checkType(["text/plain","text/html"])) {
 				// type = text/plain, text/html
 				$.ajax({
@@ -195,14 +187,14 @@ Html5Player.prototype.load = function(source)
 						$(this.htmlPlayer).append(data);
 					},this)
 				});
-			} else {
+			}// else {
 				// TODO?
-			}
+			//}
 			break;
-		}
+		
 	}
     
-}
+};
 
 /**
  * This function should be called to set function calls based on
@@ -227,7 +219,7 @@ Html5Player.prototype.exec = function(time,callback)
 			this.popcornPlayer.cue(time,callback);
 		}
 	}
-}
+};
 
 /**
  * Start
@@ -237,7 +229,7 @@ Html5Player.prototype.start =  function()
     if (this.popcornPlayer) {
          this.popcornPlayer.play();
     }
-}
+};
 
 /**
  * Stop
@@ -247,7 +239,7 @@ Html5Player.prototype.stop = function()
     if (this.popcornPlayer) {
 	this.popcornPlayer.pause(0);
     }
-}
+};
 
 /**
  * Pause
@@ -257,7 +249,7 @@ Html5Player.prototype.pause = function()
     if (this.popcornPlayer) {
 	this.popcornPlayer.pause();
     }
-}
+};
 
 /**
  * Resume
@@ -267,7 +259,7 @@ Html5Player.prototype.resume = function()
     if (this.popcornPlayer) {
 	this.popcornPlayer.play();
     }
-}
+};
 
 
 
@@ -278,7 +270,7 @@ Html5Player.prototype.resume = function()
 Html5Player.prototype.abort = function()
 {
     this.stop();
-}
+};
 
 
 /**
@@ -295,7 +287,7 @@ Html5Player.prototype.seek = function(newTime)
 			"},this));");
 		}
 	}
-}
+};
 
 
 
@@ -318,7 +310,7 @@ Html5Player.prototype.seekAndPlay = function(newTime)
 		} else if(this.p.checkType(["image","text"])) {
 				this.popcornPlayer.currentTime(newTime);
 		}
-}
+};
 
 
 /**
@@ -327,25 +319,67 @@ Html5Player.prototype.seekAndPlay = function(newTime)
 Html5Player.prototype.stopCallback = function (t) {
 	if (this.duration == t) {
 		this.stop();
+		var i;
 		for (i in this.endCallbacks) {
 			this.endCallbacks[i]();
 		}
 	}
-}
+};
+
 Html5Player.prototype.setProperty = function(name,value) {
-	if (name == 'explicitDur') {
+    switch(name)
+    {
+		case 'explicitDur':
+
 		this.duration = value;
 		if (!this.durationMap[value]) {
 			this.durationMap[value] = true;
 			/*
 			eval('this.exec(value,$.proxy(function() {'+
-				'if (this.duration == ' + value + ')'+
-					'this.stop();'+
+			'if (this.duration == ' + value + ')'+
+			'this.stop();'+
 			'},this));');
 			*/
 			eval('this.exec(value,$.proxy(function() {'+
-				'this.stopCallback(' + value + ');'+
+			'this.stopCallback(' + value + ');'+
 			'},this));');
 		}
-	}
-}
+
+		break;
+
+		case 'soundLevel':
+			if (this.p.checkType(["video","audio"])) {
+				this.popcornPlayer.volume(value);
+			}       
+		break;
+
+
+		case 'fit':
+			if (value=='meetBest') {
+				Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"setProperty",[name]);
+			}									
+			var fit = {
+				fill: 'fill',
+				hidden: 'none',
+				meet: 'contain',
+				meetBest: 'scaleDown',
+				slice: 'cover'
+			};
+	
+			// TODO:
+			// CSS3 property "object-fit" is currently supported by Opera only.
+			// Uncomment the 3 lines below to make it work for IE, Firefox, Chrome
+			// and Safari when they release a version that supports it.
+			// Also, the CSS3 value 'scaleDown' ('meetBest' on NCL) for the 'fit' property is not supported yet.
+			// Note: check if the property names (their prefixes) are correct on these browsers!
+			console.log("Property 'fit' works only on Opera 10.6+");
+	
+			$(this.htmlPlayer).css('-o-object-fit',fit[value]);			// Opera
+			//$(this.htmlPlayer).css('-webkit-object-fit',fit[value]);	// Chrome/Safari
+			//$(this.htmlPlayer).css('-moz-object-fit',fit[value]);		// Firefox
+			//$(this.htmlPlayer).css('object-fit',fit[value]);			// IE
+		break;
+
+    }
+
+};
