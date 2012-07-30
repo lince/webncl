@@ -277,8 +277,12 @@ LuaPlayer.prototype.bindlibs = function() {
 	
 	
 }
+//
 
 //TODO call all the handlers registered in their correct positions
 LuaPlayer.prototype.callHandlers = function (evt) {
-	this.events.handlers(evt);
+	for(i =0; i < this.events.handlers.length; i++){
+		this.events.handlers[i](evt);
+	}
+	
 }
