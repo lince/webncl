@@ -5,7 +5,7 @@
 function libEvents(player){
 	this.player = player;
 	this.handlers = [];
-	
+	this.handlers[0] = undefined;
 	this.counter = 0;
 	tmp = player.id;
 	this.nodeId = tmp.substring(tmp.indexOf('_')+1);
