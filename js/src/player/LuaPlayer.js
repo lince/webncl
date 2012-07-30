@@ -272,6 +272,12 @@ LuaPlayer.prototype.bindlibs = function() {
 			},
 			"unregister" : function(handler) {
 				events.unregister(handler);
+			},
+			"timer" : function(timeout, fct){
+				events.timer(timeout, fct);
+			},
+			"uptime" : function(){
+				return events.uptime();
 			}
 	}
 	
