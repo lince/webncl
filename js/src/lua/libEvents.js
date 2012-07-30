@@ -4,19 +4,23 @@
 
 function libEvents(player){
 	this.player = player;
-	this.handlers = undefined;
+	this.handlers[0] = undefined;
+	this.counter = 0;
 	tmp = player.id;
 	this.nodeId = tmp.substring(tmp.indexOf('_')+1);
 };
 
 libEvents.prototype.register = function(fct){
 	console.log('libEvents.register()');
-	this.handlers = fct;
+	this.handlers[this.counter] = fct;
+	this.counter = this.counter + 1;
 }
 
 libEvents.prototype.unregister = function(fct){
 	console.log('libEvents.unregister()');
-	this.handlers = undefined;
+	this.handlers[this.counter] = undefined;
+	if(!this.counter)
+		this.counter = this.counter - 1;
 }
 
 libEvents.prototype.post = function(evt){
