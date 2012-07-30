@@ -35,7 +35,11 @@ libCanvas.prototype.attrColor = function(r, g, b, a, mode){
 	else if(mode == "frame"){
 		this.ctx.lineWidth = "5";
 		this.ctx.strokeStyle = "rgba(" + r + ","+ g + "," + b + "," + a + ")";
-	}				
+		
+	} else
+		console.log("mode doesn't exists");	
+	
+				
 }
 
 
@@ -185,7 +189,7 @@ libCanvas.prototype.drawText =  function(xx, yy, text){
 libCanvas.prototype.measureTextLua =  function(text){
 	console.log("measureTextLua");
 	
-	var textWidth = ctx.measureText (text);
+	var textWidth = this.ctx.measureText(text);
 	
 	height = this.ctx.font[0] + this.ctx.font[1];
 			

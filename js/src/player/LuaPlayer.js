@@ -212,8 +212,8 @@ LuaPlayer.prototype.bindlibs = function() {
 				canvas.attrSize();
 			},
 
-			"attrColor" : function(r,g,b,mode){
-				canvas.attrColor(r,g,b,mode);
+			"attrColor" : function(r,g,b,a,mode){
+				canvas.attrColor(r,g,b,a,mode);
 			},
 
 			"attrClip" : function(x,y,w,h){
