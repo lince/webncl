@@ -116,10 +116,8 @@ MediaPlayer.prototype.create = function (node) {
 	
 	// Cria as áreas
 	for (i in node.area) {
-		if (!node.area[i]._ignore) {
-			this.area[node.area[i].id] = node.area[i];
-			this.area[node.area[i].id].started = false;
-		}
+		this.area[node.area[i].id] = node.area[i];
+		this.area[node.area[i].id].started = false;
 	}
 	// Verifica o tipo da mídia
 	if (node.type) {
@@ -228,25 +226,31 @@ MediaPlayer.prototype.create = function (node) {
 					
 					//onEnd trigger
 					this.player.exec('end',$.proxy(function() {
-						if(!this.playingArea)
+						if (!this.playingArea)
 							this.stop();
-						else
-						{
+						else {
 							$(this.htmlPlayer).trigger('presentation.onEnd');
 							this.playingArea = undefined;
 						}
+
+						var i;
+						var d = this.player.getDuration();
+						for (i in this.area) {
+							if (this.area[i].started) {
+								this.area[i].started = false;
+								$(this.htmlPlayer).trigger('stop',[i]);
+							} else {
+								$(this.htmlPlayer).trigger('presentation.onEnd',[i]);
+							}
+						}
+						
 						//the stop action is going to be dealed by the area event listener
                 },this));
 					
                     for (i in this.area) {
-					
+
 						eval("this.player.exec(this.area[i].endTime,$.proxy(function() {"+
-							"if (this.area['"+i+"'].started) {"+
-								"this.area['"+i+"'].started = false;"+
-								"$(this.htmlPlayer).trigger('stop',[this.area['"+i+"'].id]);"+
-							"} else {"+
-								"$(this.htmlPlayer).trigger('presentation.onEnd',[this.area['"+i+"'].id]); "+
-							"}" +
+							"this.stopArea('" + i + "');"+
 						"},this));");
 
 						eval("this.player.exec(this.area[i].beginTime,$.proxy(function() {"+
@@ -259,8 +263,6 @@ MediaPlayer.prototype.create = function (node) {
 				} else {
 						Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['exec']);
 				}
-
-
 	
 	// ---- REFER ----
 	}
@@ -608,10 +610,26 @@ MediaPlayer.prototype.hide = function () {
 
 // start
 MediaPlayer.prototype.start = function (nodeInterface) {
-// (danilo): Sugiro que quando o start for dado,
-// caso o player esteja tocando ele seja parado
-// e iniciado do lugar onde foi pedido (A maquina virtual
-// comporta-se assim no caso de ancoras), nao sei se eh o funcionamento oficial
+
+	// TODO:
+	// This is a quick fix to make the getDuration method and the area interval tests work,
+	// since they can only be called when the 'loadedmetadata' even is triggered.
+	// Note that it works only with a Html5Player playing videos.
+	// As soon as the synchronization issue is solved, this code should be removed!
+	// --- quick fix begins here
+	if (this.playerName == 'Html5Player' && this.player.p.checkType(['video'])) {
+		if (!this.ready) {
+			this.nodeInterface = nodeInterface;
+			this.ready = true;
+			this.player.popcornPlayer.on('loadedmetadata',$.proxy(function() {
+				this.start();
+			},this));
+			return;
+		}
+		nodeInterface = this.nodeInterface;
+	}
+	// --- quick fix ends here
+
 	if (this.isStopped) {
         this.presentation.inputManager.enableKeys(this.htmlPlayer);
 		if(this.node.descriptor){
@@ -620,28 +638,29 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 		this.isPlaying = true;
 		this.isStopped = false;
 		this.show();
-
-
+		
 		if (nodeInterface) {
+		
 			if (this.area[nodeInterface]._type=="area") {
-				this.area[this.area[nodeInterface].id].started = true;
+				this.area[nodeInterface].started = true;
 				this.playingArea = nodeInterface;
-				var t =  this.area[this.area[nodeInterface].id].beginTime;
-				if(t != 'begin')
-					this.seekAndPlay(this.area[this.area[nodeInterface].id].beginTime);
-				else
-					{
-						if(this.player.start)
-							this.player.start();
-						else
-							Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['start',nodeInterface]);
+				var t = this.area[nodeInterface].beginTime;
+				// getDuration will work only when the player synchronization is working
+				if (t != 'begin' && !(t > this.player.getDuration()))
+					this.seekAndPlay(t);
+				else {
+					if (t != 'begin') {
+						Logger.warning(Logger.WARN_INVALID_AREA,'area',['begin','end']);
 					}
-				
-				
-
+					if (this.player.start)
+						this.player.start();
+					else
+						Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['start',nodeInterface]);
+				}
 			} else {
 				// TODO (frames)
 			}
+			
 		} else {
 			
 			this.playingArea = undefined;
@@ -739,11 +758,18 @@ MediaPlayer.prototype.seek = function (newTime) {
 
 // seekAndPlay
 MediaPlayer.prototype.seekAndPlay = function (newTime) {
-//	if (this.isStopped) {
-                if(this.player.seekAndPlay)
-                	this.player.seekAndPlay(newTime);
-                else
-                        Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['seekAndPlay',newTime]);
-                
-//	}
+	if(this.player.seekAndPlay)
+		this.player.seekAndPlay(newTime);
+	else
+		Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['seekAndPlay',newTime]);	
 };
+
+// stopArea
+MediaPlayer.prototype.stopArea = function (nodeInterface) {
+	if (this.area[nodeInterface].started) {
+		this.area[nodeInterface].started = false;
+		$(this.htmlPlayer).trigger('stop',[nodeInterface]);
+	} else {
+		$(this.htmlPlayer).trigger('presentation.onEnd',[nodeInterface]);
+	}
+}

@@ -32,7 +32,8 @@ function Html5Player(p) {
     this.p = p;
     this.popcornPlayer  = undefined;
     this.htmlPlayer = "#" + p.id;
-	
+
+	this.duration = undefined;
 	this.durationMap = {};
 	this.endCallbacks = [];
 
@@ -316,6 +317,7 @@ Html5Player.prototype.seekAndPlay = function(newTime)
 /**
  * setProperty
  */
+
 Html5Player.prototype.stopCallback = function (t) {
 	if (this.duration == t) {
 		this.stop();
@@ -331,19 +333,15 @@ Html5Player.prototype.setProperty = function(name,value) {
     {
 		case 'explicitDur':
 
-		this.duration = value;
-		if (!this.durationMap[value]) {
-			this.durationMap[value] = true;
-			/*
-			eval('this.exec(value,$.proxy(function() {'+
-			'if (this.duration == ' + value + ')'+
-			'this.stop();'+
-			'},this));');
-			*/
-			eval('this.exec(value,$.proxy(function() {'+
-			'this.stopCallback(' + value + ');'+
-			'},this));');
-		}
+			if (value < this.popcornPlayer.duration()) {
+				this.duration = value;
+				if (!this.durationMap[value]) {
+					this.durationMap[value] = true;
+					eval('this.exec(value,$.proxy(function() {'+
+					'this.stopCallback(' + value + ');'+
+					'},this));');
+				}
+			}
 
 		break;
 
@@ -381,5 +379,13 @@ Html5Player.prototype.setProperty = function(name,value) {
 		break;
 
     }
-
+	
 };
+
+/**
+ * getDuration
+ */
+ Html5Player.prototype.getDuration = function() {
+	return this.duration || this.popcornPlayer.duration();
+ }
+ 
