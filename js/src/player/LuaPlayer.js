@@ -40,7 +40,17 @@ function LuaPlayer(p) {
 	this.canvas = undefined;
 	this.events = new libEvents(p);
 
-	p.createElement("<div class='player' id='" + p.id + "'></div>");
+	p.createElement("<canvas id='" + p.id + "'></canvas>");
+	$("#"+p.id).css('border','1px solid black');
+	
+	var a = document.getElementById(p.id);
+	console.log(a);
+	
+	
+	this.canvas = new libCanvas(a.getContext("2d"));
+	console.log(this.canvas);
+	
+	console.log(p.id);
 
 };
 
@@ -193,6 +203,8 @@ LuaPlayer.prototype.setProperty = function(name,value) {
 } 
 
 LuaPlayer.prototype.bindlibs = function() {
+	
+	canvas = this.canvas;
 
 	lua_libs["canvas"] = {
 
@@ -214,8 +226,8 @@ LuaPlayer.prototype.bindlibs = function() {
 
 			},
 
-			"drawRect" : function(x,y,w,h){
-				canvas.drawRect(x,y,w,h);
+			"drawRect" : function(x,y,w,h, mode){
+				canvas.drawRect(x,y,w,h, mode);
 
 			},
 

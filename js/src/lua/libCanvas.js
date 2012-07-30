@@ -10,34 +10,37 @@ function libCanvas(ctx){
 	this.fimX = ctx.canvas.width;
 	this.fimY = ctx.canvas.height;
 	
-
+	console.log("libCanvas");
 	
 };
 
 libCanvas.prototype.attrSize = function(){
+	console.log("attrSize");
 	
 	var canvas = document.getElementById(ctx.canvas.id);
 	
-	w = ctx.canvas.width;
-	h = ctx.canvas.height;
+	w = this.ctx.canvas.width;
+	h = this.ctx.canvas.height;
 	
 	return {w:w,h:h};
 	
 }
 
 libCanvas.prototype.attrColor = function(r, g, b, a, mode){
+	console.log("attrColor");
 	
-	if(modo == "fill")
-		ctx.fillStyle = "rgba(" + r + ","+ g + "," + b + "," + a + ")";
+	if(mode == "fill")
+		this.ctx.fillStyle = "rgba(" + r + ","+ g + "," + b + "," + a + ")";
 		
-	else if(modo == "frame"){
-		ctx.lineWidth = "5";
-		ctx.strokeStyle = "rgba(" + r + ","+ g + "," + b + "," + a + ")";
+	else if(mode == "frame"){
+		this.ctx.lineWidth = "5";
+		this.ctx.strokeStyle = "rgba(" + r + ","+ g + "," + b + "," + a + ")";
 	}				
 }
 
 
 libCanvas.prototype.attrClip= function(xx,yy,w,h){
+	console.log("attrClip");
 	
 	this.x = xx;
 	this.y= yy;
@@ -45,13 +48,13 @@ libCanvas.prototype.attrClip= function(xx,yy,w,h){
 	this.tamanhoY = h; 
 	
 	
-	ctx.lineWidth = "1";
-	ctx.strokeRect(this.x,this.y,this.tamanhoX,this.tamanhoY);
+	this.ctx.lineWidth = "1";
+	this.ctx.strokeRect(this.x,this.y,this.tamanhoX,this.tamanhoY);
 	
 }
 
 libCanvas.prototype.iniVerifClip = function(x1,y1,x2,y2){	
-	
+	console.log("IniVerifClip");
 	
 	this.inicioX = this.x + x1;
 	this.inicioY = this.y + y1;
@@ -81,6 +84,7 @@ libCanvas.prototype.iniVerifClip = function(x1,y1,x2,y2){
 }
 
 libCanvas.prototype.iniVerifClip2 =  function(x1, y1, x2, y2){
+	console.log("IniVerifClip2");
 	
 	this.inicioX = this.x + x1;
 	this.inicioY = this.y + y1;
@@ -108,16 +112,17 @@ libCanvas.prototype.iniVerifClip2 =  function(x1, y1, x2, y2){
 }
 
 libCanvas.prototype.drawLine =  function(x1, y1, x2, y2){
+	console.log("drawLine");
 		
 	var verifica = this.iniVerifClip(x1, y1, x2, y2);
 		
 	if(verifica){
-		ctx.beginPath();
-		ctx.moveTo(this.inicioX,this.inicioY);
-		ctx.lineTo(this.fimX,this.fimY);
+		this.ctx.beginPath();
+		this.ctx.moveTo(this.inicioX,this.inicioY);
+		this.ctx.lineTo(this.fimX,this.fimY);
 						
-		ctx.stroke(); 
-		ctx.save();
+		this.ctx.stroke(); 
+		this.ctx.save();
 		
 	}
 	
@@ -128,16 +133,17 @@ libCanvas.prototype.drawLine =  function(x1, y1, x2, y2){
 }
 
 libCanvas.prototype.drawRect =  function(x1, y1, x2, y2, mode){
+	console.log("drawRect");
 	
 	var verifica = this.iniVerifClip2(x1,y1,x2,y2);
 		
 	if(verifica){
-		if(modo == "fill"){
-			ctx.fillRect(this.inicioX, this.inicioY, this.fimX, this.fimY);
+		if(mode == "fill"){
+			this.ctx.fillRect(this.inicioX, this.inicioY, this.fimX, this.fimY);
 		}
 		
-		else if(modo == "frame"){
-			ctx.strokeRect(this.inicioX, this.inicioY, this.fimX, this.fimY);
+		else if(mode == "frame"){
+			this.ctx.strokeRect(this.inicioX, this.inicioY, this.fimX, this.fimY);
 		}
 		
 		else{
@@ -153,11 +159,13 @@ libCanvas.prototype.drawRect =  function(x1, y1, x2, y2, mode){
 }
 
 libCanvas.prototype.attrText =  function(face, size, style){
+	console.log("attrText");
 	
-	ctx.font = size + " " + face + " " + style;
+	this.ctx.font = size + " " + face + " " + style;
 }
 
 libCanvas.prototype.drawText =  function(xx, yy, text){
+	console.log("drawText");
 	
 	dimensao = this.measureTextLua(text);
 	
@@ -170,20 +178,22 @@ libCanvas.prototype.drawText =  function(xx, yy, text){
 	if(this.inicioX+largura > this.x+this.tamanhoX || this.inicioY+altura > this.y+this.tamanhoY)
 		console.log("Text exceeds the dimentions limited by canvas");
 	else
-		ctx.fillText(text,this.inicioX,this.inicioY);
+		this.ctx.fillText(text,this.inicioX,this.inicioY);
 	 
 }
 
 libCanvas.prototype.measureTextLua =  function(text){
+	console.log("measureTextLua");
 	
 	var textWidth = ctx.measureText (text);
 	
-	height = ctx.font[0] + ctx.font[1];
+	height = this.ctx.font[0] + this.ctx.font[1];
 			
 	return {w:textWidth.width,h:height};	
 } 
 
 libCanvas.prototype.image_path = function(caminho,x,y,w,h){
+	console.log("image_path");
 	
 	this.inicioX = this.x + x;
 	this.inicioY = this.y + y;
@@ -195,13 +205,14 @@ libCanvas.prototype.image_path = function(caminho,x,y,w,h){
 		
 		console.log("Image exceeds the dimentions limited by canvas");
 	else
-		ctx.drawImage(img, this.inicioX,this.inicioY,w,h);
+		this.ctx.drawImage(img, this.inicioX,this.inicioY,w,h);
 	
 }
 
 libCanvas.prototype.attrCrop = function(ctxDestiny, x, y, w, h){
+	console.log("attrCrop");
 	
-	canvasData = ctx.getImageData(x, y, w, h);
+	canvasData = this.ctx.getImageData(x, y, w, h);
 	
 	ctxDestino.putImageData(canvasData, x, y);
 }
@@ -209,18 +220,21 @@ libCanvas.prototype.attrCrop = function(ctxDestiny, x, y, w, h){
 
 
 libCanvas.prototype.compose = function(ctxDestino){
+	console.log("compose");
 	
-	canvasData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+	canvasData = this.ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
 	
 	ctxDestino.putImageData(canvasData, 0, 0);
 }
 
 libCanvas.prototype.save = function(){
+	console.log("save");
 	
 	ctx.save();
 }
 
 libCanvas.prototype.flush = function(){
+	console.log("restore");
 	
 	ctx.restore();
 	
