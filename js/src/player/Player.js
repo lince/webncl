@@ -45,33 +45,43 @@ Player.action = {
 // bindEvents
 Player.prototype.bindEvents = function () {
 	$(this.htmlPlayer).on("start",$.proxy(function(event,nodeInterface,callback,args) {
-		this.start(nodeInterface);
-		if (callback) {
-			callback(args);
+		if (!event.originalEvent) {
+			this.start(nodeInterface);
+			if (callback) {
+				callback(args);
+			}
 		}
 	},this));
 	$(this.htmlPlayer).on("stop",$.proxy(function(event,nodeInterface,callback,args) {
-		this.stop(nodeInterface);
-		if (callback) {
-			callback(args);
+		if (!event.originalEvent) {
+			this.stop(nodeInterface);
+			if (callback) {
+				callback(args);
+			}
 		}
 	},this));
 	$(this.htmlPlayer).on("pause",$.proxy(function(event,nodeInterface,callback,args) {
-		this.pause(nodeInterface);
-		if (callback) {
-			callback(args);
+		if (!event.originalEvent) {
+			this.pause(nodeInterface);
+			if (callback) {
+				callback(args);
+			}
 		}
 	},this));
 	$(this.htmlPlayer).on("resume",$.proxy(function(event,nodeInterface,callback,args) {
-		this.resume(nodeInterface);
-		if (callback) {
-			callback(args);
+		if (!event.originalEvent) {
+			this.resume(nodeInterface);
+			if (callback) {
+				callback(args);
+			}
 		}
 	},this));
 	$(this.htmlPlayer).on("abort",$.proxy(function(event,nodeInterface,callback,args) {
-		this.abort(nodeInterface);
-		if (callback) {
-			callback(args);
+		if (!event.originalEvent) {
+			this.abort(nodeInterface);
+			if (callback) {
+				callback(args);
+			}
 		}
 	},this));
 	$(this.htmlPlayer).on("set",$.proxy(function(event,nodeInterface,callback,args,value) {
