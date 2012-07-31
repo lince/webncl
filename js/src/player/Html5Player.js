@@ -332,17 +332,13 @@ Html5Player.prototype.setProperty = function(name,value) {
     switch(name)
     {
 		case 'explicitDur':
-
-			if (value < this.popcornPlayer.duration()) {
-				this.duration = value;
-				if (!this.durationMap[value]) {
-					this.durationMap[value] = true;
-					eval('this.exec(value,$.proxy(function() {'+
-					'this.stopCallback(' + value + ');'+
-					'},this));');
-				}
+			this.duration = value;
+			if (!this.durationMap[value]) {
+				this.durationMap[value] = true;
+				eval('this.exec(value,$.proxy(function() {'+
+				'this.stopCallback(' + value + ');'+
+				'},this));');
 			}
-
 		break;
 
 		case 'soundLevel':
@@ -386,6 +382,10 @@ Html5Player.prototype.setProperty = function(name,value) {
  * getDuration
  */
  Html5Player.prototype.getDuration = function() {
-	return this.duration || this.popcornPlayer.duration();
+ console.log(this.popcornPlayer.duration());
+	if (this.duration && this.popcornPlayer.duration)
+		return Math.min(this.duration,this.popcornPlayer.duration());
+	else
+		return this.duration || this.popcornPlayer.duration();
  }
  
