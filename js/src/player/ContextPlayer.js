@@ -27,26 +27,26 @@ function ContextPlayer (node, p) {
 	
 	this.handlers = {};
 	this.node = node;
-	this.media = [];
-	this.context = [];
-	this.port = [];
-        this.presentation = p.presentation || p;
-        this.parentContext = p;
+	this.media = {};
+	this.context = {};
+	this.port = {};
+    this.presentation = p.presentation || p;
+    this.parentContext = p;
 
         
 	//this.synchronizedPlayers = [];
 	//this.loadingPlayers = 0;
         
-    this.syncingMediaList = [];
-    this.syncingContextList = [];
-    this.syncingObjects = 0;
+    this.syncElem = [];
+    this.syncReadyElem = [];
         
-    this.playingMediaList = [];
-    this.playingContextList = [];
 	
-    this.pausedMediaList = [];
-	this.pausedContextList = [];
-        
+	//this list of paused elements is used when the context recieves a pause
+	this.pausedElemList = [];
+
+	this.playingElem = [];
+	this.pausedElem = [];
+	
 	this.isCreated = false;
 	this.htmlPlayer = "";
 	this.isPlaying = false;
@@ -105,6 +105,56 @@ ContextPlayer.prototype.notify = function (mediaPlayer) {
 */
 //== Synchronization Functions End ==
 
+// sync
+// e -> element (media or context)
+// s -> state
+ContextPlayer.prototype.nSync = function(e,s)
+{
+	
+}
+
+// notify Action
+// e -> element (media or context)
+// a -> action
+ContextPlayer.prototype.nAction = function(e,a)
+{
+	var ac = Player.action;
+	switch(a)
+	{
+		case ac.START:
+		case ac.RESUME:
+			this.playingElem.push(e);
+			var b
+			b = $.inArray(e,this.pausedElem);
+			if(b > -1)
+				this.pausedElem.splice(b-1,1);		
+
+		break;
+		
+		case ac.PAUSE:
+			this.pausedElem.push(e);
+		//no break here!!
+
+		case ac.STOP:
+		case ac.ABORT:
+			var b;
+			b = $.inArray(e,this.playingElem);
+			if(b > -1)
+				this.playingElem.splice(b-1,1);
+			
+			//if(this.playingElem.length == 0 && this.pausedElem.length == 0)
+			//{
+			//	this.isPlaying = false;
+			//	this.isStopped = true;
+			//	this.parentContext.nAction(this,Player.action.STOP);
+			//	$(this.htmlPlayer).trigger("presentation.onEnd");
+			//}
+				
+		break;
+		
+	}
+}
+
 // create
 ContextPlayer.prototype.create = function () {
 	if (!this.isCreated) {
@@ -126,8 +176,49 @@ ContextPlayer.prototype.create = function () {
 	return this;
 };
 
+// portAction
+ContextPlayer.prototype.portAction = function(port,action)
+{
+	switch (port.component._type) {
+		case "context": {
+			// component = context -> nodeInterface = port
+			if (!this.context[port.component.id]) {
+				Logger.error(Logger.ERR_INVALID_CONTEXT_REFERENCE,"port",["context",port.id,"component",port.component.id]);
+			} else
+			{
+				if (port['interface']) {
+					var nodeInterface = port['interface'];
+					this.context[port.component.id].create();
+					if (!this.context[port.component.id].port[nodeInterface]) {
+						Logger.error(Logger.ERR_INVALID_CONTEXT_REFERENCE,"port",[port.id,"interface",nodeInterface]);
+					} else {
+						this.context[port.component.id][action](nodeInterface);
+					}
+				} else {
+					this.context[port.component.id][action]();
+				}
+			}
+			break;
+		}
+		case "media": {
+			// component = media -> nodeInterface = area, property
+			nodeInterface = port["interface"];
+
+			if (nodeInterface) {
+				this.media[port.component.id][action](nodeInterface);
+			} else {
+				this.media[port.component.id][action]();
+			}
+
+			break;
+		}
+	}	
+}
+
 // start
 ContextPlayer.prototype.start = function (nodeInterface) {
+
+	//if context is stopped
 	if (this.isStopped) {
 		if (!this.isCreated) {
 			this.create();
@@ -135,121 +226,177 @@ ContextPlayer.prototype.start = function (nodeInterface) {
 		this.isPlaying = true;
 		this.isStopped = false;
 		if (nodeInterface) {
-			this.startPort(this.port[nodeInterface]);
+			this.portAction(this.port[nodeInterface],'start');
 		} else {
 			for (i in this.port) {
-				this.startPort(this.port[i]);
+				this.portAction(this.port[i],'start');
 			}
 		}
-		$(this.htmlPlayer).trigger("presentation.onBegin",[nodeInterface]);
+		this.parentContext.nAction(this,Player.action.START);
+		$(this.htmlPlayer).trigger("presentation.onBegin");
+	} else {
+	//if context is paused or playing
+	
+		//if it is paused
+		if(!this.isPlaying)
+		{
+			//This implementation is not equal to Ginga VM
+			//when the context is paused and a stopped media receives a start
+			//Ginga VM contexts doens't trigger any event
+			
+			
+		}
+		
+		//playing or paused, events are going to work (if
+		//directed to a port
+		if(nodeInterface)
+			this.portAction(this.port[nodeInterface],'start');
+		
+		
 	}
 }
 
-// startPort
-ContextPlayer.prototype.startPort = function (port) {
-	switch (port.component._type) {
-		case "context": {
-			// component = context -> nodeInterface = port
-			if (!this.context[port.component.id]) {
-				Logger.error(Logger.ERR_INVALID_CONTEXT_REFERENCE,"port",[port.id,"component",port.component.id]);
-			} else if (port.nodeInterface) {
-				this.context[port.component.id].create();
-				if (!this.context[port.component.id].port[port.nodeInterface.id]) {
-					Logger.error(Logger.ERR_INVALID_CONTEXT_REFERENCE,"port",[port.id,"interface",port.nodeInterface.id]);
-				} else {
-					this.context[port.component.id].start(port.nodeInterface.id);
-				}
-			} else {
-				this.context[port.component.id].start();
-			}
-			break;
-		}
-		case "media": {
-			// component = media -> nodeInterface = area, property
-			nodeInterface = port["interface"];
-			if (nodeInterface) {
-				this.media[port.component.id].start(nodeInterface);
-			} else {
-				this.media[port.component.id].start();
-			}
-			break;
-		}
-	}
-};
-
 // stop
 ContextPlayer.prototype.stop = function (nodeInterface) {
+	//if it is not stopped (playing or stopped)
 	if (!this.isStopped) {
-		this.isPlaying = false;
-		this.isStopped = true;
-		for (i in this.context) {
-			this.context[i].stop();
-		}	
-		for (i in this.media) {
-			this.media[i].stop();
+
+		if(!nodeInterface)
+		{
+			this.isPlaying = false;
+			this.isStopped = true;
+			
+			this.pausedElem=[];
+			this.pausedElemList=[];
+			this.playingElem=[];			
+			
+			
+			for (i in this.context) {
+				this.context[i].stop();
+			}	
+			for (i in this.media) {
+				this.media[i].stop();
+			}
+			
+
+//			//this should be triggered only when all medias were stopped
+			this.timerManager.stopAll();
+			this.parentContext.nAction(this,Player.action.STOP);
+			$(this.htmlPlayer).trigger("presentation.onEnd");
+
+			
+			
+		} else {
+			this.portAction(this.port[nodeInterface],'stop');
 		}
-		this.pausedMediaList = [];
-		this.pausedContextList = [];
-		$(this.htmlPlayer).trigger("presentation.onEnd",[nodeInterface]);
-		this.timerManager.stopAll();
+		
+	} else {
+		//if context is playing or its paused
+		if(nodeInterface)
+			this.portAction(this.port[nodeInterface],'stop');
 	}
 };
 
 // pause
 ContextPlayer.prototype.pause = function (nodeInterface) {
 	if (this.isPlaying) {
-		this.isPlaying = false;
-		this.isStopped = false;
-		for (i in this.context) {
-			if (this.context[i].isPlaying) {
-				this.pausedContextList.push(i);
-				this.context[i].pause();
+		if(!nodeInterface)
+		{
+
+			this.isPlaying = false;
+			this.isStopped = false;
+
+			//save them for future context resume
+			this.pausedElemList = this.playingElem;
+			this.playingElem = [];
+
+			//pause all playing objects
+			for (var i in this.pausedElemList)
+			{
+				this.pausedElemList[i].pause();
 			}
-		}	
-		for (i in this.media) {
-			if (this.media[i].isPlaying) {
-				this.pausedMediaList.push(i);
-				this.media[i].pause();
-			}
+			
+			this.timerManager.pauseAll();
+			this.parentContext.nAction(this,Player.action.PAUSE);
+			$(this.htmlPlayer).trigger("presentation.onPause");
+			
+		} else {
+			this.portAction(this.port[nodeInterface],'pause');
 		}
-		$(this.htmlPlayer).trigger("presentation.onPause",[nodeInterface]);
-		this.timerManager.pauseAll();
+	} 
+	else {
+		//guess this case will never happen
+		//but its treated here as its possible
+		//and lua player might be able to treat the event
+		this.portAction(this.port[nodeInterface],'pause');
 	}
 };
 
 // resume
 ContextPlayer.prototype.resume = function (nodeInterface) {
+	//if context is paused
 	if (!this.isPlaying && !this.isStopped) {
 		this.isPlaying = true;
 		this.isStopped = false;
-		for (i in this.pausedContextList) {
-			this.context[this.pausedContextList[i]].resume();
-		}		
-		for (i in this.pausedMediaList) {
-			this.media[this.pausedMediaList[i]].resume();
+		
+		
+		if(!nodeInterface)
+		{
+			for(var i in this.pausedElemList)
+				this.pausedElemList[i].resume();
+
+			this.pausedElemList=[];
+
+			
+		} else {
+			this.portAction(this.port[nodeInterface],'resume');
 		}
-		this.pausedContextList = [];
-		this.pausedMediaList = [];
-		$(this.htmlPlayer).trigger("presentation.onResume",[nodeInterface]);
+		
 		this.timerManager.resumeAll();
+		this.parentContext.nAction(this,Player.action.RESUME);
+		$(this.htmlPlayer).trigger("presentation.onResume");	
+		
+	} else {
+		//if context not paused
+		if(nodeInterface)
+		{
+			this.portAction(this.port[nodeInterface],'resume');
+		}
 	}
 };
 
 // abort
 ContextPlayer.prototype.abort = function (nodeInterface) {
 	if (!this.isStopped) {
-		this.isPlaying = false;
-		this.isStopped = true;
-		for (i in this.context) {
-			this.context[i].abort();
-		}	
-		for (i in this.media) {
-			this.media[i].abort();
+		if(!nodeInterface)
+		{
+			this.isPlaying = false;
+			this.isStopped = true;
+
+			this.pausedMediaList = [];
+			this.pausedContextList = [];
+
+			for (i in this.context) {
+				this.context[i].abort();
+			}	
+			for (i in this.media) {
+				this.media[i].abort();
+			}
+			
+			this.timerManager.stopAll();
+			$(this.htmlPlayer).trigger("presentation.onAbort",[nodeInterface]);
+			this.parentContext.nAction(this,Player.action.ABORT);
+
+		} else {
+			this.portAction(this.port[nodeInterface],'abort');
 		}
-		this.pausedMediaList = [];
-		this.pausedContextList = [];
-		$(this.htmlPlayer).trigger("presentation.onAbort",[nodeInterface]);
-		this.timerManager.stopAll();
+		
+	} else {
+		//playing or paused
+		if(nodeInterface)
+		{
+			this.portAction(this.port[nodeInterface],'abort');
+		}
 	}
 };
 
@@ -355,7 +502,7 @@ ContextPlayer.prototype.bindLinks = function()
 	/*
 	 Faz o bind dos links
 	 * */
-	for ( i in links)
+	for (var i in links)
 	{
 	
 		//causalConnector
@@ -382,7 +529,7 @@ ContextPlayer.prototype.bindLinks = function()
 		{
 			for ( var i in linkConnector.connectorParam)
 			{
-				currentConnectorParam = linkConnector.connectorParam[i];
+				var currentConnectorParam = linkConnector.connectorParam[i];
 				//Inicializa o parametro do link vazio
 				connectorParam['$'+currentConnectorParam.name] = '';
 				//TODO: Verificar se o valor eh mesmo vazio

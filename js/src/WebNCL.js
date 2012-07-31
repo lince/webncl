@@ -149,6 +149,8 @@ function WebNclPlayer (file, div) {
 
 
 
+	this.presentation.nAction = $.proxy(this.nAction,this)
+
 	/*
         Comentar efeito do ajax!
     */
@@ -406,8 +408,6 @@ WebNclPlayer.prototype.destroy = function() {
 WebNclPlayer.prototype.start = function() {
 	if (this.presentation.readyToPlay) {
 		this.presentation.context.start();
-		$('#'+this.presentation.playDiv).hide();
-		$('#'+this.presentation.endDiv).hide();	
 	} else {
 		this.presentation.playRequested = true;
 	}
@@ -416,20 +416,17 @@ WebNclPlayer.prototype.start = function() {
 // pause
 WebNclPlayer.prototype.pause = function() {
 	this.presentation.context.pause();
-	$('#'+this.presentation.playDiv).show();
 }
 
 // resume
 WebNclPlayer.prototype.resume = function() {
 	this.presentation.context.resume();
-	$('#'+this.presentation.playDiv).hide();
-	$('#'+this.presentation.endDiv).hide();
 }
         
 // abort
 WebNclPlayer.prototype.abort = function() {
 	this.presentation.context.abort();
-	$('#'+this.presentation.endDiv).show();
+
 }
 
 // stop
@@ -495,6 +492,37 @@ WebNclPlayer.prototype.postEvent = function (event) {
 WebNclPlayer.prototype.triggerEvent = function (event,nodeId,nodeInterface) {
 	$("#"+this.presentation.getDivId(nodeId)).trigger(event,[nodeInterface]);
 };
+
+/*Contexts Sync and Notify functions*/
+
+WebNclPlayer.prototype.nSync = function(e,s)
+{
+
+}
+
+WebNclPlayer.prototype.nAction = function(e,a)
+{
+	var ac = Player.action;
+	var playDiv = '#'+this.presentation.playDiv;
+	var endDiv = '#'+this.presentation.endDiv;
+	switch(a)
+	{
+		case ac.START:
+		case ac.RESUME:
+			$(playDiv).hide();
+			$(endDiv).hide();	
+		break;
+		
+		case ac.PAUSE:
+			$(playDiv).show();
+		break;
+		
+		case ac.ABORT:
+		case ac.STOP:
+			$(endDiv).show();
+	
+	}
+}
 
 WebNclPlayer.playerCount = 0;
 

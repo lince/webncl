@@ -656,9 +656,12 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 			else
 				Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['start',nodeInterface]);
 
-			
+
+
 		}
 			
+		//notify parentContext of its action
+		this.parentContext.nAction(this,Player.action.START);			
 		$(this.htmlPlayer).trigger("presentation.onBegin",[nodeInterface]);
 	}
 };
@@ -680,7 +683,9 @@ MediaPlayer.prototype.stop = function (nodeInterface) {
                     this.player.stop();
                 else
                     Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['stop',nodeInterface]);
-                
+
+		//notify parentContext of its action
+		this.parentContext.nAction(this,Player.action.STOP);
 		$(this.htmlPlayer).trigger("presentation.onEnd",[nodeInterface]);
 	}
 };
@@ -695,7 +700,9 @@ MediaPlayer.prototype.pause = function (nodeInterface) {
                     this.player.pause()
                 else
                     Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['pause',nodeInterface]);
-                
+
+		//notify parentContext of its action
+		this.parentContext.nAction(this,Player.action.PAUSE);
 		$(this.htmlPlayer).trigger("presentation.onPause",[nodeInterface]);
 	}
 };
@@ -711,6 +718,8 @@ MediaPlayer.prototype.resume = function (nodeInterface) {
                 else
                     Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['resume',nodeInterface]);
                 
+		//notify parentContext of its action
+		this.parentContext.nAction(this,Player.action.RESUME);				
 		$(this.htmlPlayer).trigger("presentation.onResume",[nodeInterface]);
 	}
 };
@@ -730,7 +739,8 @@ MediaPlayer.prototype.abort = function (nodeInterface) {
                 else
                     Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['abort',nodeInterface]);
                         
-                
+		//notify parentContext of its action
+		this.parentContext.nAction(this,Player.action.ABORT);                
 		$(this.htmlPlayer).trigger("presentation.onAbort",[nodeInterface]);
 	}
 };

@@ -32,6 +32,16 @@ function Player () {
 
 }
 
+
+
+Player.action = {
+	START  : 1,
+	STOP   : 2,
+	PAUSE  : 3,
+	RESUME : 4,
+	ABORT  : 5
+};
+
 // bindEvents
 Player.prototype.bindEvents = function () {
 	$(this.htmlPlayer).on("start",$.proxy(function(event,nodeInterface,callback,args) {
@@ -259,7 +269,7 @@ Player.prototype.setProperty = function (name, value) {
                                     break;
                             }
                             case "visible": {
-                                    this.isVisible = value=="true"?true:false;
+                                    this.isVisible = value==="true"?true:false;
                                     if (this.isVisible) {
                                             if(this.node.descriptor){
                                                     this.presentation.inputManager.addMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
