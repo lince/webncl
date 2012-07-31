@@ -382,7 +382,6 @@ Html5Player.prototype.setProperty = function(name,value) {
  * getDuration
  */
  Html5Player.prototype.getDuration = function() {
- console.log(this.popcornPlayer.duration());
 	if (this.duration && this.popcornPlayer.duration)
 		return Math.min(this.duration,this.popcornPlayer.duration());
 	else
