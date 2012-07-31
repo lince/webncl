@@ -3,14 +3,15 @@ function libCanvas(ctx){
 	this.ctx = ctx;
 	this.x = 0;
 	this.y = 0;
-	this.inicioX = 0;
-	this.inicioY = 0;
-	this.tamanhoX = ctx.canvas.width;
-	this.tamanhoY = ctx.canvas.height;
-	this.fimX = ctx.canvas.width;
-	this.fimY = ctx.canvas.height;
+	this.initX = 0;
+	this.initY = 0;
+	this.sizeX = ctx.canvas.width;
+	this.sizeY = ctx.canvas.height;
+	this.endX = ctx.canvas.width;
+	this.endY = ctx.canvas.height;
 	
 	console.log("libCanvas");
+	
 	
 };
 
@@ -48,38 +49,38 @@ libCanvas.prototype.attrClip= function(xx,yy,w,h){
 	
 	this.x = xx;
 	this.y= yy;
-	this.tamanhoX = w;
-	this.tamanhoY = h; 
+	this.sizeX = w;
+	this.sizeY = h; 
 	
 	
 	this.ctx.lineWidth = "1";
-	this.ctx.strokeRect(this.x,this.y,this.tamanhoX,this.tamanhoY);
+	this.ctx.strokeRect(this.x,this.y,this.sizeX,this.sizeY);
 	
 }
 
 libCanvas.prototype.iniVerifClip = function(x1,y1,x2,y2){	
 	console.log("IniVerifClip");
 	
-	this.inicioX = this.x + x1;
-	this.inicioY = this.y + y1;
-	this.fimX = this.x + x2;
-	this.fimY = this.y + y2;
+	this.initX = this.x + x1;
+	this.initY = this.y + y1;
+	this.endX = this.x + x2;
+	this.endY = this.y + y2;
 	var verifica = true;	
 	
 	
-	if(this.fimX > this.tamanhoX+this.x)
-		this.fimX = this.tamanhoX+this.x;
+	if(this.endX > this.sizeX+this.x)
+		this.endX = this.sizeX+this.x;
 		
-	if(this.fimY > this.tamanhoY+this.y)
-		this.fimY = this.tamanhoY+this.y;
+	if(this.endY > this.sizeY+this.y)
+		this.endY = this.sizeY+this.y;
 		
-	if(this.inicioX > this.tamanhoX+this.x)
-		this.inicioX = this.tamanhoX+this.x;
+	if(this.initX > this.sizeX+this.x)
+		this.initX = this.sizeX+this.x;
 		
-	if(this.inicioY > this.tamanhoY+this.y)
-		this.inicioY = this.tamanhoY+this.y;
+	if(this.initY > this.sizeY+this.y)
+		this.initY = this.sizeY+this.y;
 		
-	if(this.inicioX >= this.tamanhoX+this.x && this.fimX >this.tamanhoX+this.x || this.inicioY >= this.tamanhoY+this.y && this.fimY >= this.tamanhoY+this.y){
+	if(this.initX >= this.sizeX+this.x && this.endX >this.sizeX+this.x || this.initY >= this.sizeY+this.y && this.endY >= this.sizeY+this.y){
 		verifica = false;
 		
 	}
@@ -90,25 +91,25 @@ libCanvas.prototype.iniVerifClip = function(x1,y1,x2,y2){
 libCanvas.prototype.iniVerifClip2 =  function(x1, y1, x2, y2){
 	console.log("IniVerifClip2");
 	
-	this.inicioX = this.x + x1;
-	this.inicioY = this.y + y1;
-	this.fimX = x2;
-	this.fimY = y2;
+	this.initX = this.x + x1;
+	this.initY = this.y + y1;
+	this.endX = x2;
+	this.endY = y2;
 	var verifica = true;
 	var sub= 0;
 	
-	if(this.inicioX+this.fimX > this.x+this.tamanhoX){
-		sub = (this.inicioX+this.fimX) - (this.x+this.tamanhoX);
-		this.fimX = this.fimX-sub;	
+	if(this.initX+this.endX > this.x+this.sizeX){
+		sub = (this.initX+this.endX) - (this.x+this.sizeX);
+		this.endX = this.endX-sub;	
 	}
 	
-	if(this.inicioY+this.fimY > this.y+this.tamanhoY){
-		sub = (this.inicioY+this.fimY) - (this.y+this.tamanhoY);
-		this.fimY = this.fimY-sub;	
+	if(this.initY+this.endY > this.y+this.sizeY){
+		sub = (this.initY+this.endY) - (this.y+this.sizeY);
+		this.endY = this.endY-sub;	
 	}
 		
 	
-	if(this.inicioX >= this.tamanhoX+this.x || this.inicioY >= this.tamanhoY+this.y){
+	if(this.initX >= this.sizeX+this.x || this.initY >= this.sizeY+this.y){
 		verifica = false;
 	}
 	
@@ -122,8 +123,8 @@ libCanvas.prototype.drawLine =  function(x1, y1, x2, y2){
 		
 	if(verifica){
 		this.ctx.beginPath();
-		this.ctx.moveTo(this.inicioX,this.inicioY);
-		this.ctx.lineTo(this.fimX,this.fimY);
+		this.ctx.moveTo(this.initX,this.initY);
+		this.ctx.lineTo(this.endX,this.endY);
 						
 		this.ctx.stroke(); 
 		this.ctx.save();
@@ -143,11 +144,11 @@ libCanvas.prototype.drawRect =  function(x1, y1, x2, y2, mode){
 		
 	if(verifica){
 		if(mode == "fill"){
-			this.ctx.fillRect(this.inicioX, this.inicioY, this.fimX, this.fimY);
+			this.ctx.fillRect(this.initX, this.initY, this.endX, this.endY);
 		}
 		
 		else if(mode == "frame"){
-			this.ctx.strokeRect(this.inicioX, this.inicioY, this.fimX, this.fimY);
+			this.ctx.strokeRect(this.initX, this.initY, this.endX, this.endY);
 		}
 		
 		else{
@@ -168,21 +169,21 @@ libCanvas.prototype.attrText =  function(face, size, style){
 	this.ctx.font = size + " " + face + " " + style;
 }
 
-libCanvas.prototype.drawText =  function(xx, yy, text){
+libCanvas.prototype.drawText =  function(x, y, text){
 	console.log("drawText");
 	
-	dimensao = this.measureTextLua(text);
+	dimension = this.measureTextLua(text);
 	
-	altura = parseInt(dimensao.h);
-	largura = parseInt(dimensao.w);
+	height = parseInt(dimension.h);
+	width = parseInt(dimension.w);
 	
-	this.inicioX = this.x+xx;
-	this.inicioY = this.y+yy+altura;
+	this.initX = this.x+x;
+	this.initY = this.y+y+height;
 	
-	if(this.inicioX+largura > this.x+this.tamanhoX || this.inicioY+altura > this.y+this.tamanhoY)
+	if(this.initX+width > this.x+this.sizeX || this.initY+height > this.y+this.sizeY)
 		console.log("Text exceeds the dimentions limited by canvas");
 	else
-		this.ctx.fillText(text,this.inicioX,this.inicioY);
+		this.ctx.fillText(text,this.initX,this.initY);
 	 
 }
 
@@ -199,17 +200,17 @@ libCanvas.prototype.measureTextLua =  function(text){
 libCanvas.prototype.image_path = function(caminho,x,y,w,h){
 	console.log("image_path");
 	
-	this.inicioX = this.x + x;
-	this.inicioY = this.y + y;
+	this.initX = this.x + x;
+	this.initY = this.y + y;
 		
 	var img = new Image();
 	img.src = caminho;
 	
-	if(this.inicioX+w > this.x+this.tamanhoX || this.inicioY+h > this.y+this.tamanhoY)
+	if(this.initX+w > this.x+this.sizeX || this.initY+h > this.y+this.sizeY)
 		
 		console.log("Image exceeds the dimentions limited by canvas");
 	else
-		this.ctx.drawImage(img, this.inicioX,this.inicioY,w,h);
+		this.ctx.drawImage(img, this.initX,this.initY,w,h);
 	
 }
 
