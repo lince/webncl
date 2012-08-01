@@ -37,18 +37,10 @@ function LuaPlayer(p) {
 	this.htmlPlayer = "#" + p.id;
 	this.luajscode = undefined;
 	this.persitent = new libPersistent(false);
-	this.canvas = undefined;
+	this.canvas_objects = [];
 	this.events = new libEvents(p);
-
-	p.createElement("<canvas id='" + p.id + "'></canvas>");
-	$("#"+p.id).css('border','1px solid black');
+	this.id = 0;
 	
-	var a = document.getElementById(p.id);
-	console.log(a);
-	
-	
-	this.canvas = new libCanvas(a.getContext("2d"));
-	console.log(this.canvas);
 	
 	console.log(p.id);
 
@@ -204,55 +196,86 @@ LuaPlayer.prototype.setProperty = function(name,value) {
 
 LuaPlayer.prototype.bindlibs = function() {
 	
-	canvas = this.canvas;
-
+	canvas_objects = this.canvas_objects;
+	p = this.p;
+	id = this.id;
+	
 	lua_libs["canvas"] = {
-
-			"attrSize": function(){
-				canvas.attrSize();
+		
+			"init": function(){
+				
+				p.createElement("<canvas id='" + p.id + id + "'></canvas>");
+				$("#"+p.id).css('border','1px solid black');
+				
+				var a = document.getElementById(p.id);
+				console.log(a);
+								
+				ctx = a.getContext("2d");
+				console.log(ctx);
+				
+				object = new libCanvas(ctx);
+				canvas_objects[id] = object;
+				luaObject = lua_newtable();
+				luaObject.str['id'] = id;
+				id = id + 1;
+				return luaObject;
 			},
 
-			"attrColor" : function(r,g,b,a,mode){
-				canvas.attrColor(r,g,b,a,mode);
+			"attrSize": function(self){
+				objCanvas = canvas_objects[self.str[id]];
+				objCanvas.attrSize();
 			},
 
-			"attrClip" : function(x,y,w,h){
-				canvas.attrClip(x,y,w,h);
-
+			"attrColor" : function(self,r,g,b,a,mode){
+				objCanvas = canvas_objects[self.str[id]];
+				objCanvas.attrColor(r,g,b,a,mode);
 			},
 
-			"drawLine" : function(x1,y1,x2,y2){
-				canvas.drawLine(x1,y1,x2,y2);
-
-			},
-
-			"drawRect" : function(x,y,w,h, mode){
-				canvas.drawRect(x,y,w,h, mode);
-
-			},
-
-			"attrText" : function(face,size,style){
-				canvas.attrText(face,size,style);
-
-			},
-
-			"drawText" : function(x, y, text){
-				canvas.drawText(x, y, text);
-
-			},
-
-			"measureText" : function(text){
-				canvas.measureTextLua(text);
+			"attrClip" : function(self,x,y,w,h){
+				objCanvas = canvas_objects[self.str[id]];
+				objCanvas.attrClip(x,y,w,h);
 
 			},
 
-			"attrCrop" : function(ctxDestiny, x, y, w, h){
-				canvas.attrCrop(ctxDestiny, x, y, w, h);
+			"drawLine" : function(self,x1,y1,x2,y2){
+				objCanvas = canvas_objects[self.str[id]];
+				objCanvas.drawLine(x1,y1,x2,y2);
 
 			},
 
-			"compose" : function(ctxDestiny){
-				canvas.compose(ctxDestiny);
+			"drawRect" : function(self,x,y,w,h, mode){
+				objCanvas = canvas_objects[self.str[id]];
+				objCanvas.drawRect(x,y,w,h, mode);
+
+			},
+
+			"attrText" : function(self,face,size,style){
+				objCanvas = canvas_objects[self.str[id]];
+				objCanvas.attrText(face,size,style);
+
+			},
+
+			"drawText" : function(self,x, y, text){
+				objCanvas = canvas_objects[self.str[id]];
+				objCanvas.drawText(x, y, text);
+
+			},
+
+			"measureText" : function(self,text){
+				objCanvas = canvas_objects[self.str[id]];
+				objCanvas.measureTextLua(text);
+
+			},
+
+			"attrCrop" : function(self,ctxDestiny, x, y, w, h){
+				objCanvas = canvas_objects[self.str[id]];
+				objCanvas.attrCrop(ctxDestiny, x, y, w, h);
+
+			},
+
+			"compose" : function(self,ctxDestiny){
+				objCanvas = canvas_objects[self.str[id]];
+				objCanvas.compose(ctxDestiny);
 
 			}
 

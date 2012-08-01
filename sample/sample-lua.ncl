@@ -29,7 +29,7 @@
 		
 		<media id="audio" descriptor="dImage" src="audio1.mp3" />
 		
-		<media id="luascript" descriptor="dTV" src="test.lua" />
+		<media id="luascript" descriptor="dTV" src="canvas.lua" />
 		
 		<link xconnector="onKeySelectionStart">
 			<bind role="onSelection" component="luascript">
