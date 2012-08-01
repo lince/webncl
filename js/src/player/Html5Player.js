@@ -345,6 +345,36 @@ Html5Player.prototype.setProperty = function(name,value) {
 			}       
 		break;
 
+		case "fontColor": 
+				$(this.htmlPlayer).css("color",value);
+				break;
+
+		case "fontFamily": 
+				$(this.htmlPlayer).css("font-family",value);
+				break;
+
+		case "fontStyle": 
+				$(this.htmlPlayer).css("font-style",value);
+				break;
+
+		case "fontSize": 
+				$(this.htmlPlayer).css("font-size",value);
+				break;
+
+		case "fontVariant": 
+				$(this.htmlPlayer).css("font-variant",value);
+				break;
+
+		case "fontWeight": 
+				$(this.htmlPlayer).css("font-weight",value);
+				break;
+
+		case "style": 
+				// TODO: url de um arquivo css
+				Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"setProperty",[name]);
+				break;
+
+
 
 		case 'fit':
 			if (value=='meetBest') {
