@@ -19,7 +19,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function WebNclPlayer (file, div) {
+function WebNclPlayer (file, div, directory) {
+
+	if (directory && directory[directory.length-1] != '/') {
+		directory += '/';
+	}
 
 	var patt=/[\/]*.+\//g;
 	this.div = div;
@@ -45,51 +49,51 @@ function WebNclPlayer (file, div) {
 			// -----------------
 			// return "ncl" + this.playerId + (type||"") + "_" + nodeId;
 		},
-		path: (file && patt.exec(file)[0]) || '',
+		path: directory || (file && patt.exec(file)[0]) || '',
                 
-                //Default media players
-                //TODO: Future webncl versions should
-                //inspect browser features and choose the
-                //best players for the browser
-                //MediaPlayers can be changed by the user
-                mediaPlayers: {
-                "text/htm" : 
-                    {
-                            defaultPlayer: Html5Player
-                    },
-                "image" :
-                    {
-                            defaultPlayer: Html5Player
-                    },
-                "audio": 
-                    {
-                            defaultPlayer: Html5Player
-                    },
-                "video" : 
-                    {
-                            defaultPlayer: Html5Player
-                            //Its possible to choose players for specific file formats
-                    },
-                "video/x-flv": {defaultPlayer: FlowPlayer},
-                "text/css" : undefined,                 //No player - Issue Debbuger.Warning
-                "text/html" : 
-                    {
-                            defaultPlayer: Html5Player
-                    },
-                "text/plain": 
-                    {
-                            defaultPlayer: Html5Player
-                    },
-                "application/x-ginga-NCLua" : { defaultPlayer: LuaPlayer},
-                "application/x-ginga-NCLet" : undefined,
-                "application/x-ginga-settings" : {
-                            defaultPlayer: Html5Player
-                    },
-                "text/xml" : undefined
+		//Default media players
+		//TODO: Future webncl versions should
+		//inspect browser features and choose the
+		//best players for the browser
+		//MediaPlayers can be changed by the user
+		mediaPlayers: {
+		"text/htm" : 
+			{
+					defaultPlayer: Html5Player
+			},
+		"image" :
+			{
+					defaultPlayer: Html5Player
+			},
+		"audio": 
+			{
+					defaultPlayer: Html5Player
+			},
+		"video" : 
+			{
+					defaultPlayer: Html5Player
+					//Its possible to choose players for specific file formats
+			},
+		"video/x-flv": {defaultPlayer: FlowPlayer},
+		"text/css" : undefined,                 //No player - Issue Debbuger.Warning
+		"text/html" : 
+			{
+					defaultPlayer: Html5Player
+			},
+		"text/plain": 
+			{
+					defaultPlayer: Html5Player
+			},
+		"application/x-ginga-NCLua" : { defaultPlayer: LuaPlayer},
+		"application/x-ginga-NCLet" : undefined,
+		"application/x-ginga-settings" : {
+					defaultPlayer: Html5Player
+			},
+		"text/xml" : undefined
 
-                },
-                
-                keyEvents : {}
+		},
+		
+		keyEvents : {}
                 
                 
 
@@ -542,10 +546,11 @@ $(document).ready(function() {
 
 	$("nclplayer").each(function() {
 	
-		// todo: demais atributos
+		// todo: other nclplayer tag attributes
 		var src = $(this).attr("src");
 		var id = $(this).attr("id");
 		var autoplay = $(this).attr("autoplay");
+		var dir = $(this).attr("baseDir");
 		
 		this.outerHTML = '<div id="'+id+'" class="nclPlayer_'+id+'"> </div>';
 		
@@ -558,7 +563,7 @@ $(document).ready(function() {
 			+'	height: ' + ($(this).attr('height') || '480px') + ';'
 			+'}';
 
-		webNclPlayers.push(new WebNclPlayer(src,id));
+		webNclPlayers.push(new WebNclPlayer(src,id,dir));
                 
 		if (autoplay) {
 			webNclPlayers[webNclPlayers.length-1].start();   
