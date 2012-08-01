@@ -663,6 +663,7 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 		//notify parentContext of its action
 		this.parentContext.nAction(this,Player.action.START);			
 		$(this.htmlPlayer).trigger("presentation.onBegin",[nodeInterface]);
+		this.parentContext.nAction(undefined,-1);
 	}
 };
 
@@ -687,6 +688,7 @@ MediaPlayer.prototype.stop = function (nodeInterface) {
 		//notify parentContext of its action
 		this.parentContext.nAction(this,Player.action.STOP);
 		$(this.htmlPlayer).trigger("presentation.onEnd",[nodeInterface]);
+		this.parentContext.nAction(undefined,-1);
 	}
 };
 
@@ -704,6 +706,7 @@ MediaPlayer.prototype.pause = function (nodeInterface) {
 		//notify parentContext of its action
 		this.parentContext.nAction(this,Player.action.PAUSE);
 		$(this.htmlPlayer).trigger("presentation.onPause",[nodeInterface]);
+		this.parentContext.nAction(undefined,-1);
 	}
 };
 
@@ -721,6 +724,7 @@ MediaPlayer.prototype.resume = function (nodeInterface) {
 		//notify parentContext of its action
 		this.parentContext.nAction(this,Player.action.RESUME);				
 		$(this.htmlPlayer).trigger("presentation.onResume",[nodeInterface]);
+		this.parentContext.nAction(undefined,-1);
 	}
 };
 
@@ -742,6 +746,7 @@ MediaPlayer.prototype.abort = function (nodeInterface) {
 		//notify parentContext of its action
 		this.parentContext.nAction(this,Player.action.ABORT);                
 		$(this.htmlPlayer).trigger("presentation.onAbort",[nodeInterface]);
+		this.parentContext.nAction(undefined,-1);
 	}
 };
 

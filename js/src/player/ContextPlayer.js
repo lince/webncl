@@ -51,13 +51,23 @@ function ContextPlayer (node, p) {
 	this.htmlPlayer = "";
 	this.isPlaying = false;
 	this.isStopped = true;
-
 	
+	this.wAction = undefined;	//waiting action
+
+	//medias that might trigger 'start' or 'resume' events are tracked
+	this.tMedias =
+		{
+			onEnd: [],
+			onPause: [],
+			onAbort: []
+		};
+
 	if (node.id) {
 		this.htmlPlayer = this.presentation.getDivId(node.id);
 	} else {
 		this.htmlPlayer = this.presentation.bodyDiv;
 	}
+	
 	$("#"+this.presentation.contextsDiv).append("<div class='context' id='"+this.htmlPlayer+"'></div>");
 	this.htmlPlayer = "#" + this.htmlPlayer;
 	$(this.htmlPlayer).data("player",this);
@@ -119,28 +129,68 @@ ContextPlayer.prototype.nSync = function(e,s)
 ContextPlayer.prototype.nAction = function(e,a)
 {
 	var ac = Player.action;
+	var b
 	switch(a)
 	{
 		case ac.START:
 		case ac.RESUME:
 			this.playingElem.push(e);
-			var b
+			
 			b = $.inArray(e,this.pausedElem);
 			if(b > -1)
-				this.pausedElem.splice(b-1,1);		
+				this.pausedElem.splice(b-1,1);	
+			
+		
+			
+		if(a === ac.START)
+		{
+			//This implementation is not equal to Ginga VM
+			//when the context is paused and a stopped media receives a start
+			//Ginga VM contexts doens't trigger any event
+			
+		}
+		
 
 		break;
 		
 		case ac.PAUSE:
 			this.pausedElem.push(e);
-		//no break here!!
+			b = $.inArray(e,this.playingElem);
+			if(b > -1)
+				this.playingElem.splice(b-1,1);		
+			
+			//no more elements playing
+			if(this.playingElem.length === 0)
+			{
+				if($.inArray(e.htmlPlayer,this.tMedias['onPause'])===-1)
+					this.wAction = a;			
+			}
+			
+		break;
 
 		case ac.STOP:
 		case ac.ABORT:
-			var b;
 			b = $.inArray(e,this.playingElem);
 			if(b > -1)
 				this.playingElem.splice(b-1,1);
+			
+			
+			if(this.playingElem.length === 0 && this.pausedElem.length === 0)
+			{
+				//check if this last onEnd/onAbort will not trigger a start event
+				if(a === ac.STOP)
+				{
+					if(($.inArray(e.htmlPlayer,this.tMedias['onEnd'])===-1))
+						this.wAction = a;
+
+				} else {
+					if($.inArray(e.htmlPlayer,this.tMedias['onAbort'])===-1)
+						this.wAction = a;
+
+				}
+					
+
+			}
 			
 			//if(this.playingElem.length == 0 && this.pausedElem.length == 0)
 			//{
@@ -150,6 +200,48 @@ ContextPlayer.prototype.nAction = function(e,a)
 			//	$(this.htmlPlayer).trigger("presentation.onEnd");
 			//}
 				
+		break;
+		
+		
+		//callback called after media trigerred it's events (-1)
+		default:
+			if(this.wAction)
+			{
+				//work on action
+				switch(this.wAction)
+				{
+					case ac.PAUSE:
+						this.isPlaying = false;
+						this.isStopped = false;	
+						this.parentContext.nAction(this,Player.action.PAUSE);
+						$(this.htmlPlayer).trigger("presentation.onPause");
+						this.parentContext.nAction(undefined,-1);
+					break;
+					
+					case ac.STOP:
+						this.isPlaying = false;
+						this.isStopped = true;
+						this.parentContext.nAction(this,Player.action.STOP);
+						$(this.htmlPlayer).trigger("presentation.onEnd");
+						this.parentContext.nAction(undefined,-1);
+					break;
+					
+					case ac.ABORT:
+						this.isPlaying = false;
+						this.isStopped = true;	
+						this.parentContext.nAction(this,Player.action.ABORT);
+						$(this.htmlPlayer).trigger("presentation.onAbort");
+						this.parentContext.nAction(undefined,-1);
+					break;
+				}
+				
+				//execute events on list
+				//
+				//(while executing this list, should another elements be added to it?)
+				this.wAction = undefined; //events starts working properly
+				
+			}
+			
 		break;
 		
 	}
@@ -234,25 +326,14 @@ ContextPlayer.prototype.start = function (nodeInterface) {
 		}
 		this.parentContext.nAction(this,Player.action.START);
 		$(this.htmlPlayer).trigger("presentation.onBegin");
+		this.parentContext.nAction(undefined,-1);
 	} else {
-	//if context is paused or playing
-	
-		//if it is paused
-		if(!this.isPlaying)
-		{
-			//This implementation is not equal to Ginga VM
-			//when the context is paused and a stopped media receives a start
-			//Ginga VM contexts doens't trigger any event
-			
-			
-		}
-		
+
 		//playing or paused, events are going to work (if
 		//directed to a port
 		if(nodeInterface)
 			this.portAction(this.port[nodeInterface],'start');
-		
-		
+	
 	}
 }
 
@@ -283,7 +364,7 @@ ContextPlayer.prototype.stop = function (nodeInterface) {
 			this.timerManager.stopAll();
 			this.parentContext.nAction(this,Player.action.STOP);
 			$(this.htmlPlayer).trigger("presentation.onEnd");
-
+			this.parentContext.nAction(undefined,-1);
 			
 			
 		} else {
@@ -319,6 +400,7 @@ ContextPlayer.prototype.pause = function (nodeInterface) {
 			this.timerManager.pauseAll();
 			this.parentContext.nAction(this,Player.action.PAUSE);
 			$(this.htmlPlayer).trigger("presentation.onPause");
+			this.parentContext.nAction(undefined,-1);
 			
 		} else {
 			this.portAction(this.port[nodeInterface],'pause');
@@ -354,7 +436,8 @@ ContextPlayer.prototype.resume = function (nodeInterface) {
 		
 		this.timerManager.resumeAll();
 		this.parentContext.nAction(this,Player.action.RESUME);
-		$(this.htmlPlayer).trigger("presentation.onResume");	
+		$(this.htmlPlayer).trigger("presentation.onResume");
+		this.parentContext.nAction(undefined,-1);
 		
 	} else {
 		//if context not paused
@@ -386,6 +469,7 @@ ContextPlayer.prototype.abort = function (nodeInterface) {
 			this.timerManager.stopAll();
 			$(this.htmlPlayer).trigger("presentation.onAbort",[nodeInterface]);
 			this.parentContext.nAction(this,Player.action.ABORT);
+			this.parentContext.nAction(undefined,-1);
 
 		} else {
 			this.portAction(this.port[nodeInterface],'abort');
@@ -519,6 +603,13 @@ ContextPlayer.prototype.bindLinks = function()
 		var connectorParam = new Object();
 		var assessmentsMap = new Object();
 		var assessmentsArray = new Array();
+		
+		//tratamento de fim de contexto
+		var trackableCondition = 0;			//0 - nothing
+											//1 - end or abort
+											//2 - pause
+											//3 - (end or abort) and pause
+		var trackable = false;
 
 		
 
@@ -607,8 +698,9 @@ ContextPlayer.prototype.bindLinks = function()
 			var conditionUseVariable = false;
 			var conditionDefaultValue = '';
 			var conditionUseKey = false;
+			var tType = 0;						//not tracked
 
-			if (currentCondition.role == 'onSelection')
+			if (currentCondition.role === 'onSelection')
 			{
 				if(currentCondition.key)
 				{
@@ -618,7 +710,18 @@ ContextPlayer.prototype.bindLinks = function()
 					conditionDefaultValue = currentCondition.key;
 					conditionUseKey = true;
 				}
+			} else if(currentCondition.role === 'onEnd' ) {
+				tType = 1;			
+				trackableCondition |= 1;
+			} else if(currentCondition.role === 'onAbort' ) {
+				tType = 2;
+				trackableCondition |= 1;
+			} else if(currentCondition.role === 'onPause'){
+				tType = 3;
+				trackableCondition |= 2;
 			}
+			
+			
 
 			flagMap[currentCondition.role] = {
 				bindComponent: "",
@@ -627,8 +730,8 @@ ContextPlayer.prototype.bindLinks = function()
 				flag: false,
 				keyUseVariable : conditionUseVariable,
 				keyDefaultValue: conditionDefaultValue,
-				useKey : conditionUseKey
-				
+				useKey : conditionUseKey,
+				trackable: tType
 			}
 
 		}
@@ -679,10 +782,21 @@ ContextPlayer.prototype.bindLinks = function()
 	    		}
 
 	    	} else {
-	    		
+				if(!trackable)
+				{
+					if(trackableCondition != 0)
+					{
+						//important for all cases
+						if(currentAction.role === 'start' ||(currentAction.role === 'resume' && trackableCondition >=2))
+							trackable = true;
+					}
+				}
+				
+				
+				
 	    		actionMap[currentAction.role]= {
-	    		binds: new Array(),
-	    		qualifier: actions[i].qualifier
+					binds: new Array(),
+					qualifier: actions[i].qualifier
 	    		}
 	    		
 	    	}
@@ -785,7 +899,10 @@ ContextPlayer.prototype.bindLinks = function()
 			   var eventName = currentBind.role;
 			   var bindName = [eventType,eventName].join('.');
 			   var handlerName =  [currentBindComponent,bindName].join('.');
-			   
+
+				if(trackable)
+					this.tMedias[currentBind.role].push(currentBindComponentSelector);
+				
 			   var triggerArrayName = bindName+'.triggerArray';
 			   
 			   //TODO: Melhorar sistema que trata 'key' do onSelection
