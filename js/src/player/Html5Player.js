@@ -293,19 +293,19 @@ Html5Player.prototype.seek = function(newTime)
 Html5Player.prototype.seekAndPlay = function(newTime)
 {
     if (this.p.checkType(["video","audio"])) {
-			try {
-				this.popcornPlayer.currentTime(newTime);
-			} catch(e) {
-				eval("$(this.htmlPlayer).one('loadedmetadata',$.proxy(function() {"+
-					"this.popcornPlayer.currentTime("+newTime+");"+
-				"},this));");
-			}
-			$(this.htmlPlayer).one("seeked",$.proxy(function() {
-				this.popcornPlayer.play();
-			},this));
-		} else if(this.p.checkType(["image","text"])) {
-				this.popcornPlayer.currentTime(newTime);
+		try {
+			this.popcornPlayer.currentTime(newTime);
+		} catch(e) {
+			eval("$(this.htmlPlayer).one('loadedmetadata',$.proxy(function() {"+
+				"this.popcornPlayer.currentTime("+newTime+");"+
+			"},this));");
 		}
+		$(this.htmlPlayer).one("seeked",$.proxy(function() {
+			this.popcornPlayer.play();
+		},this));
+	} else if(this.p.checkType(["image","text"])) {
+		this.popcornPlayer.currentTime(newTime);
+	}
 };
 
 

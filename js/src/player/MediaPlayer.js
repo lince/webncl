@@ -635,6 +635,42 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 	}
 	// --- quick fix ends here
 	
+	// if the media was already playing an area, it should be set to stopped
+	if (this.isPlaying && this.playingArea) {
+		this.area[this.playingArea].started = false;
+	}
+	
+	if (nodeInterface) {
+		if (this.area[nodeInterface]._type=="area") {
+			this.area[nodeInterface].started = true;
+			this.playingArea = nodeInterface;
+			var t = this.area[nodeInterface].beginTime;
+			if (t != 'begin' && !(t > this.player.getDuration()))
+				this.seekAndPlay(t);
+			else {
+				if (t != 'begin') {
+					Logger.warning(Logger.WARN_INVALID_AREA,'area',['begin','end']);
+				}
+				if (this.isPlaying) {
+					this.seek(0);
+				} else if (this.player.start)
+					this.player.start();
+				else
+					Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['start',nodeInterface]);
+			}
+		} else {
+			// TODO
+		}
+	} else {
+		this.playingArea = undefined;
+		if (this.isPlaying) {
+			this.seek(0);
+		} else if (this.player.start)
+			this.player.start();
+		else
+			Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['start',nodeInterface]);
+	}
+	
 	if (this.isStopped) {
         this.presentation.inputManager.enableKeys(this.htmlPlayer);
 		if(this.node.descriptor){
@@ -643,41 +679,10 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 		this.isPlaying = true;
 		this.isStopped = false;
 		this.show();
-	
-		if (nodeInterface) {
-		
-			if (this.area[nodeInterface]._type=="area") {
-				this.area[nodeInterface].started = true;
-				this.playingArea = nodeInterface;
-				var t = this.area[nodeInterface].beginTime;
-				if (t != 'begin' && !(t > this.player.getDuration()))
-					this.seekAndPlay(t);
-				else {
-					if (t != 'begin') {
-						Logger.warning(Logger.WARN_INVALID_AREA,'area',['begin','end']);
-					}
-					if (this.player.start)
-						this.player.start();
-					else
-						Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['start',nodeInterface]);
-				}
-			} else {
-				// TODO
-			}
-			
-		} else {
-			
-			this.playingArea = undefined;
-			if(this.player.start)
-				this.player.start();
-			else
-				Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['start',nodeInterface]);
-
-			
-		}
-			
-		$(this.htmlPlayer).trigger("presentation.onBegin",[nodeInterface]);
 	}
+	
+	$(this.htmlPlayer).trigger("presentation.onBegin",[nodeInterface]);
+	
 };
 
 // stop
@@ -747,6 +752,7 @@ MediaPlayer.prototype.abort = function (nodeInterface) {
 	}
 };
 
+// seek
 MediaPlayer.prototype.seek = function (newTime) {
         if(this.player.seek)
             this.player.seek(newTime);
