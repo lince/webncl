@@ -25,7 +25,6 @@
 
 /**
  * Default player for video, image, text/plain, text/html and text/htm.
- * This is a Work in Progress. All players are still handled by MediaPlayer.js
  * @constructor
  */
 function Html5Player(p) {
@@ -33,16 +32,17 @@ function Html5Player(p) {
     this.popcornPlayer  = undefined;
     this.htmlPlayer = "#" + p.id;
 
+	// flags and callbacks for explicitDur treatment
 	this.duration = undefined;
+	this.durationBind = undefined;
+	this.durationBinded = false;
 	this.durationMap = {};
 	this.endCallbacks = [];
 
     p.onChangeProperty.propertyMap =
 	{
-
 		'soundLevel' : Player.propertyAction.OVERLOAD,
 		'fit': Player.propertyAction.OVERLOAD
-
 	};
     //overloading we don't need to trigger onEndAttribution event
 
@@ -64,68 +64,57 @@ function Html5Player(p) {
 		
 		case "application": 
 			switch (p.source.type) {
-					case "application/x-ginga-settings": 
-							// type = application/x-ginga-settings
-							 p.createElement("<div class='player' id='" + p.id + "'></div>");
-							break;
-					
-					case "application/x-ginga-NCLua": 
-							// type = application/x-ginga-NCLua
-							Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
-							break;
-					
-					case "application/x-ginga-NCLet": 
-							// type = application/x-ginga-NCLet
-							Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
-							break;
-					
-					case "application/x-ginga-time": 
-							// type = application/x-ginga-time
-							Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
-							break;
-					
+				case "application/x-ginga-settings":
+					// type = application/x-ginga-settings
+					 p.createElement("<div class='player' id='" + p.id + "'></div>");
+					break;
+				case "application/x-ginga-NCLua":
+					// type = application/x-ginga-NCLua
+					Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
+					break;
+				case "application/x-ginga-NCLet":
+					// type = application/x-ginga-NCLet
+					Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
+					break;
+				case "application/x-ginga-time":
+					// type = application/x-ginga-time
+					Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
+					break;
 			}
 			break;
 		
 		case "text": 
 			switch (p.source.type) {
-					case "text/plain":
-					case "text/html": 
-							// type = text/plain, text/html
-							p.createElement("<div class='player' id='" + p.id + "'></div>");
-							break;
-					
-					case "text/css": 
-							// type = text/css
-							Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
-							break;
-					
-					case "text/xml": 
-							// type = text/xml
-							Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
-							break;
+				case "text/plain":
+				case "text/html":
+					// type = text/plain, text/html
+					p.createElement("<div class='player' id='" + p.id + "'></div>");
+					break;
+				case "text/css":
+					// type = text/css
+					Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
+					break;
+				case "text/xml":
+					// type = text/xml
+					Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
+					break;
 
 		}
 		break;
 	}
 
-
 	//Tenta criar o popCorn player de acordo com o tipo de media
 	if (p.checkType(["video","audio"]))
 	{
 		do {	
-				//this.popcornPlayer = new Popcorn(this.htmlPlayer, { frameAnimation: true });
-				this.popcornPlayer = new Popcorn(this.htmlPlayer);	
+			this.popcornPlayer = new Popcorn(this.htmlPlayer);
 		} while (!this.popcornPlayer);
 	} else if(p.checkType(["image","text"])){
-		do {	
-				Popcorn.player("baseplayer");
-				this.popcornPlayer = new Popcorn.baseplayer(this.htmlPlayer);
-				
+		do {
+			Popcorn.player("baseplayer");
+			this.popcornPlayer = new Popcorn.baseplayer(this.htmlPlayer);
 		} while (!this.popcornPlayer);
-	} 
-	
-
+	}
 
 }
 
@@ -135,8 +124,8 @@ function Html5Player(p) {
  */
 Html5Player.prototype.unload = function()
 {
-	     //erases older content
-        $(this.htmlPlayer).empty();   
+	//erases older content
+	$(this.htmlPlayer).empty();
 };
 
 /**
@@ -147,13 +136,12 @@ Html5Player.prototype.unload = function()
  */
 Html5Player.prototype.load = function(source)
 {
- 
-        
-		var filename = source.substr(0, source.lastIndexOf('.'));
 
-        
-        //load a new content base on file type
+	var filename = source.substr(0, source.lastIndexOf('.'));
+    
+	// load a new content base on file type
 	switch (this.p.source.type.split("/")[0]) {
+	
 		case "video": 
 			// type = video/*
 			$(this.htmlPlayer).append("<source type='video/webm' src='" + filename + ".webm'></source>");
@@ -178,7 +166,7 @@ Html5Player.prototype.load = function(source)
             break;
 		
 		case "text": 
-			if (this.checkType(["text/plain","text/html"])) {
+			if (this.p.checkType(["text/plain","text/html"])) {
 				// type = text/plain, text/html
 				$.ajax({
 					type: "GET",
@@ -189,7 +177,7 @@ Html5Player.prototype.load = function(source)
 					},this)
 				});
 			}// else {
-				// TODO?
+				// TODO
 			//}
 			break;
 		
@@ -228,7 +216,11 @@ Html5Player.prototype.exec = function(time,callback)
 Html5Player.prototype.start =  function()
 {
     if (this.popcornPlayer) {
-         this.popcornPlayer.play();
+		this.popcornPlayer.play();
+		if (this.durationBind && !this.durationBinded && this.p.checkType(['image','text'])) {
+			// Bind the explicitDur callback again
+			eval(this.durationBind);
+		}
     }
 };
 
@@ -238,8 +230,11 @@ Html5Player.prototype.start =  function()
 Html5Player.prototype.stop = function()
 {
     if (this.popcornPlayer) {
-	this.popcornPlayer.pause(0);
+		this.popcornPlayer.pause(0);
     }
+	if (this.p.checkType(['image','text'])) {
+		this.durationBinded = false;
+	}
 };
 
 /**
@@ -248,7 +243,7 @@ Html5Player.prototype.stop = function()
 Html5Player.prototype.pause = function()
 {
     if (this.popcornPlayer) {
-	this.popcornPlayer.pause();
+		this.popcornPlayer.pause();
     }
 };
 
@@ -258,7 +253,7 @@ Html5Player.prototype.pause = function()
 Html5Player.prototype.resume = function()
 {
     if (this.popcornPlayer) {
-	this.popcornPlayer.play();
+		this.popcornPlayer.play();
     }
 };
 
@@ -293,7 +288,7 @@ Html5Player.prototype.seek = function(newTime)
 
 
 /**
- * SeekAndPLay
+ * SeekAndPlay
  */
 Html5Player.prototype.seekAndPlay = function(newTime)
 {
@@ -320,7 +315,6 @@ Html5Player.prototype.seekAndPlay = function(newTime)
 
 Html5Player.prototype.stopCallback = function (t) {
 	if (this.duration == t) {
-		this.stop();
 		var i;
 		for (i in this.endCallbacks) {
 			this.endCallbacks[i]();
@@ -335,9 +329,13 @@ Html5Player.prototype.setProperty = function(name,value) {
 			this.duration = value;
 			if (!this.durationMap[value]) {
 				this.durationMap[value] = true;
-				eval('this.exec(value,$.proxy(function() {'+
+				// For some reason, our baseplayer's cue method seems to work only once.
+				// Every time it starts again, this callback needs to be binded again.
+				this.durationBind = 'this.exec(' + value + ',$.proxy(function() {'+
 				'this.stopCallback(' + value + ');'+
-				'},this));');
+				'},this));';
+				eval(this.durationBind);
+				this.durationBinded = true;
 			}
 		break;
 
@@ -381,10 +379,9 @@ Html5Player.prototype.setProperty = function(name,value) {
 /**
  * getDuration
  */
- Html5Player.prototype.getDuration = function() {
+Html5Player.prototype.getDuration = function() {
 	if (this.duration && this.popcornPlayer.duration)
 		return Math.min(this.duration,this.popcornPlayer.duration());
 	else
 		return this.duration || this.popcornPlayer.duration();
- }
- 
+}

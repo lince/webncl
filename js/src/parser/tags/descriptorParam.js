@@ -21,27 +21,29 @@
 
 Parser.prototype.parseDescriptorParam = function (obj,tag,parent,tree) {
 	// explicitDur
-	values = ["(número real)s","HH:MM:SS"];
-	patt1 = /^(\d+|\d*\.\d+)s$/;
-	patt2 = /^\d+:\d+:\d+(\.\d+)?$/;
-	// format: 0=invalid, 1='real number', 2='HH:MM:SS'
-	var format = patt1.test(obj.value) ? 1 : (patt2.test(obj.value) ? 2 : 0);
-	if (format == 0) {
-		Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["value",obj.value,values]);
-	} else {
-		if (format == 1) {
-			// removes the 's' from the end of the string
-			obj.value = parseFloat(obj.value.split('s')[0]);
+	if (obj.name == 'explicitDur') {
+		values = ["(número real)s","HH:MM:SS"];
+		patt1 = /^(\d+|\d*\.\d+)s$/;
+		patt2 = /^\d+:\d+:\d+(\.\d+)?$/;
+		// format: 0=invalid, 1='real number', 2='HH:MM:SS'
+		var format = patt1.test(obj.value) ? 1 : (patt2.test(obj.value) ? 2 : 0);
+		if (format == 0) {
+			Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["value",obj.value,values]);
 		} else {
-			// calculates the number of seconds from the 'HH:MM:SS' format
-			var arr = obj.value.split(':');
-			var h = parseFloat(arr[0]);
-			var m = parseFloat(arr[1]);
-			var s = parseFloat(arr[2]);
-			if (m>=60 || s>=60) { // ncl handbook also says that hours must be in [0,23] interval, but it's not necessary
-				Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["value",obj.value,values]);
+			if (format == 1) {
+				// removes the 's' from the end of the string
+				obj.value = parseFloat(obj.value.split('s')[0]);
 			} else {
-				obj.value = parseFloat(h)*3600 + parseFloat(m)*60 + parseFloat(s);
+				// calculates the number of seconds from the 'HH:MM:SS' format
+				var arr = obj.value.split(':');
+				var h = parseFloat(arr[0]);
+				var m = parseFloat(arr[1]);
+				var s = parseFloat(arr[2]);
+				if (m>=60 || s>=60) { // ncl handbook also says that hours must be in [0,23] interval, but it's not necessary
+					Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["value",obj.value,values]);
+				} else {
+					obj.value = parseFloat(h)*3600 + parseFloat(m)*60 + parseFloat(s);
+				}
 			}
 		}
 	}

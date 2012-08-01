@@ -226,9 +226,10 @@ MediaPlayer.prototype.create = function (node) {
 					
 					//onEnd trigger
 					this.player.exec('end',$.proxy(function() {
-						if (!this.playingArea)
+					
+						if (!this.playingArea) {
 							this.stop();
-						else {
+						} else {
 							$(this.htmlPlayer).trigger('presentation.onEnd');
 							this.playingArea = undefined;
 						}
@@ -613,23 +614,27 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 
 	// TODO:
 	// This is a quick fix to make the getDuration method and the area interval tests work,
-	// since they can only be called when the 'loadedmetadata' even is triggered.
+	// since they can only be called when the 'loadedmetadata' event is triggered.
 	// Note that it works only with a Html5Player playing videos.
 	// As soon as the synchronization issue is solved, this code should be removed!
 	// --- quick fix begins here
 	if (this.playerName == 'Html5Player' && this.player.p.checkType(['video'])) {
 		if (!this.ready) {
-			this.nodeInterface = nodeInterface;
-			this.ready = true;
-			this.player.popcornPlayer.on('loadedmetadata',$.proxy(function() {
-				this.start();
-			},this));
-			return;
+			if (this.player.popcornPlayer.readyState() < 1) {
+				this.nodeInterface = nodeInterface;
+				this.ready = true;
+				this.player.popcornPlayer.on('loadedmetadata',$.proxy(function() {
+					this.start();
+				},this));
+				return;
+			}
+		} else {
+			nodeInterface = this.nodeInterface;
+			this.ready = false;
 		}
-		nodeInterface = this.nodeInterface;
 	}
 	// --- quick fix ends here
-
+	
 	if (this.isStopped) {
         this.presentation.inputManager.enableKeys(this.htmlPlayer);
 		if(this.node.descriptor){
@@ -638,14 +643,13 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 		this.isPlaying = true;
 		this.isStopped = false;
 		this.show();
-		
+	
 		if (nodeInterface) {
 		
 			if (this.area[nodeInterface]._type=="area") {
 				this.area[nodeInterface].started = true;
 				this.playingArea = nodeInterface;
 				var t = this.area[nodeInterface].beginTime;
-				// getDuration will work only when the player synchronization is working
 				if (t != 'begin' && !(t > this.player.getDuration()))
 					this.seekAndPlay(t);
 				else {
@@ -658,7 +662,7 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 						Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['start',nodeInterface]);
 				}
 			} else {
-				// TODO (frames)
+				// TODO
 			}
 			
 		} else {
@@ -679,8 +683,7 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 // stop
 MediaPlayer.prototype.stop = function (nodeInterface) {
 	if (!this.isStopped) {
-
-                this.presentation.inputManager.disableKeys(this.htmlPlayer);
+        this.presentation.inputManager.disableKeys(this.htmlPlayer);
 		if(this.node.descriptor){
 			this.presentation.inputManager.removeMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
 		}
@@ -688,12 +691,10 @@ MediaPlayer.prototype.stop = function (nodeInterface) {
 		this.isPlaying = false;
 		this.isStopped = true;
 		this.hide();
-                
-                if(this.player.stop)
-                    this.player.stop();
-                else
-                    Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['stop',nodeInterface]);
-                
+		if(this.player.stop)
+			this.player.stop();
+		else
+			Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['stop',nodeInterface]);
 		$(this.htmlPlayer).trigger("presentation.onEnd",[nodeInterface]);
 	}
 };
@@ -703,12 +704,10 @@ MediaPlayer.prototype.pause = function (nodeInterface) {
 	if (this.isPlaying) {
 		this.isPlaying = false;
 		this.isStopped = false;
-		
-                if(this.player.pause)
-                    this.player.pause()
-                else
-                    Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['pause',nodeInterface]);
-                
+		if (this.player.pause)
+			this.player.pause()
+		else
+			Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['pause',nodeInterface]);
 		$(this.htmlPlayer).trigger("presentation.onPause",[nodeInterface]);
 	}
 };
