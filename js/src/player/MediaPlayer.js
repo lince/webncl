@@ -111,18 +111,13 @@ MediaPlayer.prototype.create = function (node) {
 		this.transOut = node.descriptor.transOut;
 		
 		//Seta o valor de expliticDur
-		if (node.descriptor.explicitDur) {
-			vector = node.descriptor.explicitDur.split("s");
-			this.explicitDur = parseFloat(vector[0]);
-		}
+		this.explicitDur = node.descriptor.explicitDur;
 	}
 	
 	// Cria as áreas
 	for (i in node.area) {
-		if (!node.area[i]._ignore) {
-			this.area[node.area[i].id] = node.area[i];
-			this.area[node.area[i].id].started = false;
-		}
+		this.area[node.area[i].id] = node.area[i];
+		this.area[node.area[i].id].started = false;
 	}
 	// Verifica o tipo da mídia
 	if (node.type) {
@@ -156,17 +151,30 @@ MediaPlayer.prototype.create = function (node) {
 		
                 // Creates media player
                 var mediaPlayers = this.presentation.mediaPlayers;
-                
                 if(mediaPlayers[this.type])
                     {
                         //creates the playerSettings data structure
                         this.playerSettings = 
                         {
-                             source: 
+                                source: 
                                 {
                                     type: this.type,
                                     ext: node._ext,
                                     url: this.presentation.path + node.src
+                                },
+
+
+                                onChangeProperty:
+                                {
+                                    defaultAction: Player.propertyAction.IGNORE, //IGNORE,OVERRIDE,OVERLOAD
+
+                                    //propertyMap has higher priority than defaultAction                                    
+                                    propertyMap:
+                                    {
+                                        //'property': IGNORE,OVERRIDE,OVERLOAD
+                                    }
+                                    //when overrided, user should trigger onEndAttribution
+                                    //using postEvent
                                 },
 
 
@@ -177,12 +185,12 @@ MediaPlayer.prototype.create = function (node) {
                                 checkType: $.proxy(this.checkType,this),
 								getProperty: $.proxy(this.getProperty,this),
 								setProperty: $.proxy(this.setProperty,this),
+                                postEvent: this.presentation.postEvent,
+
                                 
                               media:{
                                 areas: this.area  
                               }
-                                
-
 
                         }
                        
@@ -212,36 +220,38 @@ MediaPlayer.prototype.create = function (node) {
 		this.load(node.src);
                 //possetup( needed ?? )
                 
-                
-                this.player.onEnded = $.proxy(function() {
-                        this.stop();
-                },this);
-                
                 //if player supports area
                 if(this.player.exec)
                 {
 					
 					//onEnd trigger
 					this.player.exec('end',$.proxy(function() {
-						if(!this.playingArea)
+					
+						if (!this.playingArea) {
 							this.stop();
-						else
-						{
+						} else {
 							$(this.htmlPlayer).trigger('presentation.onEnd');
 							this.playingArea = undefined;
 						}
+
+						var i;
+						var d = this.player.getDuration();
+						for (i in this.area) {
+							if (this.area[i].started) {
+								this.area[i].started = false;
+								$(this.htmlPlayer).trigger('stop',[i]);
+							} else {
+								$(this.htmlPlayer).trigger('presentation.onEnd',[i]);
+							}
+						}
+						
 						//the stop action is going to be dealed by the area event listener
                 },this));
 					
                     for (i in this.area) {
-					
+
 						eval("this.player.exec(this.area[i].endTime,$.proxy(function() {"+
-							"if (this.area['"+i+"'].started) {"+
-								"this.area['"+i+"'].started = false;"+
-								"$(this.htmlPlayer).trigger('stop',[this.area['"+i+"'].id]);"+
-							"} else {"+
-								"$(this.htmlPlayer).trigger('presentation.onEnd',[this.area['"+i+"'].id]); "+
-							"}" +
+							"this.stopArea('" + i + "');"+
 						"},this));");
 
 						eval("this.player.exec(this.area[i].beginTime,$.proxy(function() {"+
@@ -254,8 +264,6 @@ MediaPlayer.prototype.create = function (node) {
 				} else {
 						Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['exec']);
 				}
-
-
 	
 	// ---- REFER ----
 	}
@@ -264,6 +272,8 @@ MediaPlayer.prototype.create = function (node) {
 	// Cria as propriedades
 	$(this.htmlPlayer).data("property",[]);
 	if (node.descriptor) {
+		if (node.descriptor.explicitDur)
+			this.setProperty("explicitDur",node.descriptor.explicitDur);
 		if (node.descriptor.region) {
 			// Propriedades da tag <region> (atributos)
 			this.setProperty("zIndex",node.descriptor.region.zIndex);
@@ -383,20 +393,7 @@ MediaPlayer.prototype.create = function (node) {
 	
 	}
 	/* ----------------------------------------------- */
-	
-	// explicitDur treatment
-	if(this.explicitDur)
-	{
-                //explicitDur will not work unless player implements exec
-				//TODO: All areas that don't define an end should
-				//have the same end defined by explicitDur. This seens
-				//to be ignored here
-		if(this.player.exec)
-                    this.player.exec(this.explicitDur,$.proxy(function() {
-                         this.stop();
-                    },this));
-	}
-	
+		
 	// Bind events
 	this.bindEvents();
 	// Saves the media player using jQuery data function
@@ -614,10 +611,66 @@ MediaPlayer.prototype.hide = function () {
 
 // start
 MediaPlayer.prototype.start = function (nodeInterface) {
-// (danilo): Sugiro que quando o start for dado,
-// caso o player esteja tocando ele seja parado
-// e iniciado do lugar onde foi pedido (A maquina virtual
-// comporta-se assim no caso de ancoras), nao sei se eh o funcionamento oficial
+
+	// TODO:
+	// This is a quick fix to make the getDuration method and the area interval tests work,
+	// since they can only be called when the 'loadedmetadata' event is triggered.
+	// Note that it works only with a Html5Player playing videos.
+	// As soon as the synchronization issue is solved, this code should be removed!
+	// --- quick fix begins here
+	if (this.playerName == 'Html5Player' && this.player.p.checkType(['video'])) {
+		if (!this.ready) {
+			if (this.player.popcornPlayer.readyState() < 1) {
+				this.nodeInterface = nodeInterface;
+				this.ready = true;
+				this.player.popcornPlayer.on('loadedmetadata',$.proxy(function() {
+					this.start();
+				},this));
+				return;
+			}
+		} else {
+			nodeInterface = this.nodeInterface;
+			this.ready = false;
+		}
+	}
+	// --- quick fix ends here
+	
+	// if the media was already playing an area, it should be set to stopped
+	if (this.isPlaying && this.playingArea) {
+		this.area[this.playingArea].started = false;
+	}
+	
+	if (nodeInterface) {
+		if (this.area[nodeInterface]._type=="area") {
+			this.area[nodeInterface].started = true;
+			this.playingArea = nodeInterface;
+			var t = this.area[nodeInterface].beginTime;
+			if (t != 'begin' && !(t > this.player.getDuration()))
+				this.seekAndPlay(t);
+			else {
+				if (t != 'begin') {
+					Logger.warning(Logger.WARN_INVALID_AREA,'area',['begin','end']);
+				}
+				if (this.isPlaying) {
+					this.seek(0);
+				} else if (this.player.start)
+					this.player.start();
+				else
+					Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['start',nodeInterface]);
+			}
+		} else {
+			// TODO
+		}
+	} else {
+		this.playingArea = undefined;
+		if (this.isPlaying) {
+			this.seek(0);
+		} else if (this.player.start)
+			this.player.start();
+		else
+			Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['start',nodeInterface]);
+	}
+	
 	if (this.isStopped) {
         this.presentation.inputManager.enableKeys(this.htmlPlayer);
 		if(this.node.descriptor){
@@ -626,52 +679,19 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 		this.isPlaying = true;
 		this.isStopped = false;
 		this.show();
-
-
-		if (nodeInterface) {
-			if (this.area[nodeInterface]._type=="area") {
-				this.area[this.area[nodeInterface].id].started = true;
-				this.playingArea = nodeInterface;
-				var t =  this.area[this.area[nodeInterface].id].beginTime;
-				if(t != 'begin')
-					this.seekAndPlay(this.area[this.area[nodeInterface].id].beginTime);
-				else
-					{
-						if(this.player.start)
-							this.player.start();
-						else
-							Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['start',nodeInterface]);
-					}
-				
-				
-
-			} else {
-				// TODO (frames)
-			}
-		} else {
-			
-			this.playingArea = undefined;
-			if(this.player.start)
-				this.player.start();
-			else
-				Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['start',nodeInterface]);
-
-
-
-		}
+	}
 			
 		//notify parentContext of its action
 		this.parentContext.nAction(this,Player.action.START);			
 		$(this.htmlPlayer).trigger("presentation.onBegin",[nodeInterface]);
-		this.parentContext.nAction(undefined,-1);
-	}
+		this.parentContext.nAction(undefined,-1	);
+	
 };
 
 // stop
 MediaPlayer.prototype.stop = function (nodeInterface) {
 	if (!this.isStopped) {
-
-                this.presentation.inputManager.disableKeys(this.htmlPlayer);
+        this.presentation.inputManager.disableKeys(this.htmlPlayer);
 		if(this.node.descriptor){
 			this.presentation.inputManager.removeMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
 		}
@@ -679,14 +699,16 @@ MediaPlayer.prototype.stop = function (nodeInterface) {
 		this.isPlaying = false;
 		this.isStopped = true;
 		this.hide();
+
                 
-                if(this.player.stop)
-                    this.player.stop();
-                else
-                    Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['stop',nodeInterface]);
+		if(this.player.stop)
+			this.player.stop();
+		else
+			Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['stop',nodeInterface]);
 
 		//notify parentContext of its action
 		this.parentContext.nAction(this,Player.action.STOP);
+
 		$(this.htmlPlayer).trigger("presentation.onEnd",[nodeInterface]);
 		this.parentContext.nAction(undefined,-1);
 	}
@@ -698,10 +720,10 @@ MediaPlayer.prototype.pause = function (nodeInterface) {
 		this.isPlaying = false;
 		this.isStopped = false;
 		
-                if(this.player.pause)
-                    this.player.pause()
-                else
-                    Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['pause',nodeInterface]);
+		if(this.player.pause)
+			this.player.pause()
+		else
+			Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['pause',nodeInterface]);
 
 		//notify parentContext of its action
 		this.parentContext.nAction(this,Player.action.PAUSE);
@@ -750,6 +772,7 @@ MediaPlayer.prototype.abort = function (nodeInterface) {
 	}
 };
 
+// seek
 MediaPlayer.prototype.seek = function (newTime) {
         if(this.player.seek)
             this.player.seek(newTime);
@@ -760,11 +783,18 @@ MediaPlayer.prototype.seek = function (newTime) {
 
 // seekAndPlay
 MediaPlayer.prototype.seekAndPlay = function (newTime) {
-//	if (this.isStopped) {
-                if(this.player.seekAndPlay)
-                	this.player.seekAndPlay(newTime);
-                else
-                        Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['seekAndPlay',newTime]);
-                
-//	}
+	if(this.player.seekAndPlay)
+		this.player.seekAndPlay(newTime);
+	else
+		Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['seekAndPlay',newTime]);	
 };
+
+// stopArea
+MediaPlayer.prototype.stopArea = function (nodeInterface) {
+	if (this.area[nodeInterface].started) {
+		this.area[nodeInterface].started = false;
+		$(this.htmlPlayer).trigger('stop',[nodeInterface]);
+	} else {
+		$(this.htmlPlayer).trigger('presentation.onEnd',[nodeInterface]);
+	}
+}

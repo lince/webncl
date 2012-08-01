@@ -36,5 +36,6 @@ libPersistent.prototype.recoverField = function(key){
 	
 	var content = localStorage.getItem(key);
 	return content;
-	
 }
+
+

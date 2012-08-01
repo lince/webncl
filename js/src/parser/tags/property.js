@@ -20,21 +20,47 @@
  */
 
 Parser.prototype.parseProperty = function (obj,tag,parent,tree) {
-	// name
-	values = [
-		"system.language","system.caption","system.subtitle","system.returnBitRate(i)","system.screenSize",
-		"system.screenGraphicSize","system.audioType","system.screenSize(i)","system.screenGraphicSize(i)",
-		"system.audioType(i)","system.devNumber(i)","system.classType(i)","system.info(i)","system.classNumber",
-		"system.CPU","system.memory","system.operatingSystem","system.javaConfiguration","system.javaProfile",
-		"system.luaVersion","user.age","user.location","user.genre","default.focusBorderColor",
-		"default.selBorderColor","default.focusBorderWidth","default.focusBorderTransparency",
-		"service.currentFocus","service.currentKeyMaster","si.numberOfServices","si.numberOfPartialServices",
-		"si.channelNumber","channel.keyCapture","channel.virtualKeyBoard","channel.keyboardBounds"
-	];
-	if (obj.name!=null && jQuery.inArray(obj.name,values)==-1) {
-		patt = /^system\.(returnBitRate|screenSize|screenGraphicSize|audioType|devNumber|classType|info)\(\d+\)$/;
-		if (!patt.test(obj.name)) {
-			//Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["name",obj.name,values]);
+	// explicitDur
+	if (obj.name == 'explicitDur') {
+		values = ["(número real)s","HH:MM:SS"];
+		patt1 = /^(\d+|\d*\.\d+)s$/;
+		patt2 = /^\d+:\d+:\d+(\.\d+)?$/;
+		// format: 0=invalid, 1='real number', 2='HH:MM:SS', 4=''
+		var format;
+		
+		// get rid of whitespaces
+		obj.value = obj.value.replace(/\s/g, '');
+
+		if (obj.value.length == 0)
+			format = 4;
+		else
+			format = patt1.test(obj.value) ? 1 : (patt2.test(obj.value) ? 2 : 0);
+
+		if (format == 0) {
+			Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["value",obj.value,values]);
+		} else {
+			switch(format)
+			{
+				case 1:
+					// removes the 's' from the end of the string
+					obj.value = parseFloat(obj.value.split('s')[0]);
+				break;
+
+				case 2:
+					 // calculates the number of seconds from the 'HH:MM:SS' format
+					var arr = obj.value.split(':');
+					var h = parseFloat(arr[0]);
+					var m = parseFloat(arr[1]);
+					var s = parseFloat(arr[2]);
+					if (m>=60 || s>=60) { // ncl handbook also says that hours must be in [0,23] interval, but it's not necessary
+						Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["value",obj.value,values]);
+					} else {
+						obj.value = parseFloat(h)*3600 + parseFloat(m)*60 + parseFloat(s);
+					}
+				break;
+
+			}
+
 		}
-	}	
+	}
 };

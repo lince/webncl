@@ -1,12 +1,26 @@
 function runLua(path){
-  $.get(path, function(data){
-    var luajscode = lua_load(data);
-    lua_call(luajscode);
-  });
+	var luacode = undefined;
+	$.ajax({
+		type : "GET",
+		url : source,
+		dataType : "text",
+		async : false,
+		success : $.proxy(function(path) {
+			luacode = lua_load(path);
+		}, this),
+		error : function() {
+			console.log('error to load file');
+		}
+	});
+	lua_call(luacode);
 }
 
 
 lua_libs["canvas"] = {
+		
+	"test" : function() {
+		console.log('running canvas.test');
+	},
 	
 	"initialize" : function(ctx){
 		var canvas = new libCanvas(ctx);
@@ -62,15 +76,17 @@ lua_libs["canvas"] = {
 	
 };
 
+var persist;
+
 lua_libs["persistent"] = {
 	
-	"initializate": function(readOnly){
-		var persist = new libPersistent(readOnly);
+	"initialize": function(readOnly){
+		persist = new libPersistent(readOnly);
 		
 	},
 	
 	"set" : function(prefix, key, value){
-		persist.setField(prefix, key, value);
+		persist.storeField(prefix, key, value);
 	},
 	
 	"get" : function(key){
@@ -78,3 +94,10 @@ lua_libs["persistent"] = {
 	}
 	
 };
+
+lua_libs["event"] = {
+		
+	"post" : function(evt) {
+		
+	}
+}

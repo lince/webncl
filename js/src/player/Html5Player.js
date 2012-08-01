@@ -25,7 +25,6 @@
 
 /**
  * Default player for video, image, text/plain, text/html and text/htm.
- * This is a Work in Progress. All players are still handled by MediaPlayer.js
  * @constructor
  */
 function Html5Player(p) {
@@ -33,106 +32,91 @@ function Html5Player(p) {
     this.popcornPlayer  = undefined;
     this.htmlPlayer = "#" + p.id;
 
-    
-    /*
-     * User defined properties
-     
-     this.propertyMap = 
-    {
-       "propertyname" : override true / false 
-    }
-    
-    if propertyName is in this.propertyMap then Player.js will
-    call a function name setProperty in this player.
-    if the value is true than this player override default setProperty behavior
-    if the value is false than this player adds some functionality
-     
-     
-     */
+	// flags and callbacks for explicitDur treatment
+	this.duration = undefined;
+	this.durationBind = undefined;
+	this.durationBinded = false;
+	this.durationMap = {};
+	this.endCallbacks = [];
+
+    p.onChangeProperty.propertyMap =
+	{
+		'soundLevel' : Player.propertyAction.OVERLOAD,
+		'fit': Player.propertyAction.OVERLOAD
+	};
+    //overloading we don't need to trigger onEndAttribution event
 
     switch (p.source.type.split("/")[0]) {
-		case "video": {
+		case "video": 
 			// type = video/*
 			p.createElement("<video class='player' poster='images/loading.gif' id='" + p.id + "'></video>");	
 			break;
-		}
-		case "audio": {
+		
+		case "audio": 
 			// type = audio/*
 			p.createElement("<audio class='player' id='" + p.id+ "'></audio>");
 			break;
-		}
-		case "image": {
+		
+		case "image": 
 			// type = image/*
 			p.createElement("<img class='player' id='" + p.id + "'></img>");
 			break;
-		}
-		case "application": {
+		
+		case "application": 
 			switch (p.source.type) {
-					case "application/x-ginga-settings": {
-							// type = application/x-ginga-settings
-							 p.createElement("<div class='player' id='" + p.id + "'></div>");
-							break;
-					}
-					case "application/x-ginga-NCLua": {
-							// type = application/x-ginga-NCLua
-							Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
-							break;
-					}
-					case "application/x-ginga-NCLet": {
-							// type = application/x-ginga-NCLet
-							Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
-							break;
-					}
-					case "application/x-ginga-time": {
-							// type = application/x-ginga-time
-							Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
-							break;
-					}
+				case "application/x-ginga-settings":
+					// type = application/x-ginga-settings
+					 p.createElement("<div class='player' id='" + p.id + "'></div>");
+					break;
+				case "application/x-ginga-NCLua":
+					// type = application/x-ginga-NCLua
+					Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
+					break;
+				case "application/x-ginga-NCLet":
+					// type = application/x-ginga-NCLet
+					Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
+					break;
+				case "application/x-ginga-time":
+					// type = application/x-ginga-time
+					Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
+					break;
 			}
 			break;
-		}
-		case "text": {
+		
+		case "text": 
 			switch (p.source.type) {
-					case "text/plain":
-					case "text/html": {
-							// type = text/plain, text/html
-							p.createElement("<div class='player' id='" + p.id + "'></div>");
-							break;
-					}
-					case "text/css": {
-							// type = text/css
-							Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
-							break;
-					}
-					case "text/xml": {
-							// type = text/xml
-							Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
-							break;
-					}
-			}
-			break;
-		}
-	}
+				case "text/plain":
+				case "text/html":
+					// type = text/plain, text/html
+					p.createElement("<div class='player' id='" + p.id + "'></div>");
+					break;
+				case "text/css":
+					// type = text/css
+					Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
+					break;
+				case "text/xml":
+					// type = text/xml
+					Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
+					break;
 
+		}
+		break;
+	}
 
 	//Tenta criar o popCorn player de acordo com o tipo de media
 	if (p.checkType(["video","audio"]))
 	{
 		do {	
-				//this.popcornPlayer = new Popcorn(this.htmlPlayer, { frameAnimation: true });
-				this.popcornPlayer = new Popcorn(this.htmlPlayer);	
+			this.popcornPlayer = new Popcorn(this.htmlPlayer);
 		} while (!this.popcornPlayer);
 	} else if(p.checkType(["image","text"])){
-		do {	
-				Popcorn.player("baseplayer");
-				this.popcornPlayer = new Popcorn.baseplayer(this.htmlPlayer);
-				
+		do {
+			Popcorn.player("baseplayer");
+			this.popcornPlayer = new Popcorn.baseplayer(this.htmlPlayer);
 		} while (!this.popcornPlayer);
-	} 
-	
+	}
 
-
-};
+}
 
 /**
  * Called when the player needs to unload its sources
@@ -140,9 +124,9 @@ function Html5Player(p) {
  */
 Html5Player.prototype.unload = function()
 {
-	     //erases older content
-        $(this.htmlPlayer).empty();   
-}
+	//erases older content
+	$(this.htmlPlayer).empty();
+};
 
 /**
  * Called when the player need to load (or reload) it sources 
@@ -152,38 +136,37 @@ Html5Player.prototype.unload = function()
  */
 Html5Player.prototype.load = function(source)
 {
- 
-        
-		var filename = source.substr(0, source.lastIndexOf('.'));
 
-        
-        //load a new content base on file type
+	var filename = source.substr(0, source.lastIndexOf('.'));
+    
+	// load a new content base on file type
 	switch (this.p.source.type.split("/")[0]) {
-		case "video": {
+	
+		case "video": 
 			// type = video/*
 			$(this.htmlPlayer).append("<source type='video/webm' src='" + filename + ".webm'></source>");
 			$(this.htmlPlayer).append("<source type='video/ogg' src='" + filename + ".ogg'></source>");
 			$(this.htmlPlayer).append("<source type='video/mp4' src='" + filename + ".mp4'></source>");
 			break;
-		}
-		case "audio": {
+		
+		case "audio": 
 			// type = audio/*
 			$(this.htmlPlayer).append("<source type='audio/mpeg' src='" + filename + ".mp3'></source>");
 			$(this.htmlPlayer).append("<source type='audio/ogg' src='" + filename + ".ogg'></source>");
 			break;
-		}
-		case "image": {
+
+		case "image": 
 			// type = image/*
 			$(this.htmlPlayer).attr("src",source);
 			break;
-		}
-		case "application": {
+		
+		case "application": 
 			// type = application/*
 			// não faz nada
             break;
-		}
-		case "text": {
-			if (this.checkType(["text/plain","text/html"])) {
+		
+		case "text": 
+			if (this.p.checkType(["text/plain","text/html"])) {
 				// type = text/plain, text/html
 				$.ajax({
 					type: "GET",
@@ -193,14 +176,14 @@ Html5Player.prototype.load = function(source)
 						$(this.htmlPlayer).append(data);
 					},this)
 				});
-			} else {
-				// TODO?
-			}
+			}// else {
+				// TODO
+			//}
 			break;
-		}
+		
 	}
     
-}
+};
 
 /**
  * This function should be called to set function calls based on
@@ -210,7 +193,7 @@ Html5Player.prototype.exec = function(time,callback)
 {
 	//This function can be called more than
 	//once with the times 'begin' and 'end'.
-	//This way, the handler for these times
+	//This way, the handlbinder for these times
 	//must set a new event listener for each
 	//call
 	
@@ -219,12 +202,13 @@ Html5Player.prototype.exec = function(time,callback)
 		if (time == 'begin') {
 			$(this.htmlPlayer).on('play',callback);
 		} else if (time == 'end') {
+			this.endCallbacks.push(callback);
 			$(this.htmlPlayer).on('ended',callback);
 		} else {
 			this.popcornPlayer.cue(time,callback);
 		}
 	}
-}
+};
 
 /**
  * Start
@@ -232,9 +216,13 @@ Html5Player.prototype.exec = function(time,callback)
 Html5Player.prototype.start =  function()
 {
     if (this.popcornPlayer) {
-         this.popcornPlayer.play();
+		this.popcornPlayer.play();
+		if (this.durationBind && !this.durationBinded && this.p.checkType(['image','text'])) {
+			// Bind the explicitDur callback again
+			eval(this.durationBind);
+		}
     }
-}
+};
 
 /**
  * Stop
@@ -242,9 +230,12 @@ Html5Player.prototype.start =  function()
 Html5Player.prototype.stop = function()
 {
     if (this.popcornPlayer) {
-	this.popcornPlayer.pause(0);
+		this.popcornPlayer.pause(0);
     }
-}
+	if (this.p.checkType(['image','text'])) {
+		this.durationBinded = false;
+	}
+};
 
 /**
  * Pause
@@ -252,9 +243,9 @@ Html5Player.prototype.stop = function()
 Html5Player.prototype.pause = function()
 {
     if (this.popcornPlayer) {
-	this.popcornPlayer.pause();
+		this.popcornPlayer.pause();
     }
-}
+};
 
 /**
  * Resume
@@ -262,9 +253,9 @@ Html5Player.prototype.pause = function()
 Html5Player.prototype.resume = function()
 {
     if (this.popcornPlayer) {
-	this.popcornPlayer.play();
+		this.popcornPlayer.play();
     }
-}
+};
 
 
 
@@ -275,7 +266,7 @@ Html5Player.prototype.resume = function()
 Html5Player.prototype.abort = function()
 {
     this.stop();
-}
+};
 
 
 /**
@@ -292,27 +283,105 @@ Html5Player.prototype.seek = function(newTime)
 			"},this));");
 		}
 	}
-}
+};
 
 
 
 /**
- * SeekAndPLay
+ * SeekAndPlay
  */
 Html5Player.prototype.seekAndPlay = function(newTime)
 {
     if (this.p.checkType(["video","audio"])) {
-			try {
-				this.popcornPlayer.currentTime(newTime);
-			} catch(e) {
-				eval("$(this.htmlPlayer).one('loadedmetadata',$.proxy(function() {"+
-					"this.popcornPlayer.currentTime("+newTime+");"+
-				"},this));");
-			}
-			$(this.htmlPlayer).one("seeked",$.proxy(function() {
-				this.popcornPlayer.play();
-			},this));
-		} else if(this.p.checkType(["image","text"])) {
-				this.popcornPlayer.currentTime(newTime);
+		try {
+			this.popcornPlayer.currentTime(newTime);
+		} catch(e) {
+			eval("$(this.htmlPlayer).one('loadedmetadata',$.proxy(function() {"+
+				"this.popcornPlayer.currentTime("+newTime+");"+
+			"},this));");
 		}
+		$(this.htmlPlayer).one("seeked",$.proxy(function() {
+			this.popcornPlayer.play();
+		},this));
+	} else if(this.p.checkType(["image","text"])) {
+		this.popcornPlayer.currentTime(newTime);
+	}
+};
+
+
+/**
+ * setProperty
+ */
+
+Html5Player.prototype.stopCallback = function (t) {
+	if (this.duration == t) {
+		var i;
+		for (i in this.endCallbacks) {
+			this.endCallbacks[i]();
+		}
+	}
+};
+
+Html5Player.prototype.setProperty = function(name,value) {
+    switch(name)
+    {
+		case 'explicitDur':
+			this.duration = value;
+			if (!this.durationMap[value]) {
+				this.durationMap[value] = true;
+				// For some reason, our baseplayer's cue method seems to work only once.
+				// Every time it starts again, this callback needs to be binded again.
+				this.durationBind = 'this.exec(' + value + ',$.proxy(function() {'+
+				'this.stopCallback(' + value + ');'+
+				'},this));';
+				eval(this.durationBind);
+				this.durationBinded = true;
+			}
+		break;
+
+		case 'soundLevel':
+			if (this.p.checkType(["video","audio"])) {
+				this.popcornPlayer.volume(value);
+			}       
+		break;
+
+
+		case 'fit':
+			if (value=='meetBest') {
+				Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"setProperty",[name]);
+			}									
+			var fit = {
+				fill: 'fill',
+				hidden: 'none',
+				meet: 'contain',
+				meetBest: 'scaleDown',
+				slice: 'cover'
+			};
+	
+			// TODO:
+			// CSS3 property "object-fit" is currently supported by Opera only.
+			// Uncomment the 3 lines below to make it work for IE, Firefox, Chrome
+			// and Safari when they release a version that supports it.
+			// Also, the CSS3 value 'scaleDown' ('meetBest' on NCL) for the 'fit' property is not supported yet.
+			// Note: check if the property names (their prefixes) are correct on these browsers!
+			console.log("Property 'fit' works only on Opera 10.6+");
+	
+			$(this.htmlPlayer).css('-o-object-fit',fit[value]);			// Opera
+			//$(this.htmlPlayer).css('-webkit-object-fit',fit[value]);	// Chrome/Safari
+			//$(this.htmlPlayer).css('-moz-object-fit',fit[value]);		// Firefox
+			//$(this.htmlPlayer).css('object-fit',fit[value]);			// IE
+		break;
+
+    }
+	
+};
+
+/**
+ * getDuration
+ */
+Html5Player.prototype.getDuration = function() {
+	if (this.duration && this.popcornPlayer.duration)
+		return Math.min(this.duration,this.popcornPlayer.duration());
+	else
+		return this.duration || this.popcornPlayer.duration();
 }

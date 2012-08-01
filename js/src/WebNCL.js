@@ -67,7 +67,7 @@ function WebNclPlayer (file, div) {
                     },
                 "video" : 
                     {
-                            defaultPlayer: Html5Player,
+                            defaultPlayer: Html5Player
                             //Its possible to choose players for specific file formats
                     },
                 "video/x-flv": {defaultPlayer: FlowPlayer},
@@ -80,7 +80,7 @@ function WebNclPlayer (file, div) {
                     {
                             defaultPlayer: Html5Player
                     },
-                "application/x-ginga-NCLua" : undefined,
+                "application/x-ginga-NCLua" : { defaultPlayer: LuaPlayer},
                 "application/x-ginga-NCLet" : undefined,
                 "application/x-ginga-settings" : {
                             defaultPlayer: Html5Player
@@ -140,13 +140,16 @@ function WebNclPlayer (file, div) {
 		REWIND              :	83,		/* s */
 		EJECT               :	68,		/* d */
 		MENU				:   77
-	}
+	};
 	
 	//Despite the key codes defined above, an array should be defined
 	//with the codes that are going to be processed by the event handler
 	//User can redefine this array to avoid player from processing some key events
 	this.presentation.keys.allCodes = [13,37,38,39,40,81,87,69,82,96,97,98,99,100,101,102,103,104,105,90,88,67,86,66,78,65,83,68];
 
+
+    //postEvent
+    this.presentation.postEvent = $.proxy(this.postEvent,this); 
 
 
 	this.presentation.nAction = $.proxy(this.nAction,this)
@@ -193,6 +196,7 @@ function WebNclPlayer (file, div) {
 WebNclPlayer.prototype.execute = function (data) {
 	// cria o objeto NCL
 	var t = new Date();
+    var rb,i;
 	this.presentation.parser = new Parser();
 	this.presentation.ncl = this.presentation.parser.parse(data);
 	console.log('Player "'+this.div+'" loaded in ' + (new Date() - t) + 'ms');
@@ -256,8 +260,9 @@ WebNclPlayer.prototype.execute = function (data) {
 	this.presentation.readyToPlay = true;
 	
 	if (this.presentation.playRequested)
+    {
 		this.start();
-
+    }
 };
 
 // fixRegionBounds
@@ -283,7 +288,9 @@ WebNclPlayer.prototype.fixRegionBounds = function (node, parentBounds) {
 	for (i in relativeBounds) {
 		if (relativeBounds[i] != null) {
 			if (relativeBounds[i].split("%").length == 1)
+            {
 				relativeBounds[i] = parseInt(relativeBounds[i].split("px")[0]);
+            }
 		}
 	}
 	
@@ -448,7 +455,10 @@ WebNclPlayer.prototype.setProperty = function (nodeId,name,value) {
 
 // keyPress
 WebNclPlayer.prototype.keyPress = function (key) {
-	this.presentation.inputManager.keyEvent(key);
+    if(this.presentation.keys[key])
+	    this.presentation.inputManager.keyEvent(this.presentation.keys[key]);
+    else
+        this.presentation.inputManager.keyEvent(key);
 };
 
 // postEvent

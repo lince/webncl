@@ -27,7 +27,6 @@ Parser.prototype.parseArea = function (obj,tag,parent,tree) {
 	values = ["(número real)s","HH:MM:SS"];
 	patt1 = /^(\d+|\d*\.\d+)s$/;
 	patt2 = /^\d+:\d+:\d+(\.\d+)?$/;
-	var format = 0;
 	// 'attrs' array is used to parse both 'begin' and 'end' in a loop, since they are very similar:
 	// 1. validates 'begin' and 'end' properties
 	// 2. creates 'beginTime' and 'endTime' properties, which are used by MediaPlayer
@@ -36,11 +35,10 @@ Parser.prototype.parseArea = function (obj,tag,parent,tree) {
 		obj[attr+'Time'] = ''; // beginTime and endTime
 		if (obj[attr] != null) {
 			// format: 0=invalid, 1='real number', 2='HH:MM:SS'
-			format = patt1.test(obj[attr]) ? 1 : (patt2.test(obj[attr]) ? 2 : 0);
+			var format = patt1.test(obj[attr]) ? 1 : (patt2.test(obj[attr]) ? 2 : 0);
 			if (format == 0) {
 				Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,[attr,obj[attr],values]);
-				obj[attr+'Time'] = 'invalid'; // just for debugging, it's not used
-				obj._ignore = true;
+				obj[attr+'Time'] = attr;
 			} else {
 				if (format == 1) {
 					// removes the 's' from the end of the string
@@ -53,8 +51,7 @@ Parser.prototype.parseArea = function (obj,tag,parent,tree) {
 					var s = parseFloat(arr[2]);
 					if (m>=60 || s>=60) { // ncl handbook also says that hours must be in [0,23] interval, but it's not necessary
 						Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,[attr,obj[attr],values]);
-						obj[attr+'Time'] = 'invalid'; // just for debugging, it's not used
-						obj._ignore = true;
+						obj[attr+'Time'] = attr;
 					} else {
 						obj[attr+'Time'] = parseFloat(h)*3600 + parseFloat(m)*60 + parseFloat(s);
 					}
@@ -66,10 +63,11 @@ Parser.prototype.parseArea = function (obj,tag,parent,tree) {
 			obj[attr+'Time'] = attr;
 		}
 	}
-	// area is ignored if begin > end
-	if (obj.begin!=null && obj.end!=null && obj.beginTime>obj.endTime) {
+	// if begin>=end, the area is considered the whole media
+	if (obj.begin!=null && obj.end!=null && obj.beginTime>=obj.endTime) {
 		Logger.warning(Logger.WARN_INVALID_AREA,tag,["begin","end"]);
-		obj._ignore = true;
+		obj.beginTime = 'begin';
+		obj.endTime = 'end';
 	}
 	
 	// first, last
