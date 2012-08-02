@@ -40,7 +40,7 @@ function LuaPlayer(p) {
 	this.canvas_objects = [];
 	this.events = new libEvents(p);
 	this.id = 0;
-	
+	p.createElement("<div class='player' id='" + p.id + "'></div>");
 	
 	console.log(p.id);
 
@@ -70,7 +70,11 @@ LuaPlayer.prototype.load = function(source) {
 		dataType : "text",
 		async : false,
 		success : $.proxy(function(data) {
+			data = 'canvas = libCanvas.init();\n' + 'canvas2 = libCanvas.init();\n' + data;
 			this.luajscode = lua_load(data);
+			console.log('--------------');
+			console.log(this.luajscode);
+			console.log('--------------');
 		}, this),
 		error : function() {
 			console.log('error to load file');
@@ -205,6 +209,8 @@ LuaPlayer.prototype.bindlibs = function() {
 			"init": function(){
 				console.log('Init');
 				
+				$('p.id').append(document.createElement("canvas"));
+				
 				var canvas = document.createElement("canvas");
 				canvas.id = "mycanvas" + toString(id);
 				canvas.width = 300;
@@ -215,7 +221,7 @@ LuaPlayer.prototype.bindlibs = function() {
 				//console.log(ctx);
 				
 				
-				document.body.appendChild(canvas);
+				//document.body.appendChild(canvas);
 				
 				object = new libCanvas(ctx);
 				canvas_objects[id] = object;
@@ -229,9 +235,9 @@ LuaPlayer.prototype.bindlibs = function() {
 	
 				};
 				
-				luaObject.str['attrColor'] = function(self,r,g,b,a,mode){
+				luaObject.str['attrColor'] = function(self,r,g,b,a){
 					objCanvas = canvas_objects[self.str['id']];
-					objCanvas.attrColor(r,g,b,a,mode);
+					objCanvas.attrColor(r,g,b,a);
 				};
 				
 				luaObject.str['drawLine'] = function(self,x1,y1,x2,y2){
@@ -239,9 +245,9 @@ LuaPlayer.prototype.bindlibs = function() {
 						objCanvas.drawLine(x1,y1,x2,y2);
 				};
 				
-				luaObject.str['drawRect'] = function(self,x,y,w,h, mode){
+				luaObject.str['drawRect'] = function(self,mode,x,y,w,h){
 						objCanvas = canvas_objects[self.str['id']];
-						objCanvas.drawRect(x,y,w,h, mode);
+						objCanvas.drawRect(mode,x,y,w,h);
 				};
 				
 				luaObject.str['drawText'] = function(self,x, y, text){
