@@ -70,7 +70,7 @@ LuaPlayer.prototype.load = function(source) {
 		dataType : "text",
 		async : false,
 		success : $.proxy(function(data) {
-			//data = 'canvas = libCanvas.init();\n' + 'canvas2 = libCanvas.init();\n' + data;
+			data = 'canvas = libCanvas.init();\n' + 'canvas2 = libCanvas.init();\n' + data;
 			this.luajscode = lua_load(data);
 			
 		}, this),
@@ -202,7 +202,7 @@ LuaPlayer.prototype.bindlibs = function() {
 	p = this.p;
 	id = this.id;
 	
-	lua_libs["canvas"] = {
+	lua_libs["libCanvas"] = {
 		
 			"init": function(){
 				console.log('Init');
