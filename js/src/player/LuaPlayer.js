@@ -72,9 +72,7 @@ LuaPlayer.prototype.load = function(source) {
 		success : $.proxy(function(data) {
 			data = 'canvas = libCanvas.init();\n' + 'canvas2 = libCanvas.init();\n' + data;
 			this.luajscode = lua_load(data);
-			console.log('--------------');
-			console.log(this.luajscode);
-			console.log('--------------');
+			
 		}, this),
 		error : function() {
 			console.log('error to load file');
@@ -209,7 +207,7 @@ LuaPlayer.prototype.bindlibs = function() {
 			"init": function(){
 				console.log('Init');
 				
-				$('p.id').append(document.createElement("canvas"));
+				$('#'+p.id).append(document.createElement("canvas"));
 				
 				var canvas = document.createElement("canvas");
 				canvas.id = "mycanvas" + toString(id);

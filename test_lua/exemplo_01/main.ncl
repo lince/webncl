@@ -18,12 +18,12 @@
 <connectorBase>
 	<causalConnector id="onBeginStart">
 		<simpleCondition role="onBegin"/>
-		<simpleAction role="start" max="unbounded"/>
+		<simpleAction role="start" max="unbounded" qualifier="par"/>
 	</causalConnector>
 
 	<causalConnector id="onEndStopStart">
 		<simpleCondition role="onEnd"/>
-		<compoundAction>
+		<compoundAction operator="par">
 			<simpleAction role="stop"/>
 			<simpleAction role="start"/>
 		</compoundAction>
