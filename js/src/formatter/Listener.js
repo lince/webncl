@@ -43,6 +43,7 @@ function Listener(listenerType, actionOperator, actionMap, flagMap, assessmentSt
 	this.last = new Date();
 	this.triggerBuffer = undefined;
 	this.presentation = presentation;
+	this.pendingActions = 0;
 	
 	/*
 	 * actionNamesArray
@@ -55,9 +56,22 @@ function Listener(listenerType, actionOperator, actionMap, flagMap, assessmentSt
 	{
 	    this.actionNamesArray.push(actionName)
 	}
+	
+	this.actionMapSize = this.actionNamesArray.length;
 };
 
-/* 
+/**
+ *  notifyContexts()
+ *		notify related contexts that it has finished
+ *
+ */
+Listener.prototype.notifyContexts = function()
+{
+	//nothing at all by now
+}
+
+
+/**
  *  notifyEvent(conditionName)
  * 		Funcao responsavel por tratar um evento quando uma condicao eh 
  *  satisfeita, decidindo se as acoes associadas devem ser disparadas ou se
@@ -87,7 +101,7 @@ Listener.prototype.notifyEvent = function(conditionName)
 				this.last = new Date();
 			}
 			else
-			{				
+			{
 				//Seta a flag do evento recebido
 				this.flagMap[conditionName].flag = true;
 				var tempFlag = true;
@@ -190,6 +204,7 @@ Listener.prototype.__verifyAssessmentStatements = function()
  */
 Listener.prototype.__executeActions = function()
 {
+	this.pendingActions = this.actionMapSize;
 	if(this.actionOperator == 'seq')
 		this.__executeActionsSeq([0]);
 	else // if (this.actionOerator == 'par')
@@ -250,6 +265,26 @@ Listener.prototype.__callTriggers = function(args)
 		this.__callTriggersPar([actionName,actionIndex]);
 };
 
+/**
+ *  __actionEnded(args)
+ *		Callback function called when on action has been executed
+ *	Args:
+ *		args[0] = Another callback
+ *		args[1] = Callback arguments
+ */
+Listener.prototype.__actionEnded = function(args)
+{
+	
+	var actionName = args[1].splice(0,1);
+	if(args[0])
+		args[0](args[1]);
+	
+	this.pendingActions--;
+	
+	if(this.pendingActions == 0)
+		this.notifyContexts();
+}
+
 
 /*	
  *  __callTriggersSeq(args)
@@ -286,7 +321,7 @@ Listener.prototype.__callTriggersSeq = function(args)
         {
         	//Se alem de ser o primeiro, eh o ultimo daquela acao
         	if (triggerIndex == bindsArray.length - 1)
-            	this.triggerBuffer.push([target.bindComponent, actionName, [target.bindInterface,  $.proxy(this.__executeActionsSeq,this), [actionIndex+1], target.value]]);
+            	this.triggerBuffer.push([target.bindComponent, actionName, [target.bindInterface,  $.proxy(this.__actionEnded,this) ,[$.proxy(this.__executeActionsSeq,this), [actionName,actionIndex+1]], target.value]]);
             else
             	this.triggerBuffer.push([target.bindComponent, actionName, [target.bindInterface,  $.proxy(this.__callTriggersSeq,this), [actionName,actionIndex,triggerIndex+1], target.value]]);
         }
@@ -303,7 +338,7 @@ Listener.prototype.__callTriggersSeq = function(args)
           
          */
         else
-            $(target.bindComponent).trigger(actionName,[target.bindInterface,  $.proxy(this.__executeActionsSeq,this), [actionIndex+1], target.value]);
+            $(target.bindComponent).trigger(actionName,[target.bindInterface,  $.proxy(this.__actionEnded,this) ,[$.proxy(this.__executeActionsSeq,this), [actionName,actionIndex+1]], target.value]);
     }
     else
     {
@@ -312,19 +347,58 @@ Listener.prototype.__callTriggersSeq = function(args)
         {
         	//caso tambem seja o ultimo
         	if (triggerIndex == bindsArray.length - 1)
-            	this.triggerBuffer.push([target.bindComponent, actionName, [target.bindInterface,  null, null, target.value]]);            
+            	this.triggerBuffer.push([target.bindComponent, actionName, [target.bindInterface,  $.proxy(this.__actionEnded,this), [null,[actionName,null]], target.value]]);            
             else
             	this.triggerBuffer.push([target.bindComponent, actionName, [target.bindInterface,  $.proxy(this.__callTriggersSeq,this), [actionName,actionIndex,triggerIndex+1], target.value]]);
         }
         else if (triggerIndex < bindsArray.length - 1)
             $(target.bindComponent).trigger(actionName,[target.bindInterface,  $.proxy(this.__callTriggersSeq,this), [actionName,actionIndex,triggerIndex+1], target.value]);
         else
-            $(target.bindComponent).trigger(actionName,[target.bindInterface, null, null, target.value]);
+            $(target.bindComponent).trigger(actionName,[target.bindInterface, $.proxy(this.__actionEnded,this), [null,[actionName,null]], target.value]);
     }
 };
 
 
-/*	
+/**
+ *  __parTriggerEnded(args)
+ *     This function waits for each parallel trigger to ensure all were executed.
+ *  Args:
+ *     args[0] = Action name
+ *     args[1] = Action index
+ *
+ */
+
+Listener.prototype.__parTriggerEnded = function(args)
+{
+
+	var actionIndex = args[1];
+	var actionMapElement = this.actionMap[args[0]];
+	
+	actionMapElement.pendingAcks--;
+	
+	//if this action was finished
+	if(actionMapElement.pendingAcks ==0)
+	{
+		//one pending action
+		this.pendingActions--;
+		if(this.pendingActions ==0)
+		{
+			this.notifyContexts();
+		}
+		else
+		{
+			//verifies if this par action that just finished needs
+			//to execute another action
+			if(actionIndex >= 0)
+				this.__executeActionsSeq([actionIndex+1]);
+		}
+	}
+	
+	
+}
+
+
+/**	
  *  __callTriggersPar(args)
  * 		Funcao auxiliar da funcao callTriggers(actionName). Responsavel por
  *  executar diferentes instancias de uma mesma acao paralelamente
@@ -341,32 +415,19 @@ Listener.prototype.__callTriggersPar = function(args)
         actionMapElement = this.actionMap[actionName],
         target;
         
+	actionMapElement.pendingAcks = actionMapElement.binds.length;
+		
     for (var targetIndex in actionMapElement.binds)
     {
         target = actionMapElement.binds[targetIndex];
         
-        
-        // se for o ultimo trigger e a execucao dos diferentes tipos de acao for sequencial, chama a execucao do proximo tipo de acao
-        if( (targetIndex == actionMapElement.binds.length - 1) && (actionIndex >= 0) )
-        {
-            if(actionIndex == 0)
-                this.triggerBuffer.push([target.bindComponent, actionName,[target.bindInterface,  $.proxy(this.__executeActionsSeq,this), [actionIndex+1],target.value]]);
-            else
-                $(target.bindComponent).trigger(actionName,[target.bindInterface,  $.proxy(this.__executeActionsSeq,this), [actionIndex+1],target.value]);
-        	//$('#logger').append('<p class="formatter"> <b>'+target.bindComponent+'</b>['+target.bindInterface+']: <i>'+actionName+'</i>['+(actionIndex+1)+']() <a class="data">'+Ncl30.getDateString()+'</a></p>');
-            // before buffer: $(target.bindComponent).trigger(actionName,[target.bindInterface,  $.proxy(this.__executeActionsSeq,this), [actionIndex+1],target.value]);
-        }        
+        //se for paralela / primeira acao paralela
+		if(actionIndex <= 0)
+			this.triggerBuffer.push([target.bindComponent, actionName, [target.bindInterface, $.proxy(this.__parTriggerEnded,this), [actionName,actionIndex], target.value]]);
+		//se for sequencial (mas nao for a ultima, entao pode executar direto)
 		else
-		{
-		    if(actionIndex <= 0)
-		        this.triggerBuffer.push([target.bindComponent, actionName, [target.bindInterface, null, null, target.value]]);
-		 	
-		 
-		    else
-		        $(target.bindComponent).trigger(actionName,[target.bindInterface, null, null, target.value]);
-			//$('#logger').append('<p class="formatter"> <b>'+target.bindComponent+'</b>['+target.bindInterface+']: <i>'+actionName+'</i>[]() <a class="data">'+Ncl30.getDateString()+'</a></p>');
-		    // before buffer: $(target.bindComponent).trigger(actionName,[target.bindInterface, null, null, target.value]);
-		}
+			$(target.bindComponent).trigger(actionName,[target.bindInterface, $.proxy(this.__parTriggerEnded,this), [actionName,actionIndex], target.value]);
+
 	}
 
 };

@@ -249,6 +249,7 @@ ContextPlayer.prototype.nAction = function(e,a)
 
 // create
 ContextPlayer.prototype.create = function () {
+	
 	if (!this.isCreated) {
 		this.isCreated = true;
 		for (i in this.node.media) {
@@ -778,7 +779,8 @@ ContextPlayer.prototype.bindLinks = function()
 		    		binds: new Array(),
 		    		qualifier: actions[i].qualifier,
 		    		actionUseVariable: actionUseVariable,
-		    		actionDefaultValue: actionDefaultValue
+		    		actionDefaultValue: actionDefaultValue,
+					pendingAcks: 0
 	    		}
 
 	    	} else {
