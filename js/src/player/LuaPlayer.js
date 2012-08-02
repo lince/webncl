@@ -203,81 +203,83 @@ LuaPlayer.prototype.bindlibs = function() {
 	lua_libs["canvas"] = {
 		
 			"init": function(){
+				console.log('Init');
 				
-				p.createElement("<canvas id='" + p.id + id + "'></canvas>");
-				$("#"+p.id).css('border','1px solid black');
+				var canvas = document.createElement("canvas");
+				canvas.id = "mycanvas" + toString(id);
+				canvas.width = 300;
+				canvas.height = 200;
 				
-				var a = document.getElementById(p.id);
-				console.log(a);
-								
-				ctx = a.getContext("2d");
-				console.log(ctx);
+					
+				ctx = canvas.getContext("2d");
+				//console.log(ctx);
+				
+				
+				document.body.appendChild(canvas);
 				
 				object = new libCanvas(ctx);
 				canvas_objects[id] = object;
-				luaObject = lua_newtable();
+				var luaObject = lua_newtable();
 				luaObject.str['id'] = id;
+				luaObject.str['attrSize'] = function(self){
+						objCanvas = canvas_objects[self.str['id']];
+						//console.log(objCanvas.attrSize());
+						return objCanvas.attrSize();
+						//return [];
+	
+				};
+				
+				luaObject.str['attrColor'] = function(self,r,g,b,a,mode){
+					objCanvas = canvas_objects[self.str['id']];
+					objCanvas.attrColor(r,g,b,a,mode);
+				};
+				
+				luaObject.str['drawLine'] = function(self,x1,y1,x2,y2){
+						objCanvas = canvas_objects[self.str['id']];
+						objCanvas.drawLine(x1,y1,x2,y2);
+				};
+				
+				luaObject.str['drawRect'] = function(self,x,y,w,h, mode){
+						objCanvas = canvas_objects[self.str['id']];
+						objCanvas.drawRect(x,y,w,h, mode);
+				};
+				
+				luaObject.str['drawText'] = function(self,x, y, text){
+						objCanvas = canvas_objects[self.str['id']];
+						objCanvas.drawText(x, y, text);
+				};
+				
+				luaObject.str['measureText'] = function(self, text){
+						objCanvas = canvas_objects[self.str['id']];
+						return objCanvas.measureTextLua(text);
+				};
+				
+				luaObject.str['attrText'] = function(self, text){
+						objCanvas = canvas_objects[self.str['id']];
+						objCanvas.attrText(face,size,style);
+				};
+				
+				luaObject.str['compose'] = function(self, ctxDestiny){
+						objCanvas = canvas_objects[self.str['id']];
+						objCanvas.compose(ctxDestiny);
+				};
+				
+				luaObject.str['attrCrop'] = function(self,ctxDestiny, x, y, w, h){
+					objCanvas = canvas_objects[self.str['id']];
+					objCanvas.attrCrop(ctxDestiny, x, y, w, h);
+				};
+				
+				luaObject.str['attrClip'] = function(self,x,y,w,h){
+						objCanvas = canvas_objects[self.str['id']];
+						objCanvas.attrClip(x,y,w,h);
+				};
+				
 				id = id + 1;
-				return luaObject;
+				return [luaObject];
+				
+				
 			},
 
-			"attrSize": function(self){
-				objCanvas = canvas_objects[self.str[id]];
-				objCanvas.attrSize();
-			},
-
-			"attrColor" : function(self,r,g,b,a,mode){
-				objCanvas = canvas_objects[self.str[id]];
-				objCanvas.attrColor(r,g,b,a,mode);
-			},
-
-			"attrClip" : function(self,x,y,w,h){
-				objCanvas = canvas_objects[self.str[id]];
-				objCanvas.attrClip(x,y,w,h);
-
-			},
-
-			"drawLine" : function(self,x1,y1,x2,y2){
-				objCanvas = canvas_objects[self.str[id]];
-				objCanvas.drawLine(x1,y1,x2,y2);
-
-			},
-
-			"drawRect" : function(self,x,y,w,h, mode){
-				objCanvas = canvas_objects[self.str[id]];
-				objCanvas.drawRect(x,y,w,h, mode);
-
-			},
-
-			"attrText" : function(self,face,size,style){
-				objCanvas = canvas_objects[self.str[id]];
-				objCanvas.attrText(face,size,style);
-
-			},
-
-			"drawText" : function(self,x, y, text){
-				objCanvas = canvas_objects[self.str[id]];
-				objCanvas.drawText(x, y, text);
-
-			},
-
-			"measureText" : function(self,text){
-				objCanvas = canvas_objects[self.str[id]];
-				objCanvas.measureTextLua(text);
-
-			},
-
-			"attrCrop" : function(self,ctxDestiny, x, y, w, h){
-				objCanvas = canvas_objects[self.str[id]];
-				objCanvas.attrCrop(ctxDestiny, x, y, w, h);
-
-			},
-
-			"compose" : function(self,ctxDestiny){
-				objCanvas = canvas_objects[self.str[id]];
-				objCanvas.compose(ctxDestiny);
-
-			}
 
 	};
 	
@@ -291,7 +293,7 @@ LuaPlayer.prototype.bindlibs = function() {
 			},
 
 			"get" : function(key){
-				return persist.recoverField(key);
+				return [persist.recoverField(key)];
 			}
 
 	};

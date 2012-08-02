@@ -23,32 +23,37 @@ libCanvas.prototype.attrSize = function(){
 	w = this.ctx.canvas.width;
 	h = this.ctx.canvas.height;
 	
-	return {w:w,h:h};
+	return [w,h];
 	
 }
 
-libCanvas.prototype.attrColor = function(r, g, b, a, mode){
+libCanvas.prototype.attrColor = function(r, g, b, a){
 	console.log("attrColor");
 	
-	if(mode == "fill")
-		this.ctx.fillStyle = "rgba(" + r + ","+ g + "," + b + "," + a + ")";
+	/*if(b === undefined && a === undefined){
 		
-	else if(mode == "frame"){
-		this.ctx.lineWidth = "5";
-		this.ctx.strokeStyle = "rgba(" + r + ","+ g + "," + b + "," + a + ")";
+		switch(r){
+			case 'white':
+						this.ctx.fillStyle = "rgba(255,255,255," + b + ")"; 
+						this.ctx.lineWidth = "2";
+						this.ctx.strokeStyle = "rgba(255,255,255," + b + ")";
+			break;
+		}
 		
-	} else
-		console.log("mode doesn't exists");	
+	}*/
 	
+	this.ctx.fillStyle = "rgba(" + r + ","+ g + "," + b + "," + a + ")";
+	this.ctx.lineWidth = "2";
+	this.ctx.strokeStyle = "rgba(" + r + ","+ g + "," + b + "," + a + ")";
 				
 }
 
 
-libCanvas.prototype.attrClip= function(xx,yy,w,h){
+libCanvas.prototype.attrClip= function(x,y,w,h){
 	console.log("attrClip");
 	
-	this.x = xx;
-	this.y= yy;
+	this.x = x;
+	this.y= y;
 	this.sizeX = w;
 	this.sizeY = h; 
 	
@@ -137,7 +142,7 @@ libCanvas.prototype.drawLine =  function(x1, y1, x2, y2){
 		
 }
 
-libCanvas.prototype.drawRect =  function(x1, y1, x2, y2, mode){
+libCanvas.prototype.drawRect =  function(mode, x1, y1, x2, y2){
 	console.log("drawRect");
 	
 	var verifica = this.iniVerifClip2(x1,y1,x2,y2);
@@ -172,18 +177,27 @@ libCanvas.prototype.attrText =  function(face, size, style){
 libCanvas.prototype.drawText =  function(x, y, text){
 	console.log("drawText");
 	
+	
+	
 	dimension = this.measureTextLua(text);
 	
-	height = parseInt(dimension.h);
-	width = parseInt(dimension.w);
+	console.log(dimension);
 	
+	width = dimension[0];
+	height = dimension[1];
+		
 	this.initX = this.x+x;
 	this.initY = this.y+y+height;
 	
 	if(this.initX+width > this.x+this.sizeX || this.initY+height > this.y+this.sizeY)
 		console.log("Text exceeds the dimentions limited by canvas");
-	else
+	else{
 		this.ctx.fillText(text,this.initX,this.initY);
+		console.log("final attrText");
+	}
+		
+		
+	
 	 
 }
 
@@ -192,9 +206,9 @@ libCanvas.prototype.measureTextLua =  function(text){
 	
 	var textWidth = this.ctx.measureText(text);
 	
-	height = this.ctx.font[0] + this.ctx.font[1];
+	height = parseInt(this.ctx.font[0] + this.ctx.font[1]);
 			
-	return {w:textWidth.width,h:height};	
+	return [textWidth.width,height];	
 } 
 
 libCanvas.prototype.image_path = function(caminho,x,y,w,h){
