@@ -30,7 +30,7 @@ libCanvas.prototype.attrSize = function(){
 libCanvas.prototype.attrColor = function(r, g, b, a){
 	console.log("attrColor");
 	
-	/*if(b === undefined && a === undefined){
+	if(b === undefined && a === undefined){
 		
 		switch(r){
 			case 'white':
@@ -38,9 +38,101 @@ libCanvas.prototype.attrColor = function(r, g, b, a){
 						this.ctx.lineWidth = "2";
 						this.ctx.strokeStyle = "rgba(255,255,255," + b + ")";
 			break;
+			
+			case 'aqua':
+						this.ctx.fillStyle = "rgba(0,255,255," + b + ")"; 
+						this.ctx.lineWidth = "2";
+						this.ctx.strokeStyle = "rgba(0,255,255," + b + ")";
+			break;
+			
+			case 'lime':
+						this.ctx.fillStyle = "rgba(0,255,0," + b + ")"; 
+						this.ctx.lineWidth = "2";
+						this.ctx.strokeStyle = "rgba(0,255,0," + b + ")";
+			break;
+			
+			case 'yellow':
+						this.ctx.fillStyle = "rgba(255,255,0," + b + ")"; 
+						this.ctx.lineWidth = "2";
+						this.ctx.strokeStyle = "rgba(255,255,0," + b + ")";
+			break;
+			
+			case 'red':
+						this.ctx.fillStyle = "rgba(255,0,0," + b + ")"; 
+						this.ctx.lineWidth = "2";
+						this.ctx.strokeStyle = "rgba(255,0,0," + b + ")";
+			break;
+			
+			case 'fuchsia':
+						this.ctx.fillStyle = "rgba(255,0,255," + b + ")"; 
+						this.ctx.lineWidth = "2";
+						this.ctx.strokeStyle = "rgba(255,0,255," + b + ")";
+			break;
+			
+			case 'purple':
+						this.ctx.fillStyle = "rgba(128,0,128," + b + ")"; 
+						this.ctx.lineWidth = "2";
+						this.ctx.strokeStyle = "rgba(128,0,128," + b + ")";
+			break;
+			
+			case 'maroon':
+						this.ctx.fillStyle = "rgba(128,0,0," + b + ")"; 
+						this.ctx.lineWidth = "2";
+						this.ctx.strokeStyle = "rgba(128,0,0," + b + ")";
+			break;
+			
+			case 'blue':
+						this.ctx.fillStyle = "rgba(0,0,255," + b + ")"; 
+						this.ctx.lineWidth = "2";
+						this.ctx.strokeStyle = "rgba(0,0,255," + b + ")";
+			break;
+			
+			case 'navy':
+						this.ctx.fillStyle = "rgba(0,0,128," + b + ")"; 
+						this.ctx.lineWidth = "2";
+						this.ctx.strokeStyle = "rgba(0,0,128," + b + ")";
+			break;
+			
+			case 'teal':
+						this.ctx.fillStyle = "rgba(0,128,128," + b + ")"; 
+						this.ctx.lineWidth = "2";
+						this.ctx.strokeStyle = "rgba(0,128,128," + b + ")";
+			break;
+			
+			case 'green':
+						this.ctx.fillStyle = "rgba(0,128,0," + b + ")"; 
+						this.ctx.lineWidth = "2";
+						this.ctx.strokeStyle = "rgba(0,128,0," + b + ")";
+			break;
+			
+			
+			case 'olive':
+						this.ctx.fillStyle = "rgba(128,128,0," + b + ")"; 
+						this.ctx.lineWidth = "2";
+						this.ctx.strokeStyle = "rgba(128,128,0," + b + ")";
+			break;
+			
+			case 'silver':
+						this.ctx.fillStyle = "rgba(192,192,192," + b + ")"; 
+						this.ctx.lineWidth = "2";
+						this.ctx.strokeStyle = "rgba(192,192,192," + b + ")";
+			break;
+			
+			case 'gray':
+						this.ctx.fillStyle = "rgba(128,128,128," + b + ")"; 
+						this.ctx.lineWidth = "2";
+						this.ctx.strokeStyle = "rgba(128,128,128," + b + ")";
+			break;
+			
+			case 'black':
+						this.ctx.fillStyle = "rgba(0,0,0," + b + ")"; 
+						this.ctx.lineWidth = "2";
+						this.ctx.strokeStyle = "rgba(0,0,0," + b + ")";
+			break;
+			
 		}
 		
-	}*/
+	}
 	
 	this.ctx.fillStyle = "rgba(" + r + ","+ g + "," + b + "," + a + ")";
 	this.ctx.lineWidth = "2";
