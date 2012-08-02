@@ -33,7 +33,7 @@
  * CompoundCondition encadeado com outros compoundCondition nao sao aceitos
  * @constructor
  */
-function Listener(listenerType, actionOperator, actionMap, flagMap, assessmentStatements, presentation)
+function Listener(listenerType, actionOperator, actionMap, flagMap, assessmentStatements, presentation, ctxsUsed)
 {
 	this.listenerType = listenerType;
 	this.actionOperator = actionOperator;
@@ -44,6 +44,7 @@ function Listener(listenerType, actionOperator, actionMap, flagMap, assessmentSt
 	this.triggerBuffer = undefined;
 	this.presentation = presentation;
 	this.pendingActions = 0;
+	this.contextsUsed = ctxsUsed;
 	
 	/*
 	 * actionNamesArray
@@ -67,7 +68,8 @@ function Listener(listenerType, actionOperator, actionMap, flagMap, assessmentSt
  */
 Listener.prototype.notifyContexts = function()
 {
-	//nothing at all by now
+	for(var i in this.contextsUsed)
+		this.contextsUsed[i].notifyLink(-1); 
 }
 
 
@@ -205,6 +207,10 @@ Listener.prototype.__verifyAssessmentStatements = function()
 Listener.prototype.__executeActions = function()
 {
 	this.pendingActions = this.actionMapSize;
+	
+	for(var i in this.contextsUsed)
+		this.contextsUsed[i].notifyLink(1); //new link happening
+	
 	if(this.actionOperator == 'seq')
 		this.__executeActionsSeq([0]);
 	else // if (this.actionOerator == 'par')

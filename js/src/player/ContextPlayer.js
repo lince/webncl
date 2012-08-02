@@ -32,6 +32,7 @@ function ContextPlayer (node, p) {
 	this.port = {};
     this.presentation = p.presentation || p;
     this.parentContext = p;
+	this.pendingLinks = 0;
 
         
 	//this.synchronizedPlayers = [];
@@ -51,16 +52,8 @@ function ContextPlayer (node, p) {
 	this.htmlPlayer = "";
 	this.isPlaying = false;
 	this.isStopped = true;
+	this.wAction = 0;
 	
-	this.wAction = undefined;	//waiting action
-
-	//medias that might trigger 'start' or 'resume' events are tracked
-	this.tMedias =
-		{
-			onEnd: [],
-			onPause: [],
-			onAbort: []
-		};
 
 	if (node.id) {
 		this.htmlPlayer = this.presentation.getDivId(node.id);
@@ -115,6 +108,27 @@ ContextPlayer.prototype.notify = function (mediaPlayer) {
 */
 //== Synchronization Functions End ==
 
+//notifyLink
+//n = -1 //event listener ended
+//n = 1  //event listener started
+ContextPlayer.prototype.notifyLink = function(n)
+{
+	if(n === -1 || n === 1)
+		this.pendingLinks += n;
+	
+	if(this.pendingLinks == 0)
+	{
+		if(this.isPlaying || (!this.isPlaying && !this.isStopped))
+		{
+			if(this.playingElem.length == 0 && this.pausedeElem.length == 0)
+			{
+				this.wAction  = Player.action.STOP;
+				this.nAction(undefined,-1);
+			}
+		}
+	}
+}
+
 // sync
 // e -> element (media or context)
 // s -> state
@@ -140,7 +154,7 @@ ContextPlayer.prototype.nAction = function(e,a)
 			if(b > -1)
 				this.pausedElem.splice(b-1,1);	
 			
-		
+			
 			
 		if(a === ac.START)
 		{
@@ -159,13 +173,6 @@ ContextPlayer.prototype.nAction = function(e,a)
 			if(b > -1)
 				this.playingElem.splice(b-1,1);		
 			
-			//no more elements playing
-			if(this.playingElem.length === 0)
-			{
-				if($.inArray(e.htmlPlayer,this.tMedias['onPause'])===-1)
-					this.wAction = a;			
-			}
-			
 		break;
 
 		case ac.STOP:
@@ -173,32 +180,20 @@ ContextPlayer.prototype.nAction = function(e,a)
 			b = $.inArray(e,this.playingElem);
 			if(b > -1)
 				this.playingElem.splice(b-1,1);
-			
-			
-			if(this.playingElem.length === 0 && this.pausedElem.length === 0)
-			{
-				//check if this last onEnd/onAbort will not trigger a start event
-				if(a === ac.STOP)
-				{
-					if(($.inArray(e.htmlPlayer,this.tMedias['onEnd'])===-1))
-						this.wAction = a;
-
-				} else {
-					if($.inArray(e.htmlPlayer,this.tMedias['onAbort'])===-1)
-						this.wAction = a;
-
-				}
 					
-
+			if(this.playingElem.length == 0 && this.pausedElem.length == 0)
+			{
+				
+				var data = $(e.htmlPlayer).data();
+				if(this.pendingLinks === 0)
+					if(data['presentation.onEnd'] === undefined  && data['presentation.onAbort'] === undefined)
+					{
+						this.isPlaying = false;
+						this.isStopped = true;
+						this.parentContext.nAction(this,Player.action.STOP);
+						$(this.htmlPlayer).trigger("presentation.onEnd");
+					}
 			}
-			
-			//if(this.playingElem.length == 0 && this.pausedElem.length == 0)
-			//{
-			//	this.isPlaying = false;
-			//	this.isStopped = true;
-			//	this.parentContext.nAction(this,Player.action.STOP);
-			//	$(this.htmlPlayer).trigger("presentation.onEnd");
-			//}
 				
 		break;
 		
@@ -605,12 +600,6 @@ ContextPlayer.prototype.bindLinks = function()
 		var assessmentsMap = new Object();
 		var assessmentsArray = new Array();
 		
-		//tratamento de fim de contexto
-		var trackableCondition = 0;			//0 - nothing
-											//1 - end or abort
-											//2 - pause
-											//3 - (end or abort) and pause
-		var trackable = false;
 
 		
 
@@ -699,7 +688,7 @@ ContextPlayer.prototype.bindLinks = function()
 			var conditionUseVariable = false;
 			var conditionDefaultValue = '';
 			var conditionUseKey = false;
-			var tType = 0;						//not tracked
+
 
 			if (currentCondition.role === 'onSelection')
 			{
@@ -711,18 +700,7 @@ ContextPlayer.prototype.bindLinks = function()
 					conditionDefaultValue = currentCondition.key;
 					conditionUseKey = true;
 				}
-			} else if(currentCondition.role === 'onEnd' ) {
-				tType = 1;			
-				trackableCondition |= 1;
-			} else if(currentCondition.role === 'onAbort' ) {
-				tType = 2;
-				trackableCondition |= 1;
-			} else if(currentCondition.role === 'onPause'){
-				tType = 3;
-				trackableCondition |= 2;
-			}
-			
-			
+			} 
 
 			flagMap[currentCondition.role] = {
 				bindComponent: "",
@@ -731,8 +709,7 @@ ContextPlayer.prototype.bindLinks = function()
 				flag: false,
 				keyUseVariable : conditionUseVariable,
 				keyDefaultValue: conditionDefaultValue,
-				useKey : conditionUseKey,
-				trackable: tType
+				useKey : conditionUseKey
 			}
 
 		}
@@ -784,18 +761,7 @@ ContextPlayer.prototype.bindLinks = function()
 	    		}
 
 	    	} else {
-				if(!trackable)
-				{
-					if(trackableCondition != 0)
-					{
-						//important for all cases
-						if(currentAction.role === 'start' ||(currentAction.role === 'resume' && trackableCondition >=2))
-							trackable = true;
-					}
-				}
-				
-				
-				
+		
 	    		actionMap[currentAction.role]= {
 					binds: new Array(),
 					qualifier: actions[i].qualifier
@@ -810,9 +776,10 @@ ContextPlayer.prototype.bindLinks = function()
 	    	 
 	    }
 
+		var contextsUsed = [this];
 
 		//Como o tipo de listener e o tipo de action (operator) ja estao definidos,posso criar o listener
-		var listener = new Listener(lType,aOperator,actionMap,flagMap,assessmentsArray,this.presentation);
+		var listener = new Listener(lType,aOperator,actionMap,flagMap,assessmentsArray,this.presentation,contextsUsed);
 		/*
 		 * Note que o flagMap e o actionMap ainda nao estao completos
 		 * entranto, como o objeto listener referencia os objetos que 
@@ -874,6 +841,8 @@ ContextPlayer.prototype.bindLinks = function()
 			  	
 			  }
 			  
+			  if(this.context[currentBindComponent] && currentInterface)
+				  contextsUsed.push(this.context[currentBindComponent]);
 				
 			  currentAction.binds.push(
 			  	{
@@ -901,9 +870,6 @@ ContextPlayer.prototype.bindLinks = function()
 			   var eventName = currentBind.role;
 			   var bindName = [eventType,eventName].join('.');
 			   var handlerName =  [currentBindComponent,bindName].join('.');
-
-				if(trackable)
-					this.tMedias[currentBind.role].push(currentBindComponentSelector);
 				
 			   var triggerArrayName = bindName+'.triggerArray';
 			   
