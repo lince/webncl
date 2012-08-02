@@ -70,7 +70,7 @@ LuaPlayer.prototype.load = function(source) {
 		dataType : "text",
 		async : false,
 		success : $.proxy(function(data) {
-			data = 'canvas = libCanvas.init();\n' + 'canvas2 = libCanvas.init();\n' + data;
+			//data = 'canvas = libCanvas.init();\n' + 'canvas2 = libCanvas.init();\n' + data;
 			this.luajscode = lua_load(data);
 			
 		}, this),
@@ -214,23 +214,16 @@ LuaPlayer.prototype.bindlibs = function() {
 				canvas.width = 300;
 				canvas.height = 200;
 				
-					
 				ctx = canvas.getContext("2d");
-				//console.log(ctx);
-				
-				
-				//document.body.appendChild(canvas);
-				
+								
 				object = new libCanvas(ctx);
 				canvas_objects[id] = object;
 				var luaObject = lua_newtable();
 				luaObject.str['id'] = id;
 				luaObject.str['attrSize'] = function(self){
 						objCanvas = canvas_objects[self.str['id']];
-						//console.log(objCanvas.attrSize());
 						return objCanvas.attrSize();
-						//return [];
-	
+							
 				};
 				
 				luaObject.str['attrColor'] = function(self,r,g,b,a){
@@ -329,7 +322,11 @@ LuaPlayer.prototype.bindlibs = function() {
 //TODO call all the handlers registered in their correct positions
 LuaPlayer.prototype.callHandlers = function (evt) {
 	for(i =0; i < this.events.handlers.length; i++){
-		this.events.handlers[i](evt);
+		if(this.events.handlers[i] === undefined){
+			
+		}
+		else
+			this.events.handlers[i](evt);
 	}
 	
 }
