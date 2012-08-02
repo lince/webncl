@@ -1,5 +1,5 @@
-function libCanvas(ctx){
-	
+function libCanvas(ctx) {
+
 	this.ctx = ctx;
 	this.x = 0;
 	this.y = 0;
@@ -9,344 +9,328 @@ function libCanvas(ctx){
 	this.sizeY = ctx.canvas.height;
 	this.endX = ctx.canvas.width;
 	this.endY = ctx.canvas.height;
-	
+
 	console.log("libCanvas");
-	
-	
+
 };
 
-libCanvas.prototype.attrSize = function(){
+libCanvas.prototype.attrSize = function() {
 	console.log("attrSize");
-	
+
 	var canvas = document.getElementById(ctx.canvas.id);
-	
+
 	w = this.ctx.canvas.width;
 	h = this.ctx.canvas.height;
-	
-	return [w,h];
-	
+
+	return [w, h];
+
 }
 
-libCanvas.prototype.attrColor = function(r, g, b, a){
+libCanvas.prototype.attrColor = function(r, g, b, a) {
 	console.log("attrColor");
-	
-	if(b === undefined && a === undefined){
-		
-		switch(r){
+
+	if (b === undefined && a === undefined) {
+		console.log("----------------------");
+		console.log("patter color selected");
+		console.log("----------------------");
+		switch(r) {
 			case 'white':
-						this.ctx.fillStyle = "rgba(255,255,255," + b + ")"; 
-						this.ctx.lineWidth = "2";
-						this.ctx.strokeStyle = "rgba(255,255,255," + b + ")";
-			break;
-			
+				this.ctx.fillStyle = "rgba(255,255,255," + b + ")";
+				this.ctx.lineWidth = "2";
+				this.ctx.strokeStyle = "rgba(255,255,255," + b + ")";
+				break;
+
 			case 'aqua':
-						this.ctx.fillStyle = "rgba(0,255,255," + b + ")"; 
-						this.ctx.lineWidth = "2";
-						this.ctx.strokeStyle = "rgba(0,255,255," + b + ")";
-			break;
-			
+				this.ctx.fillStyle = "rgba(0,255,255," + b + ")";
+				this.ctx.lineWidth = "2";
+				this.ctx.strokeStyle = "rgba(0,255,255," + b + ")";
+				break;
+
 			case 'lime':
-						this.ctx.fillStyle = "rgba(0,255,0," + b + ")"; 
-						this.ctx.lineWidth = "2";
-						this.ctx.strokeStyle = "rgba(0,255,0," + b + ")";
-			break;
-			
+				this.ctx.fillStyle = "rgba(0,255,0," + b + ")";
+				this.ctx.lineWidth = "2";
+				this.ctx.strokeStyle = "rgba(0,255,0," + b + ")";
+				break;
+
 			case 'yellow':
-						this.ctx.fillStyle = "rgba(255,255,0," + b + ")"; 
-						this.ctx.lineWidth = "2";
-						this.ctx.strokeStyle = "rgba(255,255,0," + b + ")";
-			break;
-			
+				this.ctx.fillStyle = "rgba(255,255,0," + b + ")";
+				this.ctx.lineWidth = "2";
+				this.ctx.strokeStyle = "rgba(255,255,0," + b + ")";
+				break;
+
 			case 'red':
-						this.ctx.fillStyle = "rgba(255,0,0," + b + ")"; 
-						this.ctx.lineWidth = "2";
-						this.ctx.strokeStyle = "rgba(255,0,0," + b + ")";
-			break;
-			
+				this.ctx.fillStyle = "rgba(255,0,0," + b + ")";
+				this.ctx.lineWidth = "2";
+				this.ctx.strokeStyle = "rgba(255,0,0," + b + ")";
+				break;
+
 			case 'fuchsia':
-						this.ctx.fillStyle = "rgba(255,0,255," + b + ")"; 
-						this.ctx.lineWidth = "2";
-						this.ctx.strokeStyle = "rgba(255,0,255," + b + ")";
-			break;
-			
+				this.ctx.fillStyle = "rgba(255,0,255," + b + ")";
+				this.ctx.lineWidth = "2";
+				this.ctx.strokeStyle = "rgba(255,0,255," + b + ")";
+				break;
+
 			case 'purple':
-						this.ctx.fillStyle = "rgba(128,0,128," + b + ")"; 
-						this.ctx.lineWidth = "2";
-						this.ctx.strokeStyle = "rgba(128,0,128," + b + ")";
-			break;
-			
+				this.ctx.fillStyle = "rgba(128,0,128," + b + ")";
+				this.ctx.lineWidth = "2";
+				this.ctx.strokeStyle = "rgba(128,0,128," + b + ")";
+				break;
+
 			case 'maroon':
-						this.ctx.fillStyle = "rgba(128,0,0," + b + ")"; 
-						this.ctx.lineWidth = "2";
-						this.ctx.strokeStyle = "rgba(128,0,0," + b + ")";
-			break;
-			
+				this.ctx.fillStyle = "rgba(128,0,0," + b + ")";
+				this.ctx.lineWidth = "2";
+				this.ctx.strokeStyle = "rgba(128,0,0," + b + ")";
+				break;
+
 			case 'blue':
-						this.ctx.fillStyle = "rgba(0,0,255," + b + ")"; 
-						this.ctx.lineWidth = "2";
-						this.ctx.strokeStyle = "rgba(0,0,255," + b + ")";
-			break;
-			
+				this.ctx.fillStyle = "rgba(0,0,255," + b + ")";
+				this.ctx.lineWidth = "2";
+				this.ctx.strokeStyle = "rgba(0,0,255," + b + ")";
+				console.log("***********************");
+				console.log(" color blue selected");
+				console.log("***********************");
+				break;
+
 			case 'navy':
-						this.ctx.fillStyle = "rgba(0,0,128," + b + ")"; 
-						this.ctx.lineWidth = "2";
-						this.ctx.strokeStyle = "rgba(0,0,128," + b + ")";
-			break;
-			
+				this.ctx.fillStyle = "rgba(0,0,128," + b + ")";
+				this.ctx.lineWidth = "2";
+				this.ctx.strokeStyle = "rgba(0,0,128," + b + ")";
+				break;
+
 			case 'teal':
-						this.ctx.fillStyle = "rgba(0,128,128," + b + ")"; 
-						this.ctx.lineWidth = "2";
-						this.ctx.strokeStyle = "rgba(0,128,128," + b + ")";
-			break;
-			
+				this.ctx.fillStyle = "rgba(0,128,128," + b + ")";
+				this.ctx.lineWidth = "2";
+				this.ctx.strokeStyle = "rgba(0,128,128," + b + ")";
+				break;
+
 			case 'green':
-						this.ctx.fillStyle = "rgba(0,128,0," + b + ")"; 
-						this.ctx.lineWidth = "2";
-						this.ctx.strokeStyle = "rgba(0,128,0," + b + ")";
-			break;
-			
-			
+				this.ctx.fillStyle = "rgba(0,128,0," + b + ")";
+				this.ctx.lineWidth = "2";
+				this.ctx.strokeStyle = "rgba(0,128,0," + b + ")";
+				break;
+
 			case 'olive':
-						this.ctx.fillStyle = "rgba(128,128,0," + b + ")"; 
-						this.ctx.lineWidth = "2";
-						this.ctx.strokeStyle = "rgba(128,128,0," + b + ")";
-			break;
-			
+				this.ctx.fillStyle = "rgba(128,128,0," + b + ")";
+				this.ctx.lineWidth = "2";
+				this.ctx.strokeStyle = "rgba(128,128,0," + b + ")";
+				break;
+
 			case 'silver':
-						this.ctx.fillStyle = "rgba(192,192,192," + b + ")"; 
-						this.ctx.lineWidth = "2";
-						this.ctx.strokeStyle = "rgba(192,192,192," + b + ")";
-			break;
-			
+				this.ctx.fillStyle = "rgba(192,192,192," + b + ")";
+				this.ctx.lineWidth = "2";
+				this.ctx.strokeStyle = "rgba(192,192,192," + b + ")";
+				break;
+
 			case 'gray':
-						this.ctx.fillStyle = "rgba(128,128,128," + b + ")"; 
-						this.ctx.lineWidth = "2";
-						this.ctx.strokeStyle = "rgba(128,128,128," + b + ")";
-			break;
-			
+				this.ctx.fillStyle = "rgba(128,128,128," + b + ")";
+				this.ctx.lineWidth = "2";
+				this.ctx.strokeStyle = "rgba(128,128,128," + b + ")";
+				break;
+
 			case 'black':
-						this.ctx.fillStyle = "rgba(0,0,0," + b + ")"; 
-						this.ctx.lineWidth = "2";
-						this.ctx.strokeStyle = "rgba(0,0,0," + b + ")";
-			break;
-			
+				this.ctx.fillStyle = "rgba(0,0,0," + b + ")";
+				this.ctx.lineWidth = "2";
+				this.ctx.strokeStyle = "rgba(0,0,0," + b + ")";
+				break;
+
 		}
-		
+
 	}
-	
-	this.ctx.fillStyle = "rgba(" + r + ","+ g + "," + b + "," + a + ")";
+
+	this.ctx.fillStyle = "rgba(" + r + "," + g + "," + b + "," + a + ")";
 	this.ctx.lineWidth = "2";
-	this.ctx.strokeStyle = "rgba(" + r + ","+ g + "," + b + "," + a + ")";
-				
+	this.ctx.strokeStyle = "rgba(" + r + "," + g + "," + b + "," + a + ")";
+
 }
 
-
-libCanvas.prototype.attrClip= function(x,y,w,h){
+libCanvas.prototype.attrClip = function(x, y, w, h) {
 	console.log("attrClip");
-	
+
 	this.x = x;
-	this.y= y;
+	this.y = y;
 	this.sizeX = w;
-	this.sizeY = h; 
-	
-	
+	this.sizeY = h;
+
 	this.ctx.lineWidth = "1";
-	this.ctx.strokeRect(this.x,this.y,this.sizeX,this.sizeY);
-	
+	this.ctx.strokeRect(this.x, this.y, this.sizeX, this.sizeY);
+
 }
 
-libCanvas.prototype.iniVerifClip = function(x1,y1,x2,y2){	
+libCanvas.prototype.iniVerifClip = function(x1, y1, x2, y2) {
 	console.log("IniVerifClip");
-	
+
 	this.initX = this.x + x1;
 	this.initY = this.y + y1;
 	this.endX = this.x + x2;
 	this.endY = this.y + y2;
-	var verifica = true;	
-	
-	
-	if(this.endX > this.sizeX+this.x)
-		this.endX = this.sizeX+this.x;
-		
-	if(this.endY > this.sizeY+this.y)
-		this.endY = this.sizeY+this.y;
-		
-	if(this.initX > this.sizeX+this.x)
-		this.initX = this.sizeX+this.x;
-		
-	if(this.initY > this.sizeY+this.y)
-		this.initY = this.sizeY+this.y;
-		
-	if(this.initX >= this.sizeX+this.x && this.endX >this.sizeX+this.x || this.initY >= this.sizeY+this.y && this.endY >= this.sizeY+this.y){
+	var verifica = true;
+
+	if (this.endX > this.sizeX + this.x)
+		this.endX = this.sizeX + this.x;
+
+	if (this.endY > this.sizeY + this.y)
+		this.endY = this.sizeY + this.y;
+
+	if (this.initX > this.sizeX + this.x)
+		this.initX = this.sizeX + this.x;
+
+	if (this.initY > this.sizeY + this.y)
+		this.initY = this.sizeY + this.y;
+
+	if (this.initX >= this.sizeX + this.x && this.endX > this.sizeX + this.x || this.initY >= this.sizeY + this.y && this.endY >= this.sizeY + this.y) {
 		verifica = false;
-		
+
 	}
-		
+
 	return verifica;
 }
 
-libCanvas.prototype.iniVerifClip2 =  function(x1, y1, x2, y2){
+libCanvas.prototype.iniVerifClip2 = function(x1, y1, x2, y2) {
 	console.log("IniVerifClip2");
-	
+
 	this.initX = this.x + x1;
 	this.initY = this.y + y1;
 	this.endX = x2;
 	this.endY = y2;
 	var verifica = true;
-	var sub= 0;
-	
-	if(this.initX+this.endX > this.x+this.sizeX){
-		sub = (this.initX+this.endX) - (this.x+this.sizeX);
-		this.endX = this.endX-sub;	
+	var sub = 0;
+
+	if (this.initX + this.endX > this.x + this.sizeX) {
+		sub = (this.initX + this.endX) - (this.x + this.sizeX);
+		this.endX = this.endX - sub;
 	}
-	
-	if(this.initY+this.endY > this.y+this.sizeY){
-		sub = (this.initY+this.endY) - (this.y+this.sizeY);
-		this.endY = this.endY-sub;	
+
+	if (this.initY + this.endY > this.y + this.sizeY) {
+		sub = (this.initY + this.endY) - (this.y + this.sizeY);
+		this.endY = this.endY - sub;
 	}
-		
-	
-	if(this.initX >= this.sizeX+this.x || this.initY >= this.sizeY+this.y){
+
+	if (this.initX >= this.sizeX + this.x || this.initY >= this.sizeY + this.y) {
 		verifica = false;
 	}
-	
-	return verifica;	
+
+	return verifica;
 }
 
-libCanvas.prototype.drawLine =  function(x1, y1, x2, y2){
+libCanvas.prototype.drawLine = function(x1, y1, x2, y2) {
 	console.log("drawLine");
-		
+
 	var verifica = this.iniVerifClip(x1, y1, x2, y2);
-		
-	if(verifica){
+
+	if (verifica) {
 		this.ctx.beginPath();
-		this.ctx.moveTo(this.initX,this.initY);
-		this.ctx.lineTo(this.endX,this.endY);
-						
-		this.ctx.stroke(); 
+		this.ctx.moveTo(this.initX, this.initY);
+		this.ctx.lineTo(this.endX, this.endY);
+
+		this.ctx.stroke();
 		this.ctx.save();
-		
-	}
-	
-	else{
+
+	} else {
 		console.log("Coordinates out of area selected to draw")
 	}
-		
+
 }
 
-libCanvas.prototype.drawRect =  function(mode, x1, y1, x2, y2){
+libCanvas.prototype.drawRect = function(mode, x1, y1, x2, y2) {
 	console.log("drawRect");
-	
-	var verifica = this.iniVerifClip2(x1,y1,x2,y2);
-		
-	if(verifica){
-		if(mode == "fill"){
+
+	var verifica = this.iniVerifClip2(x1, y1, x2, y2);
+
+	if (verifica) {
+		if (mode == "fill") {
 			this.ctx.fillRect(this.initX, this.initY, this.endX, this.endY);
-		}
-		
-		else if(mode == "frame"){
+		} else if (mode == "frame") {
 			this.ctx.strokeRect(this.initX, this.initY, this.endX, this.endY);
-		}
-		
-		else{
+		} else {
 			console.log("mode doesn't exists - Please choise 'fill' or 'frame'");
-			
+
 		}
-	}
-	
-	else{
+	} else {
 		console.log("Coordinates out of area selected to draw")
 	}
-			
+
 }
 
-libCanvas.prototype.attrText =  function(face, size, style){
+libCanvas.prototype.attrText = function(face, size, style) {
 	console.log("attrText");
-	
+
 	this.ctx.font = size + " " + face + " " + style;
 }
 
-libCanvas.prototype.drawText =  function(x, y, text){
+libCanvas.prototype.drawText = function(x, y, text) {
 	console.log("drawText");
-	
-	
-	
+
 	dimension = this.measureTextLua(text);
-	
+
 	console.log(dimension);
-	
+
 	width = dimension[0];
 	height = dimension[1];
-		
-	this.initX = this.x+x;
-	this.initY = this.y+y+height;
-	
-	if(this.initX+width > this.x+this.sizeX || this.initY+height > this.y+this.sizeY)
+
+	this.initX = this.x + x;
+	this.initY = this.y + y + height;
+
+	if (this.initX + width > this.x + this.sizeX || this.initY + height > this.y + this.sizeY)
 		console.log("Text exceeds the dimentions limited by canvas");
-	else{
-		this.ctx.fillText(text,this.initX,this.initY);
+	else {
+		this.ctx.fillText(text, this.initX, this.initY);
 		console.log("final attrText");
 	}
-		
-		
-	
-	 
+
 }
 
-libCanvas.prototype.measureTextLua =  function(text){
+libCanvas.prototype.measureTextLua = function(text) {
 	console.log("measureTextLua");
-	
-	var textWidth = this.ctx.measureText(text);
-	
-	height = parseInt(this.ctx.font[0] + this.ctx.font[1]);
-			
-	return [textWidth.width,height];	
-} 
 
-libCanvas.prototype.image_path = function(caminho,x,y,w,h){
+	var textWidth = this.ctx.measureText(text);
+
+	height = parseInt(this.ctx.font[0] + this.ctx.font[1]);
+
+	return [textWidth.width, height];
+}
+
+libCanvas.prototype.image_path = function(caminho, x, y, w, h) {
 	console.log("image_path");
-	
+
 	this.initX = this.x + x;
 	this.initY = this.y + y;
-		
+
 	var img = new Image();
 	img.src = caminho;
-	
-	if(this.initX+w > this.x+this.sizeX || this.initY+h > this.y+this.sizeY)
-		
+
+	if (this.initX + w > this.x + this.sizeX || this.initY + h > this.y + this.sizeY)
+
 		console.log("Image exceeds the dimentions limited by canvas");
 	else
-		this.ctx.drawImage(img, this.initX,this.initY,w,h);
-	
+		this.ctx.drawImage(img, this.initX, this.initY, w, h);
+
 }
 
-libCanvas.prototype.attrCrop = function(ctxDestiny, x, y, w, h){
+libCanvas.prototype.attrCrop = function(ctxDestiny, x, y, w, h) {
 	console.log("attrCrop");
-	
+
 	canvasData = this.ctx.getImageData(x, y, w, h);
-	
+
 	ctxDestino.putImageData(canvasData, x, y);
 }
 
-
-
-libCanvas.prototype.compose = function(ctxDestino){
+libCanvas.prototype.compose = function(ctxDestino) {
 	console.log("compose");
-	
+
 	canvasData = this.ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
-	
+
 	ctxDestino.putImageData(canvasData, 0, 0);
 }
 
-libCanvas.prototype.save = function(){
+libCanvas.prototype.save = function() {
 	console.log("save");
-	
+
 	ctx.save();
 }
 
-libCanvas.prototype.flush = function(){
+libCanvas.prototype.flush = function() {
 	console.log("restore");
-	
+
 	ctx.restore();
-	
+
 }
