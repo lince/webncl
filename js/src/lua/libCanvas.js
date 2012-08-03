@@ -1,6 +1,9 @@
 function libCanvas(ctx) {
 
+	//context
 	this.ctx = ctx;
+
+	//variables for attrClip
 	this.x = 0;
 	this.y = 0;
 	this.initX = 0;
@@ -9,6 +12,19 @@ function libCanvas(ctx) {
 	this.sizeY = ctx.canvas.height;
 	this.endX = ctx.canvas.width;
 	this.endY = ctx.canvas.height;
+
+	//variables for new
+	this.w = 0;
+	this.h = 0;
+	this.initW = 0;
+	this.initH = 0;
+	this.sizeW = ctx.canvas.width;
+	this.sizeH = ctx.canvas.height;
+	this.widthEnd = ctx.canvas.width;
+	this.heightEnd = ctx.canvas.height;
+
+	this.ultimo = true;
+	this.compositeTypes = ['source-over', 'source-in', 'source-out', 'source-atop', 'destination-over', 'destination-in', 'destination-out', 'destination-atop', 'lighter', 'darker', 'copy', 'xor'];
 
 	console.log("libCanvas");
 
@@ -26,23 +42,94 @@ libCanvas.prototype.attrSize = function() {
 
 }
 
+libCanvas.prototype.newCanvas = function(width, height) {
+	newObject = new libCanvas(this.ctx);
+
+	this.ultimo = false;
+
+	newObject.setData(0, 0, width, height);
+
+	return newObject;
+
+}
+
+libCanvas.prototype.newImage = function(caminho) {
+	newObject = new libCanvas(this.ctx);
+	
+	var img = new Image();
+	img.src = caminho;
+	newObject.setData(0, 0, img.width, img.height);
+	newObject.image_path(caminho, 0, 0, img.width, img.height);
+	
+	return newObject;
+	
+}
+
+libCanvas.prototype.image_path = function(caminho, x, y, w, h) {
+	console.log("image_path");
+
+	this.initX = this.x + x;
+	this.initY = this.y + y;
+
+	var img = new Image();
+	img.src = caminho;
+
+	if (this.initX + w > this.x + this.sizeX || this.initY + h > this.y + this.sizeY)
+
+		console.log("Image exceeds the dimentions limited by canvas");
+	else
+		this.ctx.drawImage(img, this.initX, this.initY, w, h);
+
+}
+
+libCanvas.prototype.setData = function(x1, y1, x2, y2) {
+
+	this.initW = this.w + x1;
+	this.initH = this.h + y1;
+	this.endW = x2;
+	this.endH = y2;
+
+	if (this.initW + this.endW > this.w + this.sizeW) {
+		sub = (this.initW + this.endW) - (this.w + this.sizeW);
+		this.endW = this.endW - sub;
+	}
+
+	if (this.initH + this.endH > this.h + this.sizeH) {
+		sub = (this.initH + this.endH) - (this.h + this.sizeH);
+		this.endH = this.endH - sub;
+	}
+
+	if (this.initW >= this.sizeW + this.w) {
+		this.initW = this.w;
+		console.log("width exceeds limit permissed");
+	}
+	if (this.initH >= this.sizeH + this.h) {
+		this.initH = this.h;
+		console.log("height exceeds limit permissed");
+	}
+
+	this.ctx.width = this.endW;
+	this.ctx.height = this.endH;
+
+}
+
 libCanvas.prototype.attrColor = function(r, g, b, a) {
 	console.log("attrColor");
 
 	if (b === undefined && a === undefined) {
-		
-		if(g === undefined){
+
+		if (g === undefined) {
 			g = 1;
 		}
-		
+
 		switch(r) {
-						
+
 			case 'lime' :
 				this.ctx.fillStyle = "rgba(0,255,0," + g + ")";
 				this.ctx.lineWidth = "2";
 				this.ctx.strokeStyle = "rgba(0,255,0,0.8)";
 				break;
-			
+
 			case 'white':
 				this.ctx.fillStyle = "rgba(255,255,255," + g + ")";
 				this.ctx.lineWidth = "2";
@@ -55,7 +142,6 @@ libCanvas.prototype.attrColor = function(r, g, b, a) {
 				this.ctx.strokeStyle = "rgba(0,255,255," + g + ")";
 				break;
 
-			
 			case 'yellow':
 				this.ctx.fillStyle = "rgba(255,255,0," + g + ")";
 				this.ctx.lineWidth = "2";
@@ -90,9 +176,7 @@ libCanvas.prototype.attrColor = function(r, g, b, a) {
 				this.ctx.fillStyle = "rgba(0,0,255," + g + ")";
 				this.ctx.lineWidth = "2";
 				this.ctx.strokeStyle = "rgba(0,0,255," + g + ")";
-				console.log("***********************");
-				console.log(" color blue selected");
-				console.log("***********************");
+
 				break;
 
 			case 'navy':
@@ -192,13 +276,22 @@ libCanvas.prototype.iniVerifClip = function(x1, y1, x2, y2) {
 libCanvas.prototype.iniVerifClip2 = function(x1, y1, x2, y2) {
 	console.log("IniVerifClip2");
 
+	//set for attrClip
 	this.initX = this.x + x1;
 	this.initY = this.y + y1;
 	this.endX = x2;
 	this.endY = y2;
 	var verifica = true;
 	var sub = 0;
+	console.log("x: " + this.x);
+	console.log("y: " + this.y);
+	console.log("initX: " + this.initX);
+	console.log("initY: " + this.initY);
+	console.log("endX: " + this.endX);
+	console.log("endY: " + this.endY);
 
+	//#------------------------------------------------------------------------------#
+	//verifications for attrClip
 	if (this.initX + this.endX > this.x + this.sizeX) {
 		sub = (this.initX + this.endX) - (this.x + this.sizeX);
 		this.endX = this.endX - sub;
@@ -212,6 +305,10 @@ libCanvas.prototype.iniVerifClip2 = function(x1, y1, x2, y2) {
 	if (this.initX >= this.sizeX + this.x || this.initY >= this.sizeY + this.y) {
 		verifica = false;
 	}
+	//end of verifications for attrClip
+	//#-------------------------------------------------------------------------------#
+	console.log("endX: " + this.endX);
+	console.log("endY: " + this.endY);
 
 	return verifica;
 }
@@ -219,7 +316,14 @@ libCanvas.prototype.iniVerifClip2 = function(x1, y1, x2, y2) {
 libCanvas.prototype.drawLine = function(x1, y1, x2, y2) {
 	console.log("drawLine");
 
-	var verifica = this.iniVerifClip(x1, y1, x2, y2);
+	if (this.ultimo)
+		this.ctx.globalCompostion = this.compositeTypes[0];
+		
+	else
+		this.ctx.globalCompostion = this.compositeTypes[4];
+		
+		
+		verifica = this.iniVerifClip(x1, y1, x2, y2);
 
 	if (verifica) {
 		this.ctx.beginPath();
@@ -237,6 +341,12 @@ libCanvas.prototype.drawLine = function(x1, y1, x2, y2) {
 
 libCanvas.prototype.drawRect = function(mode, x1, y1, x2, y2) {
 	console.log("drawRect");
+	
+	if (this.ultimo)
+		this.ctx.globalCompostion = this.compositeTypes[0];
+		
+	else
+		this.ctx.globalCompostion = this.compositeTypes[4];
 
 	var verifica = this.iniVerifClip2(x1, y1, x2, y2);
 
@@ -338,3 +448,5 @@ libCanvas.prototype.flush = function() {
 	ctx.restore();
 
 }
+
+
