@@ -39,13 +39,15 @@ function Html5Player(p) {
 	this.durationMap = {};
 	this.endCallbacks = [];
 
+	// property map
     p.onChangeProperty.propertyMap =
 	{
-		'soundLevel' : Player.propertyAction.OVERLOAD,
+		'soundLevel': Player.propertyAction.OVERLOAD,
 		'fit': Player.propertyAction.OVERLOAD
 	};
-    //overloading we don't need to trigger onEndAttribution event
-
+    // overloading we don't need to trigger onEndAttribution event
+	
+	// creates the media
     switch (p.source.type.split("/")[0]) {
 		case "video": 
 			// type = video/*
@@ -98,12 +100,11 @@ function Html5Player(p) {
 					// type = text/xml
 					Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
 					break;
-
-		}
+			}
 		break;
 	}
 
-	//Tenta criar o popCorn player de acordo com o tipo de media
+	// creates the popcorn player
 	if (p.checkType(["video","audio"]))
 	{
 		do {	
@@ -116,6 +117,53 @@ function Html5Player(p) {
 		} while (!this.popcornPlayer);
 	}
 
+	/***** Areas *****/
+	
+	this.playing = false;
+	this.playingArea = undefined;
+	this.anchors = [];
+	
+	for (i in p.area) {
+	
+		var id = p.area[i].id;
+		this.anchors[id] = p.area[i];
+		
+		// anchor type flags
+		this.anchors[id].temporal = p.area[i].begin || p.area[i].end || p.area[i].first || p.area[i].last ? true : false;
+		this.anchors[id].textual = p.area[i].beginText || p.area[i].endText || p.area[i].beginPosition || p.area[i].endPosition ? true : false;
+		this.anchors[id].spatial = p.area[i].coords ? true : false;
+
+		// temporal anchors
+		if (this.anchors[id].temporal) {
+			eval("this.exec(this.anchors[id].beginTime,$.proxy(function() {"+
+				"$(this.htmlPlayer).trigger('presentation.onBegin',['"+id+"']);"+
+			"},this));");
+			eval("this.exec(this.anchors[id].endTime,$.proxy(function() {"+
+				"this.stopArea('" + id + "');"+
+			"},this));");
+		}
+		
+	}
+	
+	// When the media ends, we need to set every area to stopped
+	this.exec('end',$.proxy(function() {
+		for (i in this.anchors) {
+			if (this.anchors[i].temporal)
+				this.stopArea(i);
+		}
+	},this));
+
+	/*****************/
+	
+}
+
+Html5Player.prototype.stopArea = function (nodeInterface) {
+	if (this.anchors[nodeInterface].started) {
+		this.anchors[nodeInterface].started = false;
+		$(this.htmlPlayer).trigger('stop',[nodeInterface]);
+	} else {
+		$(this.htmlPlayer).trigger('presentation.onEnd',[nodeInterface]);
+	}
 }
 
 /**
@@ -213,15 +261,54 @@ Html5Player.prototype.exec = function(time,callback)
 /**
  * Start
  */
-Html5Player.prototype.start =  function()
+Html5Player.prototype.start =  function (nodeInterface)
 {
-    if (this.popcornPlayer) {
+	
+	/***** Areas *****/
+	
+	if (this.playingArea) {
+		this.anchors[this.playingArea].started = false;
+	}
+	
+	if (nodeInterface) {
+		if (this.anchors[nodeInterface].temporal) {
+			this.anchors[nodeInterface].started = true;
+			this.playingArea = nodeInterface;
+			var t = this.anchors[nodeInterface].beginTime;
+			if (t != 'begin' && !(t > this.getDuration()))
+				this.seekAndPlay(t);
+			else {
+				if (t != 'begin') {
+					Logger.warning(Logger.WARN_INVALID_AREA,'area',['begin','end']);
+				}
+				if (this.playing) {
+					this.seek(0);
+					return;
+				} else {
+					//this.start();
+				}
+			}
+		}
+	} else {
+		this.playingArea = undefined;
+		if (this.playing) {
+			this.seek(0);
+			return;
+		} else {
+			//this.start();
+		}
+	}
+	
+	/*****************/
+	
+   if (this.popcornPlayer) {
 		this.popcornPlayer.play();
 		if (this.durationBind && !this.durationBinded && this.p.checkType(['image','text'])) {
 			// Bind the explicitDur callback again
 			eval(this.durationBind);
 		}
     }
+	
 };
 
 /**
@@ -229,6 +316,7 @@ Html5Player.prototype.start =  function()
  */
 Html5Player.prototype.stop = function()
 {
+	this.playing = false;
     if (this.popcornPlayer) {
 		this.popcornPlayer.pause(0);
     }
@@ -242,6 +330,7 @@ Html5Player.prototype.stop = function()
  */
 Html5Player.prototype.pause = function()
 {
+	this.playing = false;
     if (this.popcornPlayer) {
 		this.popcornPlayer.pause();
     }
@@ -252,6 +341,7 @@ Html5Player.prototype.pause = function()
  */
 Html5Player.prototype.resume = function()
 {
+	this.playing = true;
     if (this.popcornPlayer) {
 		this.popcornPlayer.play();
     }
