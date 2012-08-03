@@ -33,14 +33,12 @@ function MediaPlayer (node, parentContext) {
     this.player = undefined;
     this.playerName = undefined;
     this.playerSettings = undefined;
-	this.area = [];
 	this.transIn = [];
 	this.transOut = [];
 	this.isPlaying = false;
 	this.isStopped = true;
 	this.isVisible = true;
 	this.isFocused = false;
-	this.playingArea = undefined;
 	this.explicitDur = undefined;
 	this.opacity = 1;	
 	this.node = node;
@@ -114,11 +112,6 @@ MediaPlayer.prototype.create = function (node) {
 		this.explicitDur = node.descriptor.explicitDur;
 	}
 	
-	// Cria as áreas
-	for (i in node.area) {
-		this.area[node.area[i].id] = node.area[i];
-		this.area[node.area[i].id].started = false;
-	}
 	// Verifica o tipo da mídia
 	if (node.type) {
 		this.type = node.type;
@@ -186,11 +179,8 @@ MediaPlayer.prototype.create = function (node) {
 								getProperty: $.proxy(this.getProperty,this),
 								setProperty: $.proxy(this.setProperty,this),
                                 postEvent: this.presentation.postEvent,
-
-                                
-                              media:{
-                                areas: this.area  
-                              }
+								
+								area: node.area
 
                         }
                        
@@ -216,54 +206,7 @@ MediaPlayer.prototype.create = function (node) {
 		
 		$(this.htmlPlayerBkg).css("display","none");
                 
-                //presetup (construtor)
 		this.load(node.src);
-                //possetup( needed ?? )
-                
-                //if player supports area
-                if(this.player.exec)
-                {
-					
-					//onEnd trigger
-					this.player.exec('end',$.proxy(function() {
-					
-						if (!this.playingArea) {
-							this.stop();
-						} else {
-							$(this.htmlPlayer).trigger('presentation.onEnd');
-							this.playingArea = undefined;
-						}
-
-						var i;
-						var d = this.player.getDuration();
-						for (i in this.area) {
-							if (this.area[i].started) {
-								this.area[i].started = false;
-								$(this.htmlPlayer).trigger('stop',[i]);
-							} else {
-								$(this.htmlPlayer).trigger('presentation.onEnd',[i]);
-							}
-						}
-						
-						//the stop action is going to be dealed by the area event listener
-                },this));
-					
-                    for (i in this.area) {
-
-						eval("this.player.exec(this.area[i].endTime,$.proxy(function() {"+
-							"this.stopArea('" + i + "');"+
-						"},this));");
-
-						eval("this.player.exec(this.area[i].beginTime,$.proxy(function() {"+
-							"$(this.htmlPlayer).trigger('presentation.onBegin',[this.area['"+i+"'].id]);"+
-						"},this));");
-						
-						// TODO: area definida por frames ao invés de tempo
-						
-					}
-				} else {
-						Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['exec']);
-				}
 	
 	// ---- REFER ----
 	}
@@ -393,7 +336,19 @@ MediaPlayer.prototype.create = function (node) {
 	
 	}
 	/* ----------------------------------------------- */
-		
+	
+	// when the media ends, MediaPlayer.stop() needs to be called
+	if (this.player.exec) {
+		this.player.exec('end',$.proxy(function() {
+			if (!this.playingArea) {
+				this.stop();
+			} else {
+				$(this.htmlPlayer).trigger('presentation.onEnd');
+				this.playingArea = undefined;
+			}
+		},this));
+	}
+	
 	// Bind events
 	this.bindEvents();
 	// Saves the media player using jQuery data function
@@ -634,41 +589,9 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 		}
 	}
 	// --- quick fix ends here
-	
-	// if the media was already playing an area, it should be set to stopped
-	if (this.isPlaying && this.playingArea) {
-		this.area[this.playingArea].started = false;
-	}
-	
-	if (nodeInterface) {
-		if (this.area[nodeInterface]._type=="area") {
-			this.area[nodeInterface].started = true;
-			this.playingArea = nodeInterface;
-			var t = this.area[nodeInterface].beginTime;
-			if (t != 'begin' && !(t > this.player.getDuration()))
-				this.seekAndPlay(t);
-			else {
-				if (t != 'begin') {
-					Logger.warning(Logger.WARN_INVALID_AREA,'area',['begin','end']);
-				}
-				if (this.isPlaying) {
-					this.seek(0);
-				} else if (this.player.start)
-					this.player.start();
-				else
-					Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['start',nodeInterface]);
-			}
-		} else {
-			// TODO
-		}
-	} else {
-		this.playingArea = undefined;
-		if (this.isPlaying) {
-			this.seek(0);
-		} else if (this.player.start)
-			this.player.start();
-		else
-			Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['start',nodeInterface]);
+
+	if (this.player.start) {
+		this.player.start(nodeInterface);
 	}
 	
 	if (this.isStopped) {
@@ -680,11 +603,11 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 		this.isStopped = false;
 		this.show();
 	}
-			
-		//notify parentContext of its action
-		this.parentContext.nAction(this,Player.action.START);			
-		$(this.htmlPlayer).trigger("presentation.onBegin",[nodeInterface]);
-		this.parentContext.nAction(undefined,-1	);
+
+	//notify parentContext of its action
+	this.parentContext.nAction(this,Player.action.START);			
+	$(this.htmlPlayer).trigger("presentation.onBegin",[nodeInterface]);
+	this.parentContext.nAction(undefined,-1	);
 	
 };
 
@@ -700,7 +623,6 @@ MediaPlayer.prototype.stop = function (nodeInterface) {
 		this.isStopped = true;
 		this.hide();
 
-                
 		if(this.player.stop)
 			this.player.stop();
 		else
@@ -708,7 +630,6 @@ MediaPlayer.prototype.stop = function (nodeInterface) {
 
 		//notify parentContext of its action
 		this.parentContext.nAction(this,Player.action.STOP);
-
 		$(this.htmlPlayer).trigger("presentation.onEnd",[nodeInterface]);
 		this.parentContext.nAction(undefined,-1);
 	}
@@ -719,6 +640,8 @@ MediaPlayer.prototype.pause = function (nodeInterface) {
 	if (this.isPlaying) {
 		this.isPlaying = false;
 		this.isStopped = false;
+		
+		this.presentation.inputManager.disableKeys(this.htmlPlayer);
 		
 		if(this.player.pause)
 			this.player.pause()
@@ -737,11 +660,13 @@ MediaPlayer.prototype.resume = function (nodeInterface) {
 	if (!this.isStopped && !this.isPlaying) {
 		this.isPlaying = true;
 		this.isStopped = false;
+
+		this.presentation.inputManager.enableKeys(this.htmlPlayer);
 		
-                if(this.player.resume)
-                    this.player.resume();
-                else
-                    Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['resume',nodeInterface]);
+		if(this.player.resume)
+			this.player.resume();
+		else
+			Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['resume',nodeInterface]);
                 
 		//notify parentContext of its action
 		this.parentContext.nAction(this,Player.action.RESUME);				
@@ -753,18 +678,20 @@ MediaPlayer.prototype.resume = function (nodeInterface) {
 // abort
 MediaPlayer.prototype.abort = function (nodeInterface) {
 	if (!this.isStopped) {
+		this.presentation.inputManager.disableKeys(this.htmlPlayer);
 		if(this.node.descriptor){
 			this.presentation.inputManager.removeMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
 		}
+		
 		this.isPlaying = false;
 		this.isStopped = true;
 		this.hide();
-		
-                if(this.player.abort)
-                    this.player.abort();
-                else
-                    Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['abort',nodeInterface]);
-                        
+
+		if(this.player.abort)
+			this.player.abort();
+		else
+			Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['abort',nodeInterface]);
+				
 		//notify parentContext of its action
 		this.parentContext.nAction(this,Player.action.ABORT);                
 		$(this.htmlPlayer).trigger("presentation.onAbort",[nodeInterface]);
@@ -774,11 +701,10 @@ MediaPlayer.prototype.abort = function (nodeInterface) {
 
 // seek
 MediaPlayer.prototype.seek = function (newTime) {
-        if(this.player.seek)
-            this.player.seek(newTime);
-        else
-            Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['seek',newTime]);
-                
+	if(this.player.seek)
+		this.player.seek(newTime);
+	else
+		Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['seek',newTime]);
 };
 
 // seekAndPlay
@@ -788,13 +714,3 @@ MediaPlayer.prototype.seekAndPlay = function (newTime) {
 	else
 		Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['seekAndPlay',newTime]);	
 };
-
-// stopArea
-MediaPlayer.prototype.stopArea = function (nodeInterface) {
-	if (this.area[nodeInterface].started) {
-		this.area[nodeInterface].started = false;
-		$(this.htmlPlayer).trigger('stop',[nodeInterface]);
-	} else {
-		$(this.htmlPlayer).trigger('presentation.onEnd',[nodeInterface]);
-	}
-}
