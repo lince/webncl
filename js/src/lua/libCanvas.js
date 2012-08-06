@@ -54,6 +54,7 @@ libCanvas.prototype.newCanvas = function(width, height) {
 }
 
 libCanvas.prototype.newImage = function(caminho) {
+	console.log("newImage");
 	newObject = new libCanvas(this.ctx);
 	
 	var img = new Image();
@@ -367,6 +368,9 @@ libCanvas.prototype.drawRect = function(mode, x1, y1, x2, y2) {
 
 libCanvas.prototype.attrText = function(face, size, style) {
 	console.log("attrText");
+	
+	if(style === undefined)
+		style = "none";
 
 	this.ctx.font = size + " " + face + " " + style;
 }
@@ -384,12 +388,13 @@ libCanvas.prototype.drawText = function(x, y, text) {
 	this.initX = this.x + x;
 	this.initY = this.y + y + height;
 
-	if (this.initX + width > this.x + this.sizeX || this.initY + height > this.y + this.sizeY)
+	/*if (this.initX + width > this.x + this.sizeX || this.initY + height > this.y + this.sizeY)
 		console.log("Text exceeds the dimentions limited by canvas");
 	else {
 		this.ctx.fillText(text, this.initX, this.initY);
 		console.log("final attrText");
-	}
+	}*/
+	this.ctx.fillText(text, this.initX, this.initY);
 
 }
 
