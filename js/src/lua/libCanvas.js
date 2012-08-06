@@ -53,17 +53,19 @@ libCanvas.prototype.newCanvas = function(width, height) {
 
 }
 
+//TODO use function onload to first load the image then execute de code
 libCanvas.prototype.newImage = function(caminho) {
 	console.log("newImage");
-	newObject = new libCanvas(this.ctx);
-	
+
 	var img = new Image();
 	img.src = caminho;
+
+	newObject = new libCanvas(this.ctx);
 	newObject.setData(0, 0, img.width, img.height);
 	newObject.image_path(caminho, 0, 0, img.width, img.height);
 	
 	return newObject;
-	
+
 }
 
 libCanvas.prototype.image_path = function(caminho, x, y, w, h) {
@@ -109,8 +111,8 @@ libCanvas.prototype.setData = function(x1, y1, x2, y2) {
 		console.log("height exceeds limit permissed");
 	}
 
-	this.ctx.width = this.endW;
-	this.ctx.height = this.endH;
+	this.ctx.canvas.width = this.endW;
+	this.ctx.canvas.height = this.endH;
 
 }
 
@@ -319,12 +321,11 @@ libCanvas.prototype.drawLine = function(x1, y1, x2, y2) {
 
 	if (this.ultimo)
 		this.ctx.globalCompostion = this.compositeTypes[0];
-		
-	else
+	
+else
 		this.ctx.globalCompostion = this.compositeTypes[4];
-		
-		
-		verifica = this.iniVerifClip(x1, y1, x2, y2);
+
+	verifica = this.iniVerifClip(x1, y1, x2, y2);
 
 	if (verifica) {
 		this.ctx.beginPath();
@@ -342,11 +343,11 @@ libCanvas.prototype.drawLine = function(x1, y1, x2, y2) {
 
 libCanvas.prototype.drawRect = function(mode, x1, y1, x2, y2) {
 	console.log("drawRect");
-	
+
 	if (this.ultimo)
 		this.ctx.globalCompostion = this.compositeTypes[0];
-		
-	else
+	
+else
 		this.ctx.globalCompostion = this.compositeTypes[4];
 
 	var verifica = this.iniVerifClip2(x1, y1, x2, y2);
@@ -368,8 +369,8 @@ libCanvas.prototype.drawRect = function(mode, x1, y1, x2, y2) {
 
 libCanvas.prototype.attrText = function(face, size, style) {
 	console.log("attrText");
-	
-	if(style === undefined)
+
+	if (style === undefined)
 		style = "none";
 
 	this.ctx.font = size + " " + face + " " + style;
@@ -389,11 +390,11 @@ libCanvas.prototype.drawText = function(x, y, text) {
 	this.initY = this.y + y + height;
 
 	/*if (this.initX + width > this.x + this.sizeX || this.initY + height > this.y + this.sizeY)
-		console.log("Text exceeds the dimentions limited by canvas");
-	else {
-		this.ctx.fillText(text, this.initX, this.initY);
-		console.log("final attrText");
-	}*/
+	 console.log("Text exceeds the dimentions limited by canvas");
+	 else {
+	 this.ctx.fillText(text, this.initX, this.initY);
+	 console.log("final attrText");
+	 }*/
 	this.ctx.fillText(text, this.initX, this.initY);
 
 }
@@ -453,5 +454,4 @@ libCanvas.prototype.flush = function() {
 	ctx.restore();
 
 }
-
 

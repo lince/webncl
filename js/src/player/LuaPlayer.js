@@ -227,13 +227,13 @@ LuaPlayer.prototype.bindlibs = function() {
 
 			if (attr1 === undefined) {
 				url = attr0;
+				objCanvas = canvas_objects[self.str['id']];
 				newObject = objCanvas.newImage(url);
 				var newLuaObjet = $.extend({}, self);
+				console.log(newLuaObjet);
 
 				this.variable.id = this.variable.id + 1;
-				console.log('new sendo chamado - ', this.variable.id);
 				newLuaObjet.str['id'] = this.variable.id;
-				console.log('new sendo chamado - ', this.variable.id);
 				canvas_objects[this.variable.id] = newObject;
 				return [newLuaObjet];
 
@@ -247,9 +247,7 @@ LuaPlayer.prototype.bindlibs = function() {
 				var newLuaObjet = $.extend({}, self);
 
 				this.variable.id = this.variable.id + 1;
-				console.log('new sendo chamado - ', this.variable.id);
 				newLuaObjet.str['id'] = this.variable.id;
-				console.log('new sendo chamado - ', this.variable.id);
 				canvas_objects[this.variable.id] = newObject;
 				return [newLuaObjet];
 			}
