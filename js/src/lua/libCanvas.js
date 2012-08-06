@@ -2,7 +2,11 @@ function libCanvas(ctx) {
 
 	//context
 	this.ctx = ctx;
-
+	
+	this.width = ctx.canvas.width;
+	this.height = ctx.canvas.height;
+	
+	
 	//variables for attrClip
 	this.x = 0;
 	this.y = 0;
@@ -23,7 +27,7 @@ function libCanvas(ctx) {
 	this.widthEnd = ctx.canvas.width;
 	this.heightEnd = ctx.canvas.height;
 
-	this.ultimo = true;
+	
 	this.compositeTypes = ['source-over', 'source-in', 'source-out', 'source-atop', 'destination-over', 'destination-in', 'destination-out', 'destination-atop', 'lighter', 'darker', 'copy', 'xor'];
 
 	console.log("libCanvas");
@@ -35,20 +39,16 @@ libCanvas.prototype.attrSize = function() {
 
 	var canvas = document.getElementById(ctx.canvas.id);
 
-	w = this.ctx.canvas.width;
-	h = this.ctx.canvas.height;
-
-	return [w, h];
+	return [this.width, this.height];
 
 }
 
 libCanvas.prototype.newCanvas = function(width, height) {
+
 	newObject = new libCanvas(this.ctx);
-
-	this.ultimo = false;
-
-	newObject.setData(0, 0, width, height);
-
+	
+	newObject.setData(width, height);
+	
 	return newObject;
 
 }
@@ -56,12 +56,11 @@ libCanvas.prototype.newCanvas = function(width, height) {
 //TODO use function onload to first load the image then execute de code
 libCanvas.prototype.newImage = function(caminho) {
 	console.log("newImage");
-
+	
 	var img = new Image();
 	img.src = caminho;
-
-	newObject = new libCanvas(this.ctx);
-	newObject.setData(0, 0, img.width, img.height);
+	newObject = new libCanvas(this.ctx);	
+	newObject.setData(img.width, img.height);
 	newObject.image_path(caminho, 0, 0, img.width, img.height);
 	
 	return newObject;
@@ -85,35 +84,11 @@ libCanvas.prototype.image_path = function(caminho, x, y, w, h) {
 
 }
 
-libCanvas.prototype.setData = function(x1, y1, x2, y2) {
-
-	this.initW = this.w + x1;
-	this.initH = this.h + y1;
-	this.endW = x2;
-	this.endH = y2;
-
-	if (this.initW + this.endW > this.w + this.sizeW) {
-		sub = (this.initW + this.endW) - (this.w + this.sizeW);
-		this.endW = this.endW - sub;
-	}
-
-	if (this.initH + this.endH > this.h + this.sizeH) {
-		sub = (this.initH + this.endH) - (this.h + this.sizeH);
-		this.endH = this.endH - sub;
-	}
-
-	if (this.initW >= this.sizeW + this.w) {
-		this.initW = this.w;
-		console.log("width exceeds limit permissed");
-	}
-	if (this.initH >= this.sizeH + this.h) {
-		this.initH = this.h;
-		console.log("height exceeds limit permissed");
-	}
-
-	this.ctx.canvas.width = this.endW;
-	this.ctx.canvas.height = this.endH;
-
+libCanvas.prototype.setData = function(x, y) {
+		
+	this.width = x;
+	this.height = y;
+	
 }
 
 libCanvas.prototype.attrColor = function(r, g, b, a) {

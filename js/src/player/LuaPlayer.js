@@ -191,6 +191,7 @@ LuaPlayer.prototype.createCanvasObject = function() {
 
 }
 
+//TODO fix the bug attrSize
 LuaPlayer.prototype.bindlibs = function() {
 
 	canvas_objects = this.canvas_objects;
@@ -227,12 +228,13 @@ LuaPlayer.prototype.bindlibs = function() {
 
 			if (attr1 === undefined) {
 				url = attr0;
+				
 				objCanvas = canvas_objects[self.str['id']];
 				newObject = objCanvas.newImage(url);
-				var newLuaObjet = $.extend({}, self);
-				console.log(newLuaObjet);
-
 				this.variable.id = this.variable.id + 1;
+				var newLuaObjet = $.extend({}, self);
+
+								
 				newLuaObjet.str['id'] = this.variable.id;
 				canvas_objects[this.variable.id] = newObject;
 				return [newLuaObjet];
@@ -243,10 +245,10 @@ LuaPlayer.prototype.bindlibs = function() {
 
 				objCanvas = canvas_objects[self.str['id']];
 				newObject = objCanvas.newCanvas(w, h);
-
+				this.variable.id = this.variable.id + 1;
 				var newLuaObjet = $.extend({}, self);
 
-				this.variable.id = this.variable.id + 1;
+				
 				newLuaObjet.str['id'] = this.variable.id;
 				canvas_objects[this.variable.id] = newObject;
 				return [newLuaObjet];
@@ -259,7 +261,7 @@ LuaPlayer.prototype.bindlibs = function() {
 			return objCanvas.attrSize();
 
 		};
-
+		
 		luaObject.str['attrColor'] = function(self, r, g, b, a) {
 			objCanvas = canvas_objects[self.str['id']];
 			objCanvas.attrColor(r, g, b, a);
