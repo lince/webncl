@@ -80,4 +80,33 @@ Parser.prototype.parseArea = function (obj,tag,parent,tree) {
 	if (obj.last!=null && !patt.test(obj.last)) {
 		Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["last",obj.last,values]);
 	}
+	
+	// coords
+	
+	values = ["(valor,valor,valor,valor)"];
+	patt1 = /^\d+\s*(px)?$/;
+	patt2 = /^(\.\d+|(\d|\d\d)(\.\d+)?|100(\.0+)?)%$/;
+	if (obj.coords) {
+		var coords = obj.coords.split(',');
+		var valid = true;
+		if (coords.length == 4) {
+			for (i in coords) {
+				coords[i] = $.trim(coords[i]);
+				if (patt1.test(coords[i])) {
+					coords[i] = $.trim(coords[i].split('px')[0]);
+				} else if (!patt2.test(coords[i])) {
+					valid = false;
+				}
+			}
+		} else {
+			valid = false;
+		}
+		if (valid) {
+			obj.coords = coords.join(',');
+		} else {
+			obj._ignore = true;
+			Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["coords",obj.coords,values]);
+		}
+	}
+	
 };
