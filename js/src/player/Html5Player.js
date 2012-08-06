@@ -186,7 +186,7 @@ Html5Player.prototype.stopArea = function (nodeInterface) {
 
 /**
  * Called when the player needs to unload its sources
- * (Precedes calls to unload, excepting the first call)
+ * (Precedes calls to load, excepting the first call)
  */
 Html5Player.prototype.unload = function()
 {
