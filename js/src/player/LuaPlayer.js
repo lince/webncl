@@ -220,13 +220,9 @@ LuaPlayer.prototype.bindlibs = function() {
 		var luaObject = lua_newtable();
 		luaObject.str['id'] = this.variable.id;
 
-		var worker = new Worker('js/src/player/doWork.js');
+		
 
 		luaObject.str['new'] = $.proxy(function(self, attr0, attr1) {
-
-			worker.postMessage({
-				'operation' : 0
-			});
 
 			var url;
 			var w, h;
@@ -241,10 +237,6 @@ LuaPlayer.prototype.bindlibs = function() {
 				canvas_objects[this.variable.id] = newObject;
 				var newLuaObjet = $.extend(true, {}, self);
 				newLuaObjet.str['id'] = this.variable.id;
-
-				worker.addEventListener('message', function(e) {
-					console.log('Worker said: ', e.data);
-				}, false);
 
 				return [newLuaObjet];
 
@@ -271,8 +263,11 @@ LuaPlayer.prototype.bindlibs = function() {
 		};
 
 		luaObject.str['attrColor'] = function(self, r, g, b, a) {
+			
 			objCanvas = canvas_objects[self.str['id']];
 			objCanvas.attrColor(r, g, b, a);
+			
+			
 		};
 
 		luaObject.str['drawLine'] = function(self, x1, y1, x2, y2) {
