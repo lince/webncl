@@ -191,7 +191,6 @@ LuaPlayer.prototype.createCanvasObject = function() {
 
 }
 
-
 LuaPlayer.prototype.bindlibs = function() {
 
 	canvas_objects = this.canvas_objects;
@@ -205,7 +204,6 @@ LuaPlayer.prototype.bindlibs = function() {
 		},
 	};
 
-	//TODO fix the bug of id duplicated
 	lua_libs["libCanvas"]["init"] = $.proxy(function() {
 
 		var canvas = document.createElement("canvas");
@@ -221,27 +219,33 @@ LuaPlayer.prototype.bindlibs = function() {
 		canvas_objects[id] = object;
 		var luaObject = lua_newtable();
 		luaObject.str['id'] = this.variable.id;
-		
-		
-		
+
+		var worker = new Worker('js/src/player/doWork.js');
 
 		luaObject.str['new'] = $.proxy(function(self, attr0, attr1) {
+
+			worker.postMessage({
+				'operation' : 0
+			});
+
 			var url;
 			var w, h;
-			
+
 			if (attr1 === undefined) {
 				url = attr0;
-				
+
 				objCanvas = canvas_objects[self.str['id']];
-				
+
 				newObject = objCanvas.newImage(url);
 				this.variable.id = this.variable.id + 1;
 				canvas_objects[this.variable.id] = newObject;
-				var newLuaObjet = $.extend(true,{}, self);
+				var newLuaObjet = $.extend(true, {}, self);
 				newLuaObjet.str['id'] = this.variable.id;
-				console.log(self);
-				console.log(newLuaObjet);
-				
+
+				worker.addEventListener('message', function(e) {
+					console.log('Worker said: ', e.data);
+				}, false);
+
 				return [newLuaObjet];
 
 			} else {
@@ -251,9 +255,8 @@ LuaPlayer.prototype.bindlibs = function() {
 				objCanvas = canvas_objects[self.str['id']];
 				newObject = objCanvas.newCanvas(w, h);
 				this.variable.id = this.variable.id + 1;
-				var newLuaObjet = $.extend(true,{}, self);
+				var newLuaObjet = $.extend(true, {}, self);
 
-				
 				newLuaObjet.str['id'] = this.variable.id;
 				canvas_objects[this.variable.id] = newObject;
 				return [newLuaObjet];
@@ -266,7 +269,7 @@ LuaPlayer.prototype.bindlibs = function() {
 			return objCanvas.attrSize();
 
 		};
-		
+
 		luaObject.str['attrColor'] = function(self, r, g, b, a) {
 			objCanvas = canvas_objects[self.str['id']];
 			objCanvas.attrColor(r, g, b, a);
@@ -302,9 +305,9 @@ LuaPlayer.prototype.bindlibs = function() {
 			objCanvas.compose(ctxDestiny);
 		};
 
-		luaObject.str['attrCrop'] = function(self, ctxDestiny, x, y, w, h) {
+		luaObject.str['attrCrop'] = function(self, x, y, w, h) {
 			objCanvas = canvas_objects[self.str['id']];
-			objCanvas.attrCrop(ctxDestiny, x, y, w, h);
+			return [objCanvas.attrCrop(x, y, w, h)];
 		};
 
 		luaObject.str['attrClip'] = function(self, x, y, w, h) {
@@ -352,7 +355,6 @@ LuaPlayer.prototype.bindlibs = function() {
 }
 //
 
-//TODO call all the handlers registered in their correct positions
 LuaPlayer.prototype.callHandlers = function(evt) {
 	for ( i = 0; i < this.events.handlers.length; i++) {
 		if (this.events.handlers[i] === undefined) {

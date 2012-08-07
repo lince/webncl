@@ -1,8 +1,4 @@
-local dx,dy = canvas:attrSize()
-print (dx)
-print (dy)
-c = canvas:new("images/blender.png")
+-- RUNNER: guarda a imagem, posicao inicial e dimensoes
+local img = canvas:new('images/blender.png')
 
-local dx,dy = c:attrSize()
-print (dx)
-print (dy)
+
