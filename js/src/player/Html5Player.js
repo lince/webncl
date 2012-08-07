@@ -239,7 +239,8 @@ Html5Player.prototype.load = function(source)
 					url: source,
 					dataType: "text",
 					success: $.proxy(function (data) {
-						$(this.htmlPlayer).append(data);
+						this.textData = data;
+						this.loadTextData();
 					},this)
 				});
 			}// else {
@@ -309,25 +310,40 @@ Html5Player.prototype.start =  function (nodeInterface)
 			}
 		}
 		
+		// textual anchors
+		if (this.anchors[nodeInterface].textual && this.p.checkType(['text'])) {
+			this.textualAnchor = this.anchors[nodeInterface];
+			if (this.textData) {
+				this.loadTextData();
+			}
+		}
+		
 		// spatial anchors
-		if (this.anchors[nodeInterface].spatial && !this.anchors[nodeInterface]._ignore) {
+		if (this.anchors[nodeInterface].spatial && !this.anchors[nodeInterface]._ignore && this.p.checkType(['image'])) {
 			var clip = 'rect(' +
 				eval(this.anchors[nodeInterface].calculatedCoords[1]) + 'px,' +
 				eval(this.anchors[nodeInterface].calculatedCoords[2]) + 'px,' +
 				eval(this.anchors[nodeInterface].calculatedCoords[3]) + 'px,' +
 				eval(this.anchors[nodeInterface].calculatedCoords[0]) + 'px)';
 			$(this.htmlPlayer).css('clip',clip);
-		} else {
-			$(this.htmlPlayer).css('clip','auto');
 		}
 		
 	} else {
+		// no anchor defined
 		this.playingArea = undefined;
-		$(this.htmlPlayer).css('clip','auto');
 		if (this.playing) {
 			alreadyPlaying = true;
-			return;
 		}
+	}
+	
+	// restores full text if no textual anchor defined
+	if ((!nodeInterface || !this.anchors[nodeInterface].textual) && this.p.checkType(['text'])) {
+		this.textualAnchor = undefined;
+	}
+	
+	// restores full image if no spatial anchor defined
+	if ((!nodeInterface || !this.anchors[nodeInterface].spatial) && this.p.checkType(['image'])) {
+		$(this.htmlPlayer).css('clip','auto');
 	}
 	
 	/*****************/
@@ -537,4 +553,40 @@ Html5Player.prototype.getDuration = function() {
 		return Math.min(this.duration,this.popcornPlayer.duration());
 	else
 		return this.duration || this.popcornPlayer.duration();
+}
+
+/**
+ * loadTextData
+ */
+Html5Player.prototype.loadTextData = function() {
+	var beginText = this.textualAnchor.beginText || '';
+	var endText = this.textualAnchor.endText || '';
+	var beginPosition = this.textualAnchor.beginPosition || 1;
+	var endPosition = this.textualAnchor.endPosition || 1;
+	var data = this.textData;
+
+	if (beginText) {
+		var bdata = data;
+		data = data.split(beginText);
+		if (data.length > beginPosition) {
+			data = beginText + data.slice(beginPosition).join(beginText);
+		} else {
+			data = bdata;
+			Logger.warning(Logger.WARN_INVALID_AREA,'area',['beginText','beginPosition']);
+		}
+	}
+	
+	if (endText) {
+		var edata = data;
+		data = data.split(endText);
+		endPosition -= this.textData.split(endText).length - data.length;
+		if (data.length > endPosition && endPosition > 0) {
+			data = data.slice(0,endPosition).join(endText) + endText;
+		} else {
+			data = edata;
+			Logger.warning(Logger.WARN_INVALID_AREA,'area',['endText','endPosition']);
+		}
+	}
+	
+	$(this.htmlPlayer).append(data);
 }

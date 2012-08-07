@@ -95,7 +95,7 @@ MediaPlayer.prototype.checkType = function (typeList) {
 
 // createElement
 // (used by user defined players to create their own html)
-MediaPlayer.prototype.createElement =  function(htmlText)
+MediaPlayer.prototype.createElement = function(htmlText)
 {
     $(this.htmlPlayerBkg).append(htmlText);
 }
@@ -235,7 +235,6 @@ MediaPlayer.prototype.create = function (node) {
 		}
 	}
 	
-	
 	/* --- Property tags (under <media>) treatment --- */
 
 	var boundsProperties = [];
@@ -359,14 +358,11 @@ MediaPlayer.prototype.load = function (source) {
 
 	// Recalculates the url based on presentation path
 	source = this.presentation.path + source;
-	// TODO: Needs to deal with other types (create a new media player)
 
 	this.player.unload(source);
 	this.player.load(source);
 
 };
-
-
 
 // focus
 MediaPlayer.prototype.focus = function () {

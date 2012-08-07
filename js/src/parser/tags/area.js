@@ -70,7 +70,7 @@ Parser.prototype.parseArea = function (obj,tag,parent,tree) {
 		obj.endTime = 'end';
 	}
 	
-	// first, last
+	// first, last, beginPosition, endPosition
 	
 	values = ["(número inteiro)"];
 	patt = /^\d+$/;
@@ -79,6 +79,12 @@ Parser.prototype.parseArea = function (obj,tag,parent,tree) {
 	}
 	if (obj.last!=null && !patt.test(obj.last)) {
 		Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["last",obj.last,values]);
+	}
+	if (obj.beginPosition!=null && !patt.test(obj.beginPosition)) {
+		Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["beginPosition",obj.beginPosition,values]);
+	}
+	if (obj.endPosition!=null && !patt.test(obj.endPosition)) {
+		Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["endPosition",obj.endPosition,values]);
 	}
 	
 	// coords

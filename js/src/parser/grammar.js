@@ -29,7 +29,7 @@ Parser.nclStructureMap = {
 		attrs: {
 			reference_target: ["id"],
 			required: ["id"],
-			optional: ["coords","begin","end","text","position","first","last","label"]
+			optional: ["coords","begin","end","beginText","endText","beginPosition","endPosition","first","last","label","clip"]
 		},
 		content: {}
 	},
