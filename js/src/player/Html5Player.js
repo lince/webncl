@@ -143,6 +143,24 @@ function Html5Player(p) {
 			"},this));");
 		}
 		
+		// spatial anchors
+		if (this.anchors[id].spatial && !this.anchors[id]._ignore) {
+			var coords = this.anchors[id].coords.split(',');
+			// makes it ready to evaluate when the media starts, because
+			// width and height are still undefined here
+			for (i in coords) {
+				var coord = coords[i].split('%');
+				if (coord.length > 1) {
+					coords[i] = 'Math.round(parseInt($(this.htmlPlayer).css("' + (i%2?'height':'width') + '").split("px")[0]) * ' + parseFloat(coord[0])/100 + ')';
+				}
+			}
+			this.anchors[id].calculatedCoords = coords;
+			// 'coords' is only supported by images
+			if (!this.p.checkType(['image'])) {
+				Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,'area',['coords',p.source.type]);
+			}
+		}
+		
 	}
 	
 	// When the media ends, we need to set every area to stopped
@@ -168,7 +186,7 @@ Html5Player.prototype.stopArea = function (nodeInterface) {
 
 /**
  * Called when the player needs to unload its sources
- * (Precedes calls to unload, excepting the first call)
+ * (Precedes calls to load, excepting the first call)
  */
 Html5Player.prototype.unload = function()
 {
@@ -263,6 +281,7 @@ Html5Player.prototype.exec = function(time,callback)
  */
 Html5Player.prototype.start =  function (nodeInterface)
 {
+	var alreadyPlaying = false;
 	
 	/***** Areas *****/
 	
@@ -271,6 +290,8 @@ Html5Player.prototype.start =  function (nodeInterface)
 	}
 	
 	if (nodeInterface) {
+	
+		// temporal anchors
 		if (this.anchors[nodeInterface].temporal) {
 			this.anchors[nodeInterface].started = true;
 			this.playingArea = nodeInterface;
@@ -283,25 +304,36 @@ Html5Player.prototype.start =  function (nodeInterface)
 				}
 				if (this.playing) {
 					this.seek(0);
-					return;
-				} else {
-					//this.start();
+					alreadyPlaying = true;
 				}
 			}
 		}
+		
+		// spatial anchors
+		if (this.anchors[nodeInterface].spatial && !this.anchors[nodeInterface]._ignore) {
+			var clip = 'rect(' +
+				eval(this.anchors[nodeInterface].calculatedCoords[1]) + 'px,' +
+				eval(this.anchors[nodeInterface].calculatedCoords[2]) + 'px,' +
+				eval(this.anchors[nodeInterface].calculatedCoords[3]) + 'px,' +
+				eval(this.anchors[nodeInterface].calculatedCoords[0]) + 'px)';
+			$(this.htmlPlayer).css('clip',clip);
+		} else {
+			$(this.htmlPlayer).css('clip','auto');
+		}
+		
 	} else {
 		this.playingArea = undefined;
+		$(this.htmlPlayer).css('clip','auto');
 		if (this.playing) {
-			this.seek(0);
+			alreadyPlaying = true;
 			return;
-		} else {
-			//this.start();
 		}
 	}
 	
 	/*****************/
 	
-   if (this.popcornPlayer) {
+	// if it wasn't playing yet, do it
+   if (!alreadyPlaying && this.popcornPlayer) {
 		this.popcornPlayer.play();
 		if (this.durationBind && !this.durationBinded && this.p.checkType(['image','text'])) {
 			// Bind the explicitDur callback again
@@ -323,6 +355,7 @@ Html5Player.prototype.stop = function()
 	if (this.p.checkType(['image','text'])) {
 		this.durationBinded = false;
 	}
+	$(this.htmlPlayer).css('clip','auto');
 };
 
 /**
