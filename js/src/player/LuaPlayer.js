@@ -191,7 +191,7 @@ LuaPlayer.prototype.createCanvasObject = function() {
 
 }
 
-//TODO fix the bug attrSize
+
 LuaPlayer.prototype.bindlibs = function() {
 
 	canvas_objects = this.canvas_objects;
@@ -205,11 +205,11 @@ LuaPlayer.prototype.bindlibs = function() {
 		},
 	};
 
+	//TODO fix the bug of id duplicated
 	lua_libs["libCanvas"]["init"] = $.proxy(function() {
 
 		var canvas = document.createElement("canvas");
 		canvas.id = "mycanvas_" + this.variable.id;
-		console.log(canvas.id);
 		canvas.width = 500;
 		canvas.height = 500;
 
@@ -221,22 +221,27 @@ LuaPlayer.prototype.bindlibs = function() {
 		canvas_objects[id] = object;
 		var luaObject = lua_newtable();
 		luaObject.str['id'] = this.variable.id;
+		
+		
+		
 
 		luaObject.str['new'] = $.proxy(function(self, attr0, attr1) {
 			var url;
 			var w, h;
-
+			
 			if (attr1 === undefined) {
 				url = attr0;
 				
 				objCanvas = canvas_objects[self.str['id']];
+				
 				newObject = objCanvas.newImage(url);
 				this.variable.id = this.variable.id + 1;
-				var newLuaObjet = $.extend({}, self);
-
-								
-				newLuaObjet.str['id'] = this.variable.id;
 				canvas_objects[this.variable.id] = newObject;
+				var newLuaObjet = $.extend(true,{}, self);
+				newLuaObjet.str['id'] = this.variable.id;
+				console.log(self);
+				console.log(newLuaObjet);
+				
 				return [newLuaObjet];
 
 			} else {
@@ -246,7 +251,7 @@ LuaPlayer.prototype.bindlibs = function() {
 				objCanvas = canvas_objects[self.str['id']];
 				newObject = objCanvas.newCanvas(w, h);
 				this.variable.id = this.variable.id + 1;
-				var newLuaObjet = $.extend({}, self);
+				var newLuaObjet = $.extend(true,{}, self);
 
 				
 				newLuaObjet.str['id'] = this.variable.id;
