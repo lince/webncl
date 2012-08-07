@@ -295,13 +295,15 @@ LuaPlayer.prototype.bindlibs = function() {
 			objCanvas.attrText(face, size, style);
 		};
 
-		luaObject.str['compose'] = function(self, ctxDestiny) {
+		luaObject.str['compose'] = function(self, x, y, img) {
 			objCanvas = canvas_objects[self.str['id']];
-			objCanvas.compose(ctxDestiny);
+			objCanvas.compose(x,y, img);
 		};
 
 		luaObject.str['attrCrop'] = function(self, x, y, w, h) {
 			objCanvas = canvas_objects[self.str['id']];
+			console.log(x,y,w,h);
+s
 			return [objCanvas.attrCrop(x, y, w, h)];
 		};
 

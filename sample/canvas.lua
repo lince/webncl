@@ -1,6 +1,10 @@
--- RUNNER: guarda a imagem, posicao inicial e dimensoes
-local img = canvas:new('images/blender.png')
+local x = 0
+local END = 50
 
-canvas:attrColor(255,0,0,1);
+canvas:attrColor('red')
 
-
+while x < END do
+	canvas:drawRect('fill',x,x,4,4)
+	x = x+ 5
+	
+end

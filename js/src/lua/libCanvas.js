@@ -58,13 +58,9 @@ libCanvas.prototype.attrCrop = function(x, y, w, h) {
 
 	canvasData = this.ctx.getImageData(x, y, w, h);
 	
-	this.ctxDestiny.getImageData(x,y,w,h);
+	this.ctx.clearRect(x,y,w,h);
 	
-	ctxDestiny = newCanvas(w,h);
-
-	ctxDestiny.putImageData(canvasData, 0, 0);
-	
-	return ctxDestiny;
+	return canvasData;
 }
 
 //TODO use function onload to first load the image then execute de code
@@ -416,12 +412,10 @@ libCanvas.prototype.image_path = function(caminho, x, y, w, h) {
 }
 
 
-libCanvas.prototype.compose = function(ctxDestino) {
+libCanvas.prototype.compose = function(x,y, img) {
 	console.log("compose");
 
-	canvasData = this.ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
-
-	ctxDestino.putImageData(canvasData, 0, 0);
+	this.ctx.putImageData(img, x, y);
 }
 
 libCanvas.prototype.save = function() {
