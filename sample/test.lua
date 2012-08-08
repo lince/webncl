@@ -1,20 +1,13 @@
---print (1+3);
-ketEvent = { class='key', type='press', key='BLUE' };
-event.post(ketEvent);
-persistent.set('teste', 'teste', 5);
-a = persistent.get('teste.teste');
-print (a);
+valor = 0
 
 function handler (evt)
-	print('handler in lua called');
-	if evt.class == 'ncl' then
-		if evt.type == 'presentation' then
-			if evt.action == 'start' then
-				print ('will post a event');
-				event.post {class='ncl', type='presentation', action='stop'};
-			end
-		end
+	if evt.class == 'user' then
+		print (evt.v)
+		valor = valor + 1
+		event.post({class = 'user', v = valor} )
+		print ('after post')
 	end
 end
 
 event.register(handler)
+event.post({class = 'user', v = valor} )

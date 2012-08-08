@@ -115,6 +115,7 @@ MediaPlayer.prototype.create = function (node) {
 	if (node.type) {
 		this.type = node.type;
 	} else {
+		console.log(node.src)
 		var buffer = node.src.split(".");
 		this.type = this.mediaTypes[buffer[buffer.length-1]];
 	}

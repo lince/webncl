@@ -38,11 +38,24 @@ function LuaPlayer(p) {
 	this.luajscode = undefined;
 	this.persitent = new libPersistent(false);
 	this.canvas_objects = [];
-	this.events = new libEvents(p);
+	this.events = new libEvents(this);
 	this.id = 0;
 	p.createElement("<div class='player' id='" + p.id + "'></div>");
-
+	
+	
+	this.p.onChangeProperty = {};
+	this.p.onChangeProperty.defaultAction = Player.propertyAction.OVERRIDE;
+  	this.p.onChangeProperty.propertyMap = {}
+  	this.p.onChangeProperty.propertyMap['width'] = Player.propertyAction.IGNORE;
+  	this.p.onChangeProperty.propertyMap['height'] = Player.propertyAction.IGNORE;
+  	this.p.onChangeProperty.propertyMap['left'] = Player.propertyAction.IGNORE;
+  	this.p.onChangeProperty.propertyMap['top'] = Player.propertyAction.IGNORE;
 	console.log(p.id);
+	
+	$('#myPlayer3').on("user", $.proxy(function(evt) {
+		this.callHandlers(evt.luaevent);
+	},this));
+
 
 };
 
@@ -181,7 +194,7 @@ LuaPlayer.prototype.setProperty = function(name, value) {
 		evt.str['class'] = 'ncl';
 		evt.str['type'] = 'attribution';
 		evt.str['action'] = 'start';
-		evt.str['property'] = name;
+		evt.str['name'] = name;
 		evt.str['value'] = value;
 		this.callHandlers(evt);
 	}
@@ -303,7 +316,7 @@ LuaPlayer.prototype.bindlibs = function() {
 		luaObject.str['attrCrop'] = function(self, x, y, w, h) {
 			objCanvas = canvas_objects[self.str['id']];
 			console.log(x,y,w,h);
-s
+
 			return [objCanvas.attrCrop(x, y, w, h)];
 		};
 
@@ -353,6 +366,7 @@ s
 //
 
 LuaPlayer.prototype.callHandlers = function(evt) {
+	console.log('LuaPlayer.callHandlers()');
 	for ( i = 0; i < this.events.handlers.length; i++) {
 		if (this.events.handlers[i] === undefined) {
 

@@ -1,6 +1,6 @@
 
 -- RUNNER: guarda a imagem, posicao inicial e dimensoes
-local img = canvas:new('runner.png')
+local img = canvas:new('test_lua/exemplo_04/runner.png')
 local dx, dy = img:attrSize()
 local runner = { img=img, frame=0, x=50-dx/2, y=10, dx=dx, dy=dy }
 
@@ -14,7 +14,7 @@ function redraw ()
 	--canvas:drawRect('fill', 0,0, dx,dy)
 
 	-- linha de largada e chegada
-	canvas:attrColor('white')
+	canvas:attrColor('black')
 	canvas:drawRect('fill', INI,0, 8,dy)
 	canvas:drawRect('fill', END,0, 8,dy)
 
@@ -40,7 +40,7 @@ function handler (evt)
 
 		-- caso nao tenha chegado a linha de chegada, continua dando ciclos a animacao
 		if runner.x < END then
-			event.post('in', { class='user', time=now })
+			event.post({ class='user', time=now })
 		end
 
 		-- muda o frame do corredor a cada 5 pixels

@@ -482,9 +482,9 @@ WebNclPlayer.prototype.postEvent = function (event) {
 					case 'destroy': this.destroy(); break;
 				}
 			}
-		} else if (event.type == 'attribution') {
+		} else if (event.type == 'attribution' && event.action == 'start') {
 			// attribution event
-			this.setProperty(event.component,event.property,event.value);
+			this.setProperty(event.component,event.name,event.value);
 		}
 	} else if (event['class'] == 'key') {
 		if (!event.type || event.type == 'press') {
