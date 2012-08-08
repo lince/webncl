@@ -40,6 +40,8 @@ function LuaPlayer(p) {
 	this.canvas_objects = [];
 	this.events = new libEvents(this);
 	this.id = 0;
+	this.arrayUsers = [];
+	this.isHandlingEvent = false;
 	p.createElement("<div class='player' id='" + p.id + "'></div>");
 	
 	
@@ -52,8 +54,17 @@ function LuaPlayer(p) {
   	this.p.onChangeProperty.propertyMap['top'] = Player.propertyAction.IGNORE;
 	console.log(p.id);
 	
-	$('#myPlayer3').on("user", $.proxy(function(evt) {
-		this.callHandlers(evt.luaevent);
+	$(this.htmlPlayer).on('user', $.proxy(function(evt) {
+		console.log('calling handlers');
+		this.arrayUsers.push(evt.luaevent);
+		this.callHandlers();
+		return false;
+	},this));
+	
+	$(this.htmlPlayer).on('endCallHandlers', $.proxy(function(evt) {
+		console.log('endCallHandlers',evt);
+		this.callHandlers();
+		return false;
 	},this));
 
 
@@ -365,13 +376,40 @@ LuaPlayer.prototype.bindlibs = function() {
 }
 //
 
+
 LuaPlayer.prototype.callHandlers = function(evt) {
 	console.log('LuaPlayer.callHandlers()');
-	for ( i = 0; i < this.events.handlers.length; i++) {
-		if (this.events.handlers[i] === undefined) {
+	console.log(evt);
 
-		} else
-			this.events.handlers[i](evt);
+	if (evt) {
+		this.isHandlingEvent = true;
+		for ( i = 0; i < this.events.handlers.length; i++) {
+			if (this.events.handlers[i] === undefined) {
+
+			} else {
+				this.events.handlers[i](evt);
+
+			}
+
+		}
+		this.isHandlingEvent = false;
+		
+	} else if (this.arrayUsers.length > 0) {
+		if (this.isHandlingEvent) {
+			return;
+		} else {
+			this.isHandlingEvent = true;
+			var evnt = this.arrayUsers.splice(0, 1);
+			for ( i = 0; i < this.events.handlers.length; i++) {
+				if (this.events.handlers[i] === undefined) {
+
+				} else {
+					this.events.handlers[i](evnt[0]);
+
+				}
+			}
+			this.isHandlingEvent = false;
+			$(this.htmlPlayer).trigger('endCallHandlers');
+		}
 	}
-
 }

@@ -7,6 +7,7 @@ function libEvents(luaplayer){
 	tmp = this.player.id;
 	this.nodeId = tmp.substring(tmp.indexOf('_')+1);
 	this.t = 0;
+	
 };
 
 libEvents.prototype.register = function(fct){
@@ -50,7 +51,8 @@ libEvents.prototype.post = function(evt){
 		console.log('triggering user event');
 		var e = $.Event('user');
 		e.luaevent = evt;
-		$('#myPlayer3').trigger(e);
+		$('#' + this.player.id).trigger(e);
+		
 	}
 	var d = new Date();
 	this.t = d.getTime();

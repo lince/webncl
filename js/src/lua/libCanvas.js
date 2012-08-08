@@ -53,15 +53,7 @@ libCanvas.prototype.newCanvas = function(width, height) {
 
 }
 
-libCanvas.prototype.attrCrop = function(x, y, w, h) {
-	console.log("attrCrop");
 
-	canvasData = this.ctx.getImageData(x, y, w, h);
-	
-	this.ctx.clearRect(x,y,w,h);
-	
-	return canvasData;
-}
 
 //TODO use function onload to first load the image then execute de code
 libCanvas.prototype.newImage = function(caminho) {
@@ -389,7 +381,7 @@ libCanvas.prototype.measureTextLua = function(text) {
 
 	var textWidth = this.ctx.measureText(text);
 
-	height = parseInt(this.ctx.font[0] + this.ctx.font[1]);
+	height = parseInt(this.ctx.fonsample/sample-lua.nclt[0] + this.ctx.font[1]);
 
 	return [textWidth.width, height];
 }
@@ -411,11 +403,23 @@ libCanvas.prototype.image_path = function(caminho, x, y, w, h) {
 
 }
 
+libCanvas.prototype.attrCrop = function(x, y, w, h) {
+	console.log("attrCrop");
+
+	canvasData = this.ctx.getImageData(x, y, w, h);
+	
+	this.ctx.clearRect(x,y,w,h);
+	
+	return canvasData;
+}
 
 libCanvas.prototype.compose = function(x,y, img) {
 	console.log("compose");
 
+	console.log(img);
 	this.ctx.putImageData(img, x, y);
+	
+	
 }
 
 libCanvas.prototype.save = function() {
