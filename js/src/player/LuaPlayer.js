@@ -54,19 +54,6 @@ function LuaPlayer(p) {
   	this.p.onChangeProperty.propertyMap['top'] = Player.propertyAction.IGNORE;
 	console.log(p.id);
 	
-	$(this.htmlPlayer).on('user', $.proxy(function(evt) {
-		console.log('calling handlers');
-		this.arrayUsers.push(evt.luaevent);
-		this.callHandlers();
-		return false;
-	},this));
-	
-	$(this.htmlPlayer).on('endCallHandlers', $.proxy(function(evt) {
-		console.log('endCallHandlers',evt);
-		this.callHandlers();
-		return false;
-	},this));
-
 
 };
 
@@ -124,7 +111,7 @@ LuaPlayer.prototype.start = function() {
 		evt.str['class'] = 'ncl';
 		evt.str['type'] = 'presentation';
 		evt.str['action'] = 'start';
-		this.callHandlers(evt);
+		this.eventQueue(evt);
 	}
 }
 /**
@@ -138,7 +125,7 @@ LuaPlayer.prototype.stop = function() {
 		evt.str['class'] = 'ncl';
 		evt.str['type'] = 'presentation';
 		evt.str['action'] = 'stop';
-		this.callHandlers(evt);
+		this.eventQueue(evt);
 	}
 }
 /**
@@ -152,7 +139,7 @@ LuaPlayer.prototype.pause = function() {
 		evt.str['class'] = 'ncl';
 		evt.str['type'] = 'presentation';
 		evt.str['action'] = 'pause';
-		this.callHandlers(evt);
+		this.eventQueue(evt);
 	}
 }
 /**
@@ -166,7 +153,7 @@ LuaPlayer.prototype.resume = function() {
 		evt.str['class'] = 'ncl';
 		evt.str['type'] = 'presentation';
 		evt.str['action'] = 'resume';
-		this.callHandlers(evt);
+		this.eventQueue(evt);
 	}
 }
 /**
@@ -180,7 +167,7 @@ LuaPlayer.prototype.abort = function() {
 		evt.str['class'] = 'ncl';
 		evt.str['type'] = 'presentation';
 		evt.str['action'] = 'abort';
-		this.callHandlers(evt);
+		this.eventQueue(evt);
 	}
 }
 /**
@@ -188,7 +175,7 @@ LuaPlayer.prototype.abort = function() {
  */
 LuaPlayer.prototype.seek = function(newTime) {
 	console.log('seek lua');
-	this.callHandlers();
+	this.eventQueue(evt);
 }
 /**
  * SeekAndPLay
@@ -196,6 +183,18 @@ LuaPlayer.prototype.seek = function(newTime) {
 LuaPlayer.prototype.seekAndPlay = function(newTime) {
 	console.log('seek and play lua');
 
+}
+
+LuaPlayer.prototype.receiveKey = function(value, type){
+	
+	if(this.events.handlers){
+		var evt = lua_newtable();
+		evt.str['class'] = 'key';
+		evt.str['type'] = type;
+		this.eventQueue(evt);
+		
+	}	
+	
 }
 
 LuaPlayer.prototype.setProperty = function(name, value) {
@@ -207,7 +206,7 @@ LuaPlayer.prototype.setProperty = function(name, value) {
 		evt.str['action'] = 'start';
 		evt.str['name'] = name;
 		evt.str['value'] = value;
-		this.callHandlers(evt);
+		this.eventQueue(evt);
 	}
 }
 
@@ -397,14 +396,29 @@ LuaPlayer.prototype.callHandlers = function(evt) {
 	} else if (this.arrayUsers.length > 0) {
 		if (this.isHandlingEvent) {
 			return;
-		} else {
+		} else {events
 			this.isHandlingEvent = true;
 			var evnt = this.arrayUsers.splice(0, 1);
 			for ( i = 0; i < this.events.handlers.length; i++) {
 				if (this.events.handlers[i] === undefined) {
 
 				} else {
-					this.events.handlers[i](evnt[0]);
+					
+					var obj = {
+						h: this.events.handlers,
+						i: i,
+						evnt: evnt
+						
+					};
+					
+					setTimeout($.proxy(
+						function()
+						{
+							this.h[this.i](this.evnt[0]);
+						}
+						
+					,obj ), 0);
+					
 
 				}
 			}
@@ -412,4 +426,11 @@ LuaPlayer.prototype.callHandlers = function(evt) {
 			$(this.htmlPlayer).trigger('endCallHandlers');
 		}
 	}
+}
+
+LuaPlayer.prototype.eventQueue = function(evt){
+	
+	this.arrayUsers.push(evt.luaevent);
+	this.callHandlers();
+	
 }

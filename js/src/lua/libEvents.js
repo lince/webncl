@@ -51,7 +51,7 @@ libEvents.prototype.post = function(evt){
 		console.log('triggering user event');
 		var e = $.Event('user');
 		e.luaevent = evt;
-		$('#' + this.player.id).trigger(e);
+		this.luaplayer.eventQueue(e);
 		
 	}
 	var d = new Date();
