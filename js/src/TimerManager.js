@@ -1,7 +1,7 @@
 /*
  * Lince - Laboratory for Innovation on Computing and Engineering
- * UFSCar - Universidade Federal de São Carlos
- * São Carlos - SP, Brazil
+ * UFSCar - Universidade Federal de Sao Carlos
+ * Sao Carlos - SP, Brazil
  * <http://lince.dc.ufscar.br>
  * <http://webncl.org>
  * 
@@ -19,11 +19,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Classes Timer and TimerManager are used to create "pausable timers".
+// Classes Timer and TimerManager are used to create "pausable timers"
+// that are going to be used to synchronize each context events
 // How to use:
 //    myTimers = new TimerManager();
 //    myTimers.add (timeout1, callback1)
 //    myTimers.add (timeout2, callback2);
+//    myTimers.resumeAll();		//start then for the first time
 //    myTimers.pauseAll();
 //    myTimers.resumeAll();
 //    ...
@@ -36,60 +38,65 @@ function Timer (t,callback,manager) {
 	this.startTime = null;
 	this.id = null;
 	
-	this.timeout = function() {
-		if (this.manager) this.manager.remove(this);
-		this.callback();
-	};
-	
-	this.resume = function() {
-		this.startTime = new Date();
-		this.id = setTimeout($.proxy(function() {
-			this.timeout();
-		},this),this.timeLeft);
-	};
-	
-	this.pause = function() {
-		clearTimeout(this.id);
-		this.timeLeft -= (new Date() - this.startTime);
-	};
-	
-	this.stop = function() {
-		clearTimeout(this.id);
-	};
-	
-	this.resume();
+	//this.resume();
 	
 };
+
+Timer.prototype.timeout = function() {
+	if (this.manager) this.manager.remove(this);
+	this.callback();
+};
+
+Timer.prototype.resume = function() {
+	this.startTime = new Date();
+	this.id = setTimeout($.proxy(function() {
+		this.timeout();
+	},this),this.timeLeft);
+};
+
+Timer.prototype.pause = function() {
+	clearTimeout(this.id);
+	this.timeLeft -= (new Date() - this.startTime);
+};
+
+Timer.prototype.stop = function() {
+	clearTimeout(this.id);
+};
+
+
+/**
+ * Class TimerManager
+ **/
 
 function TimerManager () {
 
 	this.timers = [];
 	
-	this.add = function(t,callback) {
-		this.timers.push(new Timer(t,callback,this));
-	};
-	
-	this.remove = function(timer) {
-		this.timers.splice(this.timers.indexOf(timer),1);
-	};
-	
-	this.pauseAll = function() {
-		for (i in this.timers) {
-			this.timers[i].pause();
-		}
-	}
+}
 
-	this.resumeAll = function() {
-		for (i in this.timers) {
-			this.timers[i].resume();
-		}
-	}
+TimerManager.prototype.add = function(t,callback) {
+	this.timers.push(new Timer(t,callback,this));
+};
 
-	this.stopAll = function() {
-		for (i in this.timers) {
-			this.timers[i].stop();
-		}
-		this.timers = [];
-	}
+TimerManager.prototype.remove = function(timer) {
+	this.timers.splice(this.timers.indexOf(timer),1);
+};
 
+TimerManager.prototype.pauseAll = function() {
+	for (i in this.timers) {
+		this.timers[i].pause();
+	}
+}
+
+TimerManager.prototype.resumeAll = function() {
+	for (i in this.timers) {
+		this.timers[i].resume();
+	}
+}
+
+TimerManager.prototype.stopAll = function() {
+	for (i in this.timers) {
+		this.timers[i].stop();
+	}
+	this.timers = [];
 }

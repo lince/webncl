@@ -44,29 +44,32 @@ function ContextPlayer (node, p) {
 	
 	//this list of paused elements is used when the context recieves a pause
 	this.pausedElemList = [];
-
 	this.playingElem = [];
 	this.pausedElem = [];
+	this.lastMediaAborted = false;
 	
 	this.isCreated = false;
-	this.htmlPlayer = "";
-	this.isPlaying = false;
-	this.isStopped = true;
-	this.wAction = 0;
+
 	
 
 	if (node.id) {
 		this.htmlPlayer = this.presentation.getDivId(node.id);
 	} else {
 		this.htmlPlayer = this.presentation.bodyDiv;
+		//else: error
 	}
+	//if(this.body)
+		$("#"+this.presentation.contextsDiv).append("<div class='context' id='"+this.htmlPlayer+"'></div>");
+	//else
+	//	$(this.parentContext.htmlPlayer).append("<div class='context' id='"+this.htmlPlayer+"'></div>");
 	
-	$("#"+this.presentation.contextsDiv).append("<div class='context' id='"+this.htmlPlayer+"'></div>");
+	this.data = $(this.htmlPlayer).data();
+	
 	this.htmlPlayer = "#" + this.htmlPlayer;
 	$(this.htmlPlayer).data("player",this);
-	$(this.htmlPlayer).data("property",[]);	
+	$(this.htmlPlayer).data("property",[]);
 	this.bindEvents();
-
+	
 }
 
 //ContextPlayer specific constants
@@ -118,13 +121,50 @@ ContextPlayer.prototype.notifyLink = function(n)
 	
 	if(this.pendingLinks == 0)
 	{
-		if(this.isPlaying || (!this.isPlaying && !this.isStopped))
+		if(this.playingElem.length === 0)
 		{
-			if(this.playingElem.length == 0 && this.pausedeElem.length == 0)
+			//no elements are paused
+			if(this.pausedElem.length === 0)
 			{
-				this.wAction  = Player.action.STOP;
-				this.nAction(undefined,-1);
+				//stop or abort
+				this.isStopped = true;
+				this.isPlaying = false;
+				this.timerManager.stopAll();
+				if(!this.lastMediaAborted)
+					this.trigger("presentation.onEnd");
+				else
+					this.trigger("presentation.onAbort");
+				
+			} else {
+				//some are paused and no is playing
+
+				//pause
+				this.isStopped = false;
+				this.isPlaying = false;
+				this.timerManager.pauseAll();
+				this.trigger("presentation.onPause");
 			}
+
+
+		}
+		//some elements are playing
+		else {
+
+			//not playing
+			if(!this.isPlaying)
+			{
+
+				this.isStopped = false;
+				this.isPlaying = true;	
+				this.timerManager.resumeAll();
+				
+				if(this.isStopped)
+					this.trigger("presentation.onBegin");
+				else //was paused
+					this.trigger("presentation.onResume");
+
+			}
+			
 		}
 	}
 }
@@ -135,111 +175,6 @@ ContextPlayer.prototype.notifyLink = function(n)
 ContextPlayer.prototype.nSync = function(e,s)
 {
 	
-}
-
-// notify Action
-// e -> element (media or context)
-// a -> action
-ContextPlayer.prototype.nAction = function(e,a)
-{
-	var ac = Player.action;
-	var b
-	switch(a)
-	{
-		case ac.START:
-		case ac.RESUME:
-			this.playingElem.push(e);
-			
-			b = $.inArray(e,this.pausedElem);
-			if(b > -1)
-				this.pausedElem.splice(b-1,1);	
-			
-			
-			
-		if(a === ac.START)
-		{
-			//This implementation is not equal to Ginga VM
-			//when the context is paused and a stopped media receives a start
-			//Ginga VM contexts doens't trigger any event
-			
-		}
-		
-
-		break;
-		
-		case ac.PAUSE:
-			this.pausedElem.push(e);
-			b = $.inArray(e,this.playingElem);
-			if(b > -1)
-				this.playingElem.splice(b-1,1);		
-			
-		break;
-
-		case ac.STOP:
-		case ac.ABORT:
-			b = $.inArray(e,this.playingElem);
-			if(b > -1)
-				this.playingElem.splice(b-1,1);
-					
-			if(this.playingElem.length == 0 && this.pausedElem.length == 0)
-			{
-				
-				var data = $(e.htmlPlayer).data();
-				if(this.pendingLinks === 0)
-					if(data['presentation.onEnd'] === undefined  && data['presentation.onAbort'] === undefined)
-					{
-						this.isPlaying = false;
-						this.isStopped = true;
-						this.parentContext.nAction(this,Player.action.STOP);
-						$(this.htmlPlayer).trigger("presentation.onEnd");
-					}
-			}
-				
-		break;
-		
-		
-		//callback called after media trigerred it's events (-1)
-		default:
-			if(this.wAction)
-			{
-				//work on action
-				switch(this.wAction)
-				{
-					case ac.PAUSE:
-						this.isPlaying = false;
-						this.isStopped = false;	
-						this.parentContext.nAction(this,Player.action.PAUSE);
-						$(this.htmlPlayer).trigger("presentation.onPause");
-						this.parentContext.nAction(undefined,-1);
-					break;
-					
-					case ac.STOP:
-						this.isPlaying = false;
-						this.isStopped = true;
-						this.parentContext.nAction(this,Player.action.STOP);
-						$(this.htmlPlayer).trigger("presentation.onEnd");
-						this.parentContext.nAction(undefined,-1);
-					break;
-					
-					case ac.ABORT:
-						this.isPlaying = false;
-						this.isStopped = true;	
-						this.parentContext.nAction(this,Player.action.ABORT);
-						$(this.htmlPlayer).trigger("presentation.onAbort");
-						this.parentContext.nAction(undefined,-1);
-					break;
-				}
-				
-				//execute events on list
-				//
-				//(while executing this list, should another elements be added to it?)
-				this.wAction = undefined; //events starts working properly
-				
-			}
-			
-		break;
-		
-	}
 }
 
 // create
@@ -259,6 +194,7 @@ ContextPlayer.prototype.create = function () {
 		for (i in this.node.property) {
 			this.setProperty(this.node.property[i].name,this.node.property[i].value);
 		}
+		//bind links
 		this.bindLinks();
 	}
 	return this;
@@ -305,72 +241,50 @@ ContextPlayer.prototype.portAction = function(port,action)
 
 // start
 ContextPlayer.prototype.start = function (nodeInterface) {
+	if (!this.isCreated) {
+		this.create();
+	}	
 
-	//if context is stopped
-	if (this.isStopped) {
-		if (!this.isCreated) {
-			this.create();
-		}
-		this.isPlaying = true;
-		this.isStopped = false;
-		if (nodeInterface) {
-			this.portAction(this.port[nodeInterface],'start');
-		} else {
+	//if a interface is defined
+	if(nodeInterface)
+	{
+		this.portAction(this.port[nodeInterface],'start');		
+	} else {
+		//if this context is stopped
+		if (this.isStopped) {
+			//start all ports
 			for (i in this.port) {
 				this.portAction(this.port[i],'start');
 			}
+			
 		}
-		this.parentContext.nAction(this,Player.action.START);
-		$(this.htmlPlayer).trigger("presentation.onBegin");
-		this.parentContext.nAction(undefined,-1);
-	} else {
-
-		//playing or paused, events are going to work (if
-		//directed to a port
-		if(nodeInterface)
-			this.portAction(this.port[nodeInterface],'start');
-	
 	}
+
 }
 
 // stop
 ContextPlayer.prototype.stop = function (nodeInterface) {
-	//if it is not stopped (playing or stopped)
-	if (!this.isStopped) {
+	if(nodeInterface)
+	{
+		this.portAction(this.port[nodeInterface],'stop');
+	} else {
 
-		if(!nodeInterface)
-		{
-			this.isPlaying = false;
-			this.isStopped = true;
+		//if it is not stopped (playing or stopped)
+		if (!this.isStopped) {
 			
 			this.pausedElem=[];
 			this.pausedElemList=[];
 			this.playingElem=[];			
-			
 			
 			for (i in this.context) {
 				this.context[i].stop();
 			}	
 			for (i in this.media) {
 				this.media[i].stop();
-			}
-			
-
-//			//this should be triggered only when all medias were stopped
-			this.timerManager.stopAll();
-			this.parentContext.nAction(this,Player.action.STOP);
-			$(this.htmlPlayer).trigger("presentation.onEnd");
-			this.parentContext.nAction(undefined,-1);
-			
-			
-		} else {
-			this.portAction(this.port[nodeInterface],'stop');
-		}
+			}			
 		
-	} else {
-		//if context is playing or its paused
-		if(nodeInterface)
-			this.portAction(this.port[nodeInterface],'stop');
+		}
+
 	}
 };
 
@@ -379,9 +293,6 @@ ContextPlayer.prototype.pause = function (nodeInterface) {
 	if (this.isPlaying) {
 		if(!nodeInterface)
 		{
-
-			this.isPlaying = false;
-			this.isStopped = false;
 
 			//save them for future context resume
 			this.pausedElemList = this.playingElem;
@@ -392,11 +303,6 @@ ContextPlayer.prototype.pause = function (nodeInterface) {
 			{
 				this.pausedElemList[i].pause();
 			}
-			
-			this.timerManager.pauseAll();
-			this.parentContext.nAction(this,Player.action.PAUSE);
-			$(this.htmlPlayer).trigger("presentation.onPause");
-			this.parentContext.nAction(undefined,-1);
 			
 		} else {
 			this.portAction(this.port[nodeInterface],'pause');
@@ -412,72 +318,55 @@ ContextPlayer.prototype.pause = function (nodeInterface) {
 
 // resume
 ContextPlayer.prototype.resume = function (nodeInterface) {
-	//if context is paused
-	if (!this.isPlaying && !this.isStopped) {
-		this.isPlaying = true;
-		this.isStopped = false;
-		
-		
-		if(!nodeInterface)
-		{
-			for(var i in this.pausedElemList)
-				this.pausedElemList[i].resume();
-
-			this.pausedElemList=[];
-
-			
-		} else {
-			this.portAction(this.port[nodeInterface],'resume');
-		}
-		
-		this.timerManager.resumeAll();
-		this.parentContext.nAction(this,Player.action.RESUME);
-		$(this.htmlPlayer).trigger("presentation.onResume");
-		this.parentContext.nAction(undefined,-1);
-		
+	
+	if(nodeInterface)
+	{
+		this.portAction(this.port[nodeInterface],'resume');
 	} else {
-		//if context not paused
-		if(nodeInterface)
-		{
-			this.portAction(this.port[nodeInterface],'resume');
-		}
+
+		//if context is paused
+		if (!this.isPlaying && !this.isStopped) {
+
+			var list;
+
+			//player was paused because of call to ContextPlayer.pause
+			if(this.pausedElemList.length > 0)
+			{
+				//only resume medias paused that request
+				list = this.pausedElemList;
+				this.pausedElemList=[];
+			} else { //player paused because all medias inside were paused
+				//so resume all paused medias
+				list = this.pausedElem;
+			}
+
+			for(var i in list)
+				list[i].resume();
+
+		} 
+
 	}
+
 };
 
 // abort
 ContextPlayer.prototype.abort = function (nodeInterface) {
-	if (!this.isStopped) {
-		if(!nodeInterface)
-		{
-			this.isPlaying = false;
-			this.isStopped = true;
+	if(!nodeInterface)
+	{
+		this.pausedMediaList = [];
+		this.pausedContextList = [];
 
-			this.pausedMediaList = [];
-			this.pausedContextList = [];
-
-			for (i in this.context) {
-				this.context[i].abort();
-			}	
-			for (i in this.media) {
-				this.media[i].abort();
-			}
-			
-			this.timerManager.stopAll();
-			$(this.htmlPlayer).trigger("presentation.onAbort",[nodeInterface]);
-			this.parentContext.nAction(this,Player.action.ABORT);
-			this.parentContext.nAction(undefined,-1);
-
-		} else {
-			this.portAction(this.port[nodeInterface],'abort');
+		for (i in this.context) {
+			this.context[i].abort();
+		}	
+		for (i in this.media) {
+			this.media[i].abort();
 		}
-		
+
 	} else {
-		//playing or paused
-		if(nodeInterface)
-		{
-			this.portAction(this.port[nodeInterface],'abort');
-		}
+		this.portAction(this.port[nodeInterface],'abort');
 	}
+
 };
 
 // isVariable
@@ -522,7 +411,6 @@ ContextPlayer.prototype.bindLinks = function()
 	/*
 	  Faz o bind das portas
 	 * */
-	
 	for (var i in ports)
 	{
 		var currentPort = ports[i];
@@ -543,7 +431,7 @@ ContextPlayer.prototype.bindLinks = function()
 			//Caso contrario (componente eh contexto) ou a nodeInterface nao esta definida
 			var currentComponentElement  = "#"+this.presentation.getDivId(currentPort.component.id);
 			var interfaceId = currentPort.id;
-			
+
 			for(var j in this.eventType)
 			{
 				var eventType = this.eventType[j];
@@ -564,12 +452,12 @@ ContextPlayer.prototype.bindLinks = function()
 					},
 					function(e, nclInterface)
 					{
-						if (nclInterface == e.data.portInterface) {
-							var evento = $.Event(e.data.eventName);
-                        	evento.which = e.which;
-							$(e.data.contextElement).trigger(evento,[e.data.interfaceId])
-						}
-					
+							if (nclInterface == e.data.portInterface) {
+								var evento = $.Event(e.data.eventName);
+								evento.which = e.which;
+								$(e.data.contextElement).trigger(evento,[e.data.interfaceId])
+							}
+			
 					});
 							
 				}
@@ -600,9 +488,6 @@ ContextPlayer.prototype.bindLinks = function()
 		var assessmentsMap = new Object();
 		var assessmentsArray = new Array();
 		
-
-		
-
 		/*
 		   Cada parametro do link eh associado a um valor padrao vazio
 		 * */			
@@ -768,11 +653,6 @@ ContextPlayer.prototype.bindLinks = function()
 	    		}
 	    		
 	    	}
-	    	
-
-	    	
-				    	 
-	    	
 	    	 
 	    }
 
@@ -935,7 +815,7 @@ ContextPlayer.prototype.bindLinks = function()
 				  		eventName: eventName,
 				  		triggerArrayName : triggerArrayName
 				  	},
-					function(e, nclInterface)
+					function(e, nclInterface, callback)
 					{
 						var cdata = $(e.data.componentDivId).data(e.data.bindName);
 						for(var listener in cdata)
@@ -954,10 +834,13 @@ ContextPlayer.prototype.bindLinks = function()
 								} else {
 									clistener.notifyEvent(e.data.eventName);
 								}
-							
+
 						}
 						ContextPlayer.executeTriggerArray($(e.data.componentDivId).data(e.data.triggerArrayName))
-					  	
+
+						//this callback is called  when is sure that that are pending events
+						if(callback)
+							callback();
 					}	
 				  	
 				  );

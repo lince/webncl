@@ -29,19 +29,13 @@ function Player () {
 	this.abort = function() {};
 	this.seekAndPlay = function() {};
 	this.selection = function() {};
+	this.data = undefined;
+	this.htmlPlayer = "";
+	this.isPlaying = false;
+	this.isStopped = true;
 
 }
 
-
-
-
-Player.action = {
-	START  : 1,
-	STOP   : 2,
-	PAUSE  : 3,
-	RESUME : 4,
-	ABORT  : 5
-};
 
 // constants
 Player.propertyAction =
@@ -52,90 +46,221 @@ Player.propertyAction =
 
 };
 
+// notify new action
+// args should be an array
+Player.prototype.trigger = function(event,args)
+{
+	//control parent context lists
+	var b;
+	switch(event)
+	{
+		case 'presentation.onBegin':
+		case 'presentation.onResume':			
+			this.parentContext.playingElem.push(this);
+			
+			b = $.inArray(this,this.parentContext.pausedElem);
+			if(b > -1)
+				this.parentContext.pausedElem.splice(b-1,1);	
+		break;
+
+		case 'presentation.onPause':
+			this.parentContext.pausedElem.push(this);
+						
+			b = $.inArray(this,this.parentContext.playingElem);
+			if(b > -1)
+				this.parentContext.playingElem.splice(b-1,1);		
+		break;
+
+
+		case 'presentation.onEnd':
+		case 'presentation.onAbort':
+			b = $.inArray(this,this.parentContext.playingElem);
+			if(b > -1)
+				this.parentContext.playingElem.splice(b-1,1);	
+			else
+			{
+				b = $.inArray(this,this.parentContext.pausedElem);
+				if(b > -1)
+					this.parentContext.pausedElem.splice(b-1,1);					
+			}
+			
+
+		break;
+
+	}
+	 
+	if(event === 'presentation.onAbort')
+		this.parentContext.lastMediaAborted = true;
+	else
+		this.parentContext.lastMediaAborted = false;
+	
+	var callback = false;
+
+	//if there is an event handler defined for this player than no callbacks are necessary
+	/*if(this.data[event])
+	{
+		//if this player is a port than ports triggers are processed before
+		//context inner links. This way attaching it only here will be enough
+		callback = true;
+		args.push($.proxy(this.__ecallback,this));
+	}*/
+	
+	$(this.htmlPlayer).trigger(event,args);
+	
+	
+	//if no events are being raised
+	if(!callback)
+		this.parentContext.notifyLink(0);
+	
+}
+
+// callback used  for function above
+Player.prototype.__ecallback = function()
+{
+	this.parentContext.notifyLink(0);
+}
+
 // bindEvents
 Player.prototype.bindEvents = function () {
-	$(this.htmlPlayer).on("start",$.proxy(function(event,nodeInterface,callback,args) {
-		if (!event.originalEvent) {
-			this.start(nodeInterface);
+	$(this.htmlPlayer).on("start",{
+			player : this
+		},function(event,nodeInterface,callback,args) {
+		
+		//if not triggered by jQuery
+		if(!event.originalEvent)
+		{
+			event.data.player.start(nodeInterface);
+			if (callback) {
+				callback(args);
+			}
+
+		}
+		
+	});
+	
+	$(this.htmlPlayer).on("stop",{
+			player : this
+		},function(event,nodeInterface,callback,args) {
+		
+		//if not triggered by jQuery
+		if(!event.originalEvent)
+		{
+			event.data.player.stop(nodeInterface);
+			if (callback) {
+				callback(args);
+			}
+
+		}
+		
+	});
+	$(this.htmlPlayer).on("pause",{
+			player : this
+		},function(event,nodeInterface,callback,args) {
+			//if not triggered by jQuery
+			if(!event.originalEvent)
+			{
+				event.data.player.pause(nodeInterface);
+				if (callback) {
+					callback(args);
+				}				
+			}
+
+		
+	});
+	$(this.htmlPlayer).on("resume",{
+			player : this
+		},function(event,nodeInterface,callback,args) {
+		
+			//if not triggered by jQuery
+			if(!event.originalEvent)
+			{
+				event.data.player.resume(nodeInterface);
+				if (callback) {
+					callback(args);
+				}
+
+			}
+		
+	});
+	
+	$(this.htmlPlayer).on("abort",{
+			player : this
+		},function(event,nodeInterface,callback,args) {
+		
+			//if not triggered by jQuery
+			if(!event.originalEvent)
+			{
+				event.data.player.abort(nodeInterface);
+				if (callback) {
+					callback(args);
+				}
+
+			}
+		
+	});
+	$(this.htmlPlayer).on("set",
+	{
+		player: this
+	},
+	function(event,nodeInterface,callback,args,value) {
+		//if not triggered by jQuery
+		if(!event.originalEvent)
+		{
+			event.stopPropagation();
+			var player = event.data.player;
+			switch(nodeInterface){
+				// On dynamic repositioning, the % value for position is calculated based on the media's current dimension.
+					// (top/bottom values are calculated based on the current height value and left/right values are calculated based on the current width value).
+				case "top":
+				case "bottom":
+				case "height": 
+						value = player.calculatePercentageValue("height", value);
+						player.setProperty(nodeInterface,value);
+						break;
+
+				case "left":
+				case "right": 
+				case "width": 
+						value = player.calculatePercentageValue("width", value);
+						player.setProperty(nodeInterface,value);
+						break;
+
+				case "bounds": 
+						var bounds = value.split(",");
+						player.setProperty("left", player.calculatePercentageValue("width",bounds[0]));
+						player.setProperty("top", player.calculatePercentageValue("height",bounds[1]));
+						player.setProperty("width", player.calculatePercentageValue("width",bounds[2]));
+						player.setProperty("height", player.calculatePercentageValue("height",bounds[3]));
+						break;
+
+				default: 
+						player.setProperty(nodeInterface,value);
+			}
 			if (callback) {
 				callback(args);
 			}
 		}
-	},this));
-	$(this.htmlPlayer).on("stop",$.proxy(function(event,nodeInterface,callback,args) {
-		if (!event.originalEvent) {
-			this.stop(nodeInterface);
-			if (callback) {
-				callback(args);
-			}
-		}
-	},this));
-	$(this.htmlPlayer).on("pause",$.proxy(function(event,nodeInterface,callback,args) {
-		if (!event.originalEvent) {
-			this.pause(nodeInterface);
-			if (callback) {
-				callback(args);
-			}
-		}
-	},this));
-	$(this.htmlPlayer).on("resume",$.proxy(function(event,nodeInterface,callback,args) {
-		if (!event.originalEvent) {
-			this.resume(nodeInterface);
-			if (callback) {
-				callback(args);
-			}
-		}
-	},this));
-	$(this.htmlPlayer).on("abort",$.proxy(function(event,nodeInterface,callback,args) {
-		if (!event.originalEvent) {
-			this.abort(nodeInterface);
-			if (callback) {
-				callback(args);
-			}
-		}
-	},this));
-	$(this.htmlPlayer).on("set",$.proxy(function(event,nodeInterface,callback,args,value) {
-		switch(nodeInterface){
-			// On dynamic repositioning, the % value for position is calculated based on the media's current dimension.
-				// (top/bottom values are calculated based on the current height value and left/right values are calculated based on the current width value).
-			case "top":
-			case "bottom":
-			case "height": 
-					value = this.calculatePercentageValue("height", value);
-					this.setProperty(nodeInterface,value);
-					break;
-			
-			case "left":
-			case "right": 
-			case "width": 
-					value = this.calculatePercentageValue("width", value);
-					this.setProperty(nodeInterface,value);
-					break;
-			
-			case "bounds": 
-					var bounds = value.split(",");
-					this.setProperty("left", this.calculatePercentageValue("width",bounds[0]));
-					this.setProperty("top", this.calculatePercentageValue("height",bounds[1]));
-					this.setProperty("width", this.calculatePercentageValue("width",bounds[2]));
-					this.setProperty("height", this.calculatePercentageValue("height",bounds[3]));
-					break;
-			
-			default: 
-					this.setProperty(nodeInterface,value);
-		}
-		if (callback) {
-			callback(args);
-		}
-	},this));
-	$(this.htmlPlayer).on("focus",$.proxy(function() {
-		this.focus();
-	},this));
-	$(this.htmlPlayer).on("blur",$.proxy(function() {
-		this.blur();
-	},this));
-	$(this.htmlPlayer).on("selection.onSelection",$.proxy(function() {
-		this.selection();
-	},this));
+	});
+	
+	$(this.htmlPlayer).on("focus",
+	{ player : this},
+	function(e) {
+//		if(this == e.target)
+			e.data.player.focus();
+	});
+	
+	$(this.htmlPlayer).on("blur",
+	{ player : this},
+	function(e) {
+//		if(this == e.target)		
+			e.data.player.blur();
+	});
+	$(this.htmlPlayer).on("selection.onSelection",
+	{ player : this},
+	function(e) {
+//		if(this == e.target)		
+			e.data.player.selection();
+	});
 };
 
 // function to get the current value of a property from css and to return its absolute value, given a % value.

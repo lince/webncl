@@ -28,7 +28,6 @@ function MediaPlayer (node, parentContext) {
 
 	this.region = "";
 	this.type = "";
-	this.htmlPlayer = "";
 	this.htmlPlayerBkg = ""; 
     this.player = undefined;
     this.playerName = undefined;
@@ -36,8 +35,6 @@ function MediaPlayer (node, parentContext) {
 	this.area = [];
 	this.transIn = [];
 	this.transOut = [];
-	this.isPlaying = false;
-	this.isStopped = true;
 	this.isVisible = true;
 	this.isFocused = false;
 	this.playingArea = undefined;
@@ -129,7 +126,7 @@ MediaPlayer.prototype.create = function (node) {
 	// Cria os IDs (região e mídia)
 	this.htmlPlayer = "#" + this.divId;
 	this.htmlPlayerBkg = "#" + this.presentation.getDivId(node.id,"bkg");
-	if (this.checkType(["application"])) {
+	if (this.type === 'application/x-ginga-settings') {
 		this.region = "#" + this.presentation.settingsDiv;
 	} else {
 		this.region = "#" + this.presentation.playerDiv;
@@ -147,6 +144,7 @@ MediaPlayer.prototype.create = function (node) {
 	} else {
 	// -----------------
 		// Creates media background div
+
 		$(this.region).append("<div class='playerBkg' id='" + this.presentation.getDivId(node.id,"bkg") + "'></div>");
 		
                 // Creates media player
@@ -216,10 +214,12 @@ MediaPlayer.prototype.create = function (node) {
 		
 		$(this.htmlPlayerBkg).css("display","none");
                 
-                //presetup (construtor)
+        //presetup (construtor)
 		this.load(node.src);
-                //possetup( needed ?? )
+        //possetup( needed ?? )
                 
+		this.data = $(this.htmlPlayer).data();
+				
                 //if player supports area
                 if(this.player.exec)
                 {
@@ -680,11 +680,8 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 		this.isStopped = false;
 		this.show();
 	}
-			
-		//notify parentContext of its action
-		this.parentContext.nAction(this,Player.action.START);			
-		$(this.htmlPlayer).trigger("presentation.onBegin",[nodeInterface]);
-		this.parentContext.nAction(undefined,-1	);
+					
+	this.trigger("presentation.onBegin",[nodeInterface]);
 	
 };
 
@@ -707,10 +704,9 @@ MediaPlayer.prototype.stop = function (nodeInterface) {
 			Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['stop',nodeInterface]);
 
 		//notify parentContext of its action
-		this.parentContext.nAction(this,Player.action.STOP);
 
-		$(this.htmlPlayer).trigger("presentation.onEnd",[nodeInterface]);
-		this.parentContext.nAction(undefined,-1);
+		this.trigger("presentation.onEnd",[nodeInterface]);
+
 	}
 };
 
@@ -726,9 +722,9 @@ MediaPlayer.prototype.pause = function (nodeInterface) {
 			Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['pause',nodeInterface]);
 
 		//notify parentContext of its action
-		this.parentContext.nAction(this,Player.action.PAUSE);
-		$(this.htmlPlayer).trigger("presentation.onPause",[nodeInterface]);
-		this.parentContext.nAction(undefined,-1);
+
+		this.trigger("presentation.onPause",[nodeInterface]);
+
 	}
 };
 
@@ -744,9 +740,9 @@ MediaPlayer.prototype.resume = function (nodeInterface) {
                     Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['resume',nodeInterface]);
                 
 		//notify parentContext of its action
-		this.parentContext.nAction(this,Player.action.RESUME);				
-		$(this.htmlPlayer).trigger("presentation.onResume",[nodeInterface]);
-		this.parentContext.nAction(undefined,-1);
+		
+		this.trigger("presentation.onResume",[nodeInterface]);
+
 	}
 };
 
@@ -765,10 +761,9 @@ MediaPlayer.prototype.abort = function (nodeInterface) {
                 else
                     Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['abort',nodeInterface]);
                         
-		//notify parentContext of its action
-		this.parentContext.nAction(this,Player.action.ABORT);                
-		$(this.htmlPlayer).trigger("presentation.onAbort",[nodeInterface]);
-		this.parentContext.nAction(undefined,-1);
+		//notify parentContext of its action            
+		this.trigger("presentation.onAbort",[nodeInterface]);
+
 	}
 };
 

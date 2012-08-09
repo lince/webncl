@@ -152,7 +152,12 @@ function WebNclPlayer (file, div) {
     this.presentation.postEvent = $.proxy(this.postEvent,this); 
 
 
-	this.presentation.nAction = $.proxy(this.nAction,this)
+	this.presentation.isPlaying = false;
+	this.presentation.isStopped = true;
+	this.presentation.playingElem =[];
+	this.presentation.pausedElem = [];
+	this.presentation.notifyLink =$.proxy(this.nAction,this);
+	this.presentation.lastMediaAborted = false;
 
 	/*
         Comentar efeito do ajax!
@@ -510,28 +515,54 @@ WebNclPlayer.prototype.nSync = function(e,s)
 
 }
 
-WebNclPlayer.prototype.nAction = function(e,a)
+WebNclPlayer.prototype.nAction = function()
 {
-	var ac = Player.action;
-	var playDiv = '#'+this.presentation.playDiv;
-	var endDiv = '#'+this.presentation.endDiv;
-	switch(a)
+	var  p = this.presentation;
+	var playDiv = '#'+p.playDiv;
+	var endDiv = '#'+p.endDiv;
+	
+	//no elements are playing
+	if(p.playingElem.length === 0)
 	{
-		case ac.START:
-		case ac.RESUME:
-			$(playDiv).hide();
-			$(endDiv).hide();	
-		break;
-		
-		case ac.PAUSE:
-			$(playDiv).show();
-		break;
-		
-		case ac.ABORT:
-		case ac.STOP:
+		//no elements are paused
+		if(p.pausedElem.length === 0)
+		{
+			//stop or abort
+			p.isStopped = true;
+			p.isPlaying = false;
 			$(endDiv).show();
 	
+		} else {
+			//some are paused and no one is playing
+			//pause
+			p.isStopped = false;
+			p.isPlaying = false;
+
+			$(playDiv).show();		
+		}
 	}
+	//some elements are playing
+	else {
+		
+		if(!p.isPlaying)
+		{
+			$(playDiv).hide();
+			$(endDiv).hide();	
+			
+			p.isStopped = false;
+			p.isPlaying = true;
+			
+			/*
+			  if(p.isStopped)
+					//start
+			  else
+					//resume
+			 
+			 **/
+		}
+		
+	}
+	
 }
 
 WebNclPlayer.playerCount = 0;
