@@ -100,6 +100,21 @@ MediaPlayer.prototype.createElement = function(htmlText)
     $(this.htmlPlayerBkg).append(htmlText);
 }
 
+// enableKeyEvents
+// This function should be used when 
+MediaPlayer.prototype.enableKeyEvents = function( s )
+{
+    if(s === undefined || s)
+    {
+        var a = false;
+        if(this.isPlaying)
+            a = true;
+        this.presentation.keyEvents[this.htmlPlayer] = a;
+    } else {
+        delete this.presentation.keyEvents[this.htmlPlayer];
+    }
+}
+
 // create
 MediaPlayer.prototype.create = function (node) {
 	// Cria as transições
@@ -175,7 +190,7 @@ MediaPlayer.prototype.create = function (node) {
 					getProperty: $.proxy(this.getProperty,this),
 					setProperty: $.proxy(this.setProperty,this),
 					postEvent: this.presentation.postEvent,
-					
+				    enableKeyEvents: $.proxy(this.enableKeyEvents,this),	
 					area: node.area
 
 				}

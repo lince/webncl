@@ -146,11 +146,18 @@ function WebNclPlayer (file, div, directory) {
 		MENU				:   77
 	};
 	
+    this.presentation.reverseKeys = new Array(120);
+    for (var key in this.presentation.keys)
+    {
+        this.presentation.reverseKeys[this.presentation.keys[key]] = key;
+    }
+
 	//Despite the key codes defined above, an array should be defined
 	//with the codes that are going to be processed by the event handler
 	//User can redefine this array to avoid player from processing some key events
 	this.presentation.keys.allCodes = [13,37,38,39,40,81,87,69,82,96,97,98,99,100,101,102,103,104,105,90,88,67,86,66,78,65,83,68];
 
+    
 
     //postEvent
     this.presentation.postEvent = $.proxy(this.postEvent,this); 
