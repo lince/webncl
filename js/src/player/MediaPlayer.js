@@ -39,6 +39,7 @@ function MediaPlayer (node, parentContext) {
 	this.isStopped = true;
 	this.isVisible = true;
 	this.isFocused = false;
+    this.userKeyEvents = false;
 	this.explicitDur = undefined;
 	this.opacity = 1;	
 	this.node = node;
@@ -110,10 +111,45 @@ MediaPlayer.prototype.enableKeyEvents = function( s )
         if(this.isPlaying)
             a = true;
         this.presentation.keyEvents[this.htmlPlayer] = a;
+
+
+        if(!this.userKeyEvents)
+        {
+            this.userKeyEvents = true;
+            $(this.htmlPlayer).on('selection.onSelection.user',
+            {
+                mplayer : this 
+            },
+            function(e)
+            {
+
+                //key was pressed
+                if(e.which)
+                {
+
+                   var m = e.data.mplayer;
+
+                   var evt = {
+                        'class': 'key',
+                        'type': 'press',
+                        'key': m.presentation.reverseKeys[e.which]
+                   };
+
+                   m.player.keyEventHandler(evt); 
+    
+                }
+
+                
+            });
+        }
     } else {
         delete this.presentation.keyEvents[this.htmlPlayer];
+        $(this.htmlPlayer).off('selection.onSelection.user');
+        this.userKeyEvents = false;
     }
 }
+
+
 
 // create
 MediaPlayer.prototype.create = function (node) {
@@ -190,7 +226,7 @@ MediaPlayer.prototype.create = function (node) {
 					getProperty: $.proxy(this.getProperty,this),
 					setProperty: $.proxy(this.setProperty,this),
 					postEvent: this.presentation.postEvent,
-				    enableKeyEvents: $.proxy(this.enableKeyEvents,this),	
+				    enableKeyEvents: $.proxy(this.enableKeyEvents,this),
 					area: node.area
 
 				}
@@ -201,7 +237,7 @@ MediaPlayer.prototype.create = function (node) {
 					this.playerName = playerClass.name;
 					
 					// Creates templates for every method the players do not implement
-					var methods = 'load unload exec start stop pause resume abort seek seekAndPlay setProperty getDuration'.split(' ');
+					var methods = 'load unload exec start stop pause resume abort seek seekAndPlay setProperty getDuration keyEventHandler'.split(' ');
 					for (i in methods) {
 						if (!this.player[methods[i]]) {
 							eval('this.player[methods[i]] = function() {' +

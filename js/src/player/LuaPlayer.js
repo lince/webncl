@@ -52,6 +52,9 @@ function LuaPlayer(p) {
   	this.p.onChangeProperty.propertyMap['height'] = Player.propertyAction.IGNORE;
   	this.p.onChangeProperty.propertyMap['left'] = Player.propertyAction.IGNORE;
   	this.p.onChangeProperty.propertyMap['top'] = Player.propertyAction.IGNORE;
+
+    p.enableKeyEvents();
+
 	console.log(p.id);
 	
 
@@ -185,14 +188,14 @@ LuaPlayer.prototype.seekAndPlay = function(newTime) {
 
 }
 
-LuaPlayer.prototype.receiveKey = function(value, type){
+LuaPlayer.prototype.keyEventHandler = function(kevent){
 	
 	if(this.events.handlers){
 		var evt = lua_newtable();
 		evt.str['class'] = 'key';
-		evt.str['type'] = type;
+		evt.str['type'] = kevent.type;
+        evt.str['key']  = kevent.key;
 		this.eventQueue(evt);
-		
 	}	
 	
 }

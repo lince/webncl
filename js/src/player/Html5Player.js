@@ -172,8 +172,16 @@ function Html5Player(p) {
 	},this));
 
 	/*****************/
+
+    //p.enableKeyEvents();
+
 	
 }
+
+//Html5Player.prototype.keyEventHandler = function(e)
+//{
+//   console.log(this.htmlPlayer,e.key,e);
+//}
 
 Html5Player.prototype.stopArea = function (nodeInterface) {
 	if (this.anchors[nodeInterface].started) {
