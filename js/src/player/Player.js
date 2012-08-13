@@ -93,7 +93,7 @@ Player.prototype.bindEvents = function () {
 	$(this.htmlPlayer).on("set",$.proxy(function(event,nodeInterface,callback,args,value) {
 		switch(nodeInterface){
 			// On dynamic repositioning, the % value for position is calculated based on the media's current dimension.
-				// (top/bottom values are calculated based on the current height value and left/right values are calculated based on the current width value).
+			// (top/bottom values are calculated based on the current height value and left/right values are calculated based on the current width value).
 			case "top":
 			case "bottom":
 			case "height": 
@@ -110,10 +110,25 @@ Player.prototype.bindEvents = function () {
 			
 			case "bounds": 
 					var bounds = value.split(",");
-					this.setProperty("left", this.calculatePercentageValue("width",bounds[0]));
-					this.setProperty("top", this.calculatePercentageValue("height",bounds[1]));
-					this.setProperty("width", this.calculatePercentageValue("width",bounds[2]));
-					this.setProperty("height", this.calculatePercentageValue("height",bounds[3]));
+					this.setProperty("bounds", value, false);
+					this.setProperty("left", this.calculatePercentageValue("width",bounds[0]), true);
+					this.setProperty("top", this.calculatePercentageValue("height",bounds[1]), true);
+					this.setProperty("width", this.calculatePercentageValue("width",bounds[2]), true);
+					this.setProperty("height", this.calculatePercentageValue("height",bounds[3]), true);
+					break;
+			
+			case "location":
+					var loc = value.split(",");
+					this.setProperty("location", value, false);
+					this.setProperty("left", this.calculatePercentageValue("width",loc[0]), true);
+					this.setProperty("top", this.calculatePercentageValue("height",loc[1]), true);
+					break;
+			
+			case "size":
+					var size = value.split(",");
+					this.setProperty("size", value, false);
+					this.setProperty("width", this.calculatePercentageValue("width",size[0]), true);
+					this.setProperty("height", this.calculatePercentageValue("height",size[1]), true);
 					break;
 			
 			default: 
@@ -163,28 +178,31 @@ Player.prototype.getProperty = function(name)
 };
 
 // setProperty
-Player.prototype.setProperty = function (name, value) {
+Player.prototype.setProperty = function (name, value, ignoreEvents) {
     
-	// TODO: verify events
-	$(this.htmlPlayer).trigger("attribution.onBeginAttribution",[name]);
+	if (!ignoreEvents) {
+		// TODO: verify events
+		$(this.htmlPlayer).trigger("attribution.onBeginAttribution",[name]);
+	}
 
     //save property data
 	var property = $(this.htmlPlayer).data("property");
 	property[name] = value ? value : "";
 	$(this.htmlPlayer).data("property",property);
 
-	//handle user defined player
-	var p = this.playerSettings.onChangeProperty || undefined;
-	var p_action = Player.propertyAction.IGNORE;
-	if(p)
-		p_action = (p.propertyMap[name] != undefined) ? p.propertyMap[name] : p.defaultAction;
+	if (!ignoreEvents) {
+		//handle user defined player
+		var p = this.playerSettings.onChangeProperty || undefined;
+		var p_action = Player.propertyAction.IGNORE;
+		if(p)
+			p_action = (p.propertyMap[name] != undefined) ? p.propertyMap[name] : p.defaultAction;
 
-	//if media player does not override default property set function (or if media
-	//player doesn't define information related to property 'name')
-        
-	//as Player.propertyAction.IGNORE = 0
-	//its ok to test p_action
-
+		//if media player does not override default property set function (or if media
+		//player doesn't define information related to property 'name')
+			
+		//as Player.propertyAction.IGNORE = 0
+		//its ok to test p_action
+	}
 
 	if(!p_action || p_action == Player.propertyAction.OVERLOAD) {
             
@@ -220,26 +238,6 @@ Player.prototype.setProperty = function (name, value) {
 						$(this.htmlPlayer).css(name,value);
 						$(this.htmlPlayerBkg).css(name,value);
 						break;
-					
-					case "location": 
-						var location = value.split(",");
-						this.setProperty("left",bounds[0]);
-						this.setProperty("top",bounds[1]);
-						return;
-					
-					case "size": 
-						var size = value.split(",");
-						this.setProperty("width",bounds[0]);
-						this.setProperty("height",bounds[1]);
-						return;
-					
-					case "bounds": 
-						var bounds = value.split(",");
-						this.setProperty("left",bounds[0]);
-						this.setProperty("top",bounds[1]);
-						this.setProperty("width",bounds[2]);
-						this.setProperty("height",bounds[3]);
-						return;
 					
 					case "zIndex": 
 						$(this.htmlPlayer).css("z-index",value)
@@ -365,16 +363,19 @@ Player.prototype.setProperty = function (name, value) {
 			}
 
 
-			//user defined 
-			if (p_action == Player.propertyAction.OVERLOAD) {
-				this.player.setProperty(name,value);
+			if (!ignoreEvents) {
+			
+				//user defined 
+				if (p_action == Player.propertyAction.OVERLOAD) {
+					this.player.setProperty(name,value);
+				}
+			
+				//onEndAttribution is triggered automatically 
+				$(this.htmlPlayer).trigger("attribution.onEndAttribution",[name]);
 			}
-		
-			//onEndAttribution is triggered automatically 
-			$(this.htmlPlayer).trigger("attribution.onEndAttribution",[name]);
-
+			
 		}
-	} else {
+	} else if (!ignoreEvents) {
 			//override case
 			this.player.setProperty(name,value);
 	}
