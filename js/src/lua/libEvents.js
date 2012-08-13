@@ -24,7 +24,7 @@ libEvents.prototype.unregister = function(fct){
 }
 
 libEvents.prototype.post = function(evt){
-	console.log('libEvents.post()')
+	//console.log('libEvents.post()')
 
 	if (evt.str['class'] == 'key') {
 		this.player.postEvent(evt.str);	
@@ -48,10 +48,7 @@ libEvents.prototype.post = function(evt){
 		}
 		this.player.postEvent(json);
 	} else if (evt.str['class'] == 'user') {
-		console.log('triggering user event');
-		var e = $.Event('user');
-		e.luaevent = evt;
-		this.luaplayer.eventQueue(e);
+		this.luaplayer.eventQueue(evt);
 		
 	}
 	var d = new Date();

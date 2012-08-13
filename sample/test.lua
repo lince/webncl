@@ -1,9 +1,13 @@
+h, w = canvas:attrSize()
+print (h)
+canvas:drawLine(0,0,50,50)
+
 valor = 0
 
 function handler (evt)
 	if evt.class == 'user' then
 		print (evt.v)
-		if valor < 500 then
+		if valor < 10 then
 			valor = valor + 1
 			event.post({class = 'user', v = valor} )
 		end

@@ -107,14 +107,17 @@ LuaPlayer.prototype.exec = function(time, callback) {
  */
 LuaPlayer.prototype.start = function() {
 	console.log('start lua');
-	lua_call(this.luajscode);
+	
+	var evt = lua_newtable();
+	evt.str['class'] = 'ncl';
+	evt.str['type'] = 'presentation';
+	evt.str['action'] = 'start';
+	this.eventQueue(evt, true);
 
+	lua_call(this.luajscode);
+	
 	if (this.events.handlers) {
-		var evt = lua_newtable();
-		evt.str['class'] = 'ncl';
-		evt.str['type'] = 'presentation';
-		evt.str['action'] = 'start';
-		this.eventQueue(evt);
+		this.callHandlers();
 	}
 }
 /**
@@ -379,61 +382,53 @@ LuaPlayer.prototype.bindlibs = function() {
 //
 
 
-LuaPlayer.prototype.callHandlers = function(evt) {
-	console.log('LuaPlayer.callHandlers()');
-	console.log(evt);
 
-	if (evt) {
+
+LuaPlayer.prototype.callHandlers = function() {
+	//console.log('LuaPlayer.callHandlers() ' + this.isHandlingEvent);
+
+	//f (this.arrayUsers.length > 0) {
+	if (this.isHandlingEvent) {
+		return;
+	} else {
 		this.isHandlingEvent = true;
-		for ( i = 0; i < this.events.handlers.length; i++) {
-			if (this.events.handlers[i] === undefined) {
+		var evnt = this.arrayUsers.splice(0, 1);
+		while (evnt.length >= 1) {
 
-			} else {
-				this.events.handlers[i](evt);
-
-			}
-
-		}
-		this.isHandlingEvent = false;
-		
-	} else if (this.arrayUsers.length > 0) {
-		if (this.isHandlingEvent) {
-			return;
-		} else {events
-			this.isHandlingEvent = true;
-			var evnt = this.arrayUsers.splice(0, 1);
 			for ( i = 0; i < this.events.handlers.length; i++) {
 				if (this.events.handlers[i] === undefined) {
 
 				} else {
-					
+
 					var obj = {
-						h: this.events.handlers,
-						i: i,
-						evnt: evnt
-						
+						handler : this.events.handlers[i],
+						evnt : evnt[0]
+
 					};
-					
-					setTimeout($.proxy(
-						function()
-						{
-							this.h[this.i](this.evnt[0]);
-						}
-						
-					,obj ), 0);
-					
+
+					setTimeout($.proxy(function() {
+						this.handler(this.evnt);
+					}, obj), 0);
 
 				}
 			}
-			this.isHandlingEvent = false;
-			$(this.htmlPlayer).trigger('endCallHandlers');
+			
+			evnt = this.arrayUsers.splice(0, 1);
 		}
+		this.isHandlingEvent = false;
+		//$(this.htmlPlayer).trigger('endCallHandlers');
 	}
+	//
 }
 
-LuaPlayer.prototype.eventQueue = function(evt){
+
+
+LuaPlayer.prototype.eventQueue = function(evt, notcallhandlers){
 	
-	this.arrayUsers.push(evt.luaevent);
-	this.callHandlers();
+	this.arrayUsers.push(evt);
+	
+	if (notcallhandlers == undefined) {
+		this.callHandlers();
+	}
 	
 }
