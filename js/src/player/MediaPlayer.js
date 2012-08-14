@@ -32,12 +32,11 @@ function MediaPlayer (node, parentContext) {
     this.player = undefined;
     this.playerName = undefined;
     this.playerSettings = undefined;
-	this.area = [];
 	this.transIn = [];
 	this.transOut = [];
 	this.isVisible = true;
 	this.isFocused = false;
-	this.playingArea = undefined;
+    this.userKeyEvents = false;
 	this.explicitDur = undefined;
 	this.opacity = 1;	
 	this.node = node;
@@ -45,7 +44,6 @@ function MediaPlayer (node, parentContext) {
 	this.parentContext = parentContext;
     this.divId =  this.presentation.getDivId(node.id);
 	this.create(node);
-
 
 }
 
@@ -95,10 +93,60 @@ MediaPlayer.prototype.checkType = function (typeList) {
 
 // createElement
 // (used by user defined players to create their own html)
-MediaPlayer.prototype.createElement =  function(htmlText)
+MediaPlayer.prototype.createElement = function(htmlText)
 {
     $(this.htmlPlayerBkg).append(htmlText);
 }
+
+// enableKeyEvents
+// This function should be used when 
+MediaPlayer.prototype.enableKeyEvents = function( s )
+{
+    if(s === undefined || s)
+    {
+        var a = false;
+        if(this.isPlaying)
+            a = true;
+        this.presentation.keyEvents[this.htmlPlayer] = a;
+
+
+        if(!this.userKeyEvents)
+        {
+            this.userKeyEvents = true;
+            $(this.htmlPlayer).on('selection.onSelection.user',
+            {
+                mplayer : this 
+            },
+            function(e)
+            {
+
+                //key was pressed
+                if(e.which)
+                {
+
+                   var m = e.data.mplayer;
+
+                   var evt = {
+                        'class': 'key',
+                        'type': 'press',
+                        'key': m.presentation.reverseKeys[e.which]
+                   };
+
+                   m.player.keyEventHandler(evt); 
+    
+                }
+
+                
+            });
+        }
+    } else {
+        delete this.presentation.keyEvents[this.htmlPlayer];
+        $(this.htmlPlayer).off('selection.onSelection.user');
+        this.userKeyEvents = false;
+    }
+}
+
+
 
 // create
 MediaPlayer.prototype.create = function (node) {
@@ -111,11 +159,6 @@ MediaPlayer.prototype.create = function (node) {
 		this.explicitDur = node.descriptor.explicitDur;
 	}
 	
-	// Cria as áreas
-	for (i in node.area) {
-		this.area[node.area[i].id] = node.area[i];
-		this.area[node.area[i].id].started = false;
-	}
 	// Verifica o tipo da mídia
 	if (node.type) {
 		this.type = node.type;
@@ -142,129 +185,99 @@ MediaPlayer.prototype.create = function (node) {
 	if (node.refer && (node.instance!="new")) {
 		return;
 	} else {
-	// -----------------
+		// -----------------
 		// Creates media background div
 
 		$(this.region).append("<div class='playerBkg' id='" + this.presentation.getDivId(node.id,"bkg") + "'></div>");
-		
-                // Creates media player
-                var mediaPlayers = this.presentation.mediaPlayers;
-                if(mediaPlayers[this.type])
-                    {
-                        //creates the playerSettings data structure
-                        this.playerSettings = 
-                        {
-                                source: 
-                                {
-                                    type: this.type,
-                                    ext: node._ext,
-                                    url: this.presentation.path + node.src
-                                },
+
+		// Creates media player
+		var mediaPlayers = this.presentation.mediaPlayers;
+		if(mediaPlayers[this.type])
+		{
+			//creates the playerSettings data structure
+			this.playerSettings = 
+			{
+					source: 
+					{
+						type: this.type,
+						ext: node._ext,
+						url: this.presentation.path + node.src
+					},
 
 
-                                onChangeProperty:
-                                {
-                                    defaultAction: Player.propertyAction.IGNORE, //IGNORE,OVERRIDE,OVERLOAD
+					onChangeProperty:
+					{
+						defaultAction: Player.propertyAction.IGNORE, //IGNORE,OVERRIDE,OVERLOAD
 
-                                    //propertyMap has higher priority than defaultAction                                    
-                                    propertyMap:
-                                    {
-                                        //'property': IGNORE,OVERRIDE,OVERLOAD
-                                    }
-                                    //when overrided, user should trigger onEndAttribution
-                                    //using postEvent
-                                },
-
-
-                                id : this.divId,
-                                parentId: this.presentation.getDivId(node.id,"bkg"),
-
-                                createElement: $.proxy(this.createElement,this),
-                                checkType: $.proxy(this.checkType,this),
-								getProperty: $.proxy(this.getProperty,this),
-								setProperty: $.proxy(this.setProperty,this),
-                                postEvent: this.presentation.postEvent,
-
-                                
-                              media:{
-                                areas: this.area  
-                              }
-
-                        }
-                       
-                        
-                        var playerClass = mediaPlayers[this.type][node._ext] || mediaPlayers[this.type].defaultPlayer;
-                        if(playerClass)
-                            {
-                                this.player = new playerClass(this.playerSettings);
-                                this.playerName = playerClass.name;
-                            }
-                        else
-                            {
-                                Logger.error(Logger.ERR_MEDIAPLAYER_NOPLAYER,this.type,['no defaultPlayer or extension player']);
-                                this.player = {};
-                            }
-                    }
-                else
-                    {
-                        Logger.error(Logger.ERR_MEDIAPLAYER_NOPLAYER,this.type);
-                        this.player = {};
-                    }
-                
-		
-		$(this.htmlPlayerBkg).css("display","none");
-                
-        //presetup (construtor)
-		this.load(node.src);
-        //possetup( needed ?? )
-                
-		this.data = $(this.htmlPlayer).data();
-				
-                //if player supports area
-                if(this.player.exec)
-                {
-					
-					//onEnd trigger
-					this.player.exec('end',$.proxy(function() {
-					
-						if (!this.playingArea) {
-							this.stop();
-						} else {
-							$(this.htmlPlayer).trigger('presentation.onEnd');
-							this.playingArea = undefined;
+						//propertyMap has higher priority than defaultAction                                    
+						propertyMap:
+						{
+							//'property': IGNORE,OVERRIDE,OVERLOAD
 						}
+						//when overrided, user should trigger onEndAttribution
+						//using postEvent
+					},
 
-						var i;
-						var d = this.player.getDuration();
-						for (i in this.area) {
-							if (this.area[i].started) {
-								this.area[i].started = false;
-								$(this.htmlPlayer).trigger('stop',[i]);
-							} else {
-								$(this.htmlPlayer).trigger('presentation.onEnd',[i]);
-							}
-						}
-						
-						//the stop action is going to be dealed by the area event listener
-                },this));
-					
-                    for (i in this.area) {
 
-						eval("this.player.exec(this.area[i].endTime,$.proxy(function() {"+
-							"this.stopArea('" + i + "');"+
-						"},this));");
+					id : this.divId,
+					parentId: this.presentation.getDivId(node.id,"bkg"),
 
-						eval("this.player.exec(this.area[i].beginTime,$.proxy(function() {"+
-							"$(this.htmlPlayer).trigger('presentation.onBegin',[this.area['"+i+"'].id]);"+
-						"},this));");
-						
-						// TODO: area definida por frames ao invés de tempo
-						
+					createElement: $.proxy(this.createElement,this),
+					checkType: $.proxy(this.checkType,this),
+					getProperty: $.proxy(this.getProperty,this),
+					setProperty: $.proxy(this.setProperty,this),
+					postEvent: this.presentation.postEvent,
+
+				    enableKeyEvents: $.proxy(this.enableKeyEvents,this),
+					area: node.area
+
+			};
+
+			var playerClass = mediaPlayers[this.type][node._ext] || mediaPlayers[this.type].defaultPlayer;
+			if (playerClass) {
+				this.player = new playerClass(this.playerSettings);
+				this.playerName = playerClass.name;
+
+				// Creates templates for every method the players do not implement
+				var methods = 'load unload exec start stop pause resume abort seek seekAndPlay setProperty getDuration keyEventHandler'.split(' ');
+				for (i in methods) {
+					if (!this.player[methods[i]]) {
+						eval('this.player[methods[i]] = function() {' +
+							'Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,"' + this.playerName + '",["' + methods[i] + '"]);' +
+							'};');
 					}
-				} else {
-						Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['exec']);
 				}
-	
+
+			} else {
+				Logger.error(Logger.ERR_MEDIAPLAYER_NOPLAYER,this.type,['no defaultPlayer or extension player']);
+				this.player = {};
+			}
+		} else {
+			Logger.error(Logger.ERR_MEDIAPLAYER_NOPLAYER,this.type);
+			this.player = {};
+		}
+
+
+		$(this.htmlPlayerBkg).css("display","none");
+
+		this.load(node.src);
+
+		this.data = $(this.htmlPlayer).data();
+
+		//if player supports area
+		if(this.player.exec)
+		{
+			//onEnd trigger
+			this.player.exec('end',$.proxy(function() {
+
+				if (!this.playingArea) {
+					this.stop();
+				} else {
+					$(this.htmlPlayer).trigger('presentation.onEnd');
+					this.playingArea = undefined;
+				}
+			},this));
+		}
 	// ---- REFER ----
 	}
 	// ---------------
@@ -290,7 +303,6 @@ MediaPlayer.prototype.create = function (node) {
 			this.setProperty(node.descriptor.descriptorParam[i].name,node.descriptor.descriptorParam[i].value);
 		}
 	}
-	
 	
 	/* --- Property tags (under <media>) treatment --- */
 
@@ -393,7 +405,17 @@ MediaPlayer.prototype.create = function (node) {
 	
 	}
 	/* ----------------------------------------------- */
-		
+	
+	// when the media ends, MediaPlayer.stop() needs to be called
+	this.player.exec('end',$.proxy(function() {
+		if (!this.playingArea) {
+			this.stop();
+		} else {
+			$(this.htmlPlayer).trigger('presentation.onEnd');
+			this.playingArea = undefined;
+		}
+	},this));
+	
 	// Bind events
 	this.bindEvents();
 	// Saves the media player using jQuery data function
@@ -403,26 +425,13 @@ MediaPlayer.prototype.create = function (node) {
 // load
 MediaPlayer.prototype.load = function (source) {
 
+	// Recalculates the url based on presentation path
+	source = this.presentation.path + source;
 
-        //Recalculates the url based on presentation path
-		source = this.presentation.path + source;
-        //TODO: Needs to deal with other types (create a new media player )
+	this.player.unload(source);
+	this.player.load(source);
 
-        //Calls specific player unload function
-        if(this.player.unload)
-            this.player.unload(source);
-        else
-            Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['load',source]);
-
-
-        //Calls specific player load function
-        if(this.player.load)
-            this.player.load(source);
-        else
-            Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['load',source]);
 };
-
-
 
 // focus
 MediaPlayer.prototype.focus = function () {
@@ -634,42 +643,8 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 		}
 	}
 	// --- quick fix ends here
-	
-	// if the media was already playing an area, it should be set to stopped
-	if (this.isPlaying && this.playingArea) {
-		this.area[this.playingArea].started = false;
-	}
-	
-	if (nodeInterface) {
-		if (this.area[nodeInterface]._type=="area") {
-			this.area[nodeInterface].started = true;
-			this.playingArea = nodeInterface;
-			var t = this.area[nodeInterface].beginTime;
-			if (t != 'begin' && !(t > this.player.getDuration()))
-				this.seekAndPlay(t);
-			else {
-				if (t != 'begin') {
-					Logger.warning(Logger.WARN_INVALID_AREA,'area',['begin','end']);
-				}
-				if (this.isPlaying) {
-					this.seek(0);
-				} else if (this.player.start)
-					this.player.start();
-				else
-					Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['start',nodeInterface]);
-			}
-		} else {
-			// TODO
-		}
-	} else {
-		this.playingArea = undefined;
-		if (this.isPlaying) {
-			this.seek(0);
-		} else if (this.player.start)
-			this.player.start();
-		else
-			Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['start',nodeInterface]);
-	}
+
+	this.player.start(nodeInterface);
 	
 	if (this.isStopped) {
         this.presentation.inputManager.enableKeys(this.htmlPlayer);
@@ -680,8 +655,9 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 		this.isStopped = false;
 		this.show();
 	}
-					
+	
 	this.trigger("presentation.onBegin",[nodeInterface]);
+
 	
 };
 
@@ -692,17 +668,10 @@ MediaPlayer.prototype.stop = function (nodeInterface) {
 		if(this.node.descriptor){
 			this.presentation.inputManager.removeMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
 		}
-
 		this.isPlaying = false;
 		this.isStopped = true;
 		this.hide();
-
-                
-		if(this.player.stop)
-			this.player.stop();
-		else
-			Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['stop',nodeInterface]);
-
+		this.player.stop();
 		//notify parentContext of its action
 
 		this.trigger("presentation.onEnd",[nodeInterface]);
@@ -715,12 +684,8 @@ MediaPlayer.prototype.pause = function (nodeInterface) {
 	if (this.isPlaying) {
 		this.isPlaying = false;
 		this.isStopped = false;
-		
-		if(this.player.pause)
-			this.player.pause()
-		else
-			Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['pause',nodeInterface]);
-
+		this.presentation.inputManager.disableKeys(this.htmlPlayer);
+		this.player.pause()
 		//notify parentContext of its action
 
 		this.trigger("presentation.onPause",[nodeInterface]);
@@ -733,12 +698,8 @@ MediaPlayer.prototype.resume = function (nodeInterface) {
 	if (!this.isStopped && !this.isPlaying) {
 		this.isPlaying = true;
 		this.isStopped = false;
-		
-                if(this.player.resume)
-                    this.player.resume();
-                else
-                    Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['resume',nodeInterface]);
-                
+		this.presentation.inputManager.enableKeys(this.htmlPlayer);
+		this.player.resume();        
 		//notify parentContext of its action
 		
 		this.trigger("presentation.onResume",[nodeInterface]);
@@ -749,19 +710,14 @@ MediaPlayer.prototype.resume = function (nodeInterface) {
 // abort
 MediaPlayer.prototype.abort = function (nodeInterface) {
 	if (!this.isStopped) {
+		this.presentation.inputManager.disableKeys(this.htmlPlayer);
 		if(this.node.descriptor){
 			this.presentation.inputManager.removeMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
 		}
 		this.isPlaying = false;
 		this.isStopped = true;
 		this.hide();
-		
-                if(this.player.abort)
-                    this.player.abort();
-                else
-                    Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['abort',nodeInterface]);
-                        
-		//notify parentContext of its action            
+        this.player.abort();
 		this.trigger("presentation.onAbort",[nodeInterface]);
 
 	}
@@ -769,27 +725,10 @@ MediaPlayer.prototype.abort = function (nodeInterface) {
 
 // seek
 MediaPlayer.prototype.seek = function (newTime) {
-        if(this.player.seek)
-            this.player.seek(newTime);
-        else
-            Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['seek',newTime]);
-                
+	this.player.seek(newTime);
 };
 
 // seekAndPlay
 MediaPlayer.prototype.seekAndPlay = function (newTime) {
-	if(this.player.seekAndPlay)
-		this.player.seekAndPlay(newTime);
-	else
-		Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,['seekAndPlay',newTime]);	
+	this.player.seekAndPlay(newTime);
 };
-
-// stopArea
-MediaPlayer.prototype.stopArea = function (nodeInterface) {
-	if (this.area[nodeInterface].started) {
-		this.area[nodeInterface].started = false;
-		$(this.htmlPlayer).trigger('stop',[nodeInterface]);
-	} else {
-		$(this.htmlPlayer).trigger('presentation.onEnd',[nodeInterface]);
-	}
-}

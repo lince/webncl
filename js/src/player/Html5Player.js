@@ -39,13 +39,15 @@ function Html5Player(p) {
 	this.durationMap = {};
 	this.endCallbacks = [];
 
+	// property map
     p.onChangeProperty.propertyMap =
 	{
-		'soundLevel' : Player.propertyAction.OVERLOAD,
+		'soundLevel': Player.propertyAction.OVERLOAD,
 		'fit': Player.propertyAction.OVERLOAD
 	};
-    //overloading we don't need to trigger onEndAttribution event
-
+    // overloading we don't need to trigger onEndAttribution event
+	
+	// creates the media
     switch (p.source.type.split("/")[0]) {
 		case "video": 
 			// type = video/*
@@ -98,12 +100,11 @@ function Html5Player(p) {
 					// type = text/xml
 					Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"media",[p.source.type]);
 					break;
-
-		}
+			}
 		break;
 	}
 
-	//Tenta criar o popCorn player de acordo com o tipo de media
+	// creates the popcorn player
 	if (p.checkType(["video","audio"]))
 	{
 		do {	
@@ -116,11 +117,84 @@ function Html5Player(p) {
 		} while (!this.popcornPlayer);
 	}
 
+	/***** Areas *****/
+	
+	this.playing = false;
+	this.playingArea = undefined;
+	this.anchors = [];
+	
+	for (i in p.area) {
+	
+		var id = p.area[i].id;
+		this.anchors[id] = p.area[i];
+		
+		// anchor type flags
+		this.anchors[id].temporal = p.area[i].begin || p.area[i].end || p.area[i].first || p.area[i].last ? true : false;
+		this.anchors[id].textual = p.area[i].beginText || p.area[i].endText || p.area[i].beginPosition || p.area[i].endPosition ? true : false;
+		this.anchors[id].spatial = p.area[i].coords ? true : false;
+
+		// temporal anchors
+		if (this.anchors[id].temporal) {
+			eval("this.exec(this.anchors[id].beginTime,$.proxy(function() {"+
+				"$(this.htmlPlayer).trigger('presentation.onBegin',['"+id+"']);"+
+			"},this));");
+			eval("this.exec(this.anchors[id].endTime,$.proxy(function() {"+
+				"this.stopArea('" + id + "');"+
+			"},this));");
+		}
+		
+		// spatial anchors
+		if (this.anchors[id].spatial && !this.anchors[id]._ignore) {
+			var coords = this.anchors[id].coords.split(',');
+			// makes it ready to evaluate when the media starts, because
+			// width and height are still undefined here
+			for (i in coords) {
+				var coord = coords[i].split('%');
+				if (coord.length > 1) {
+					coords[i] = 'Math.round(parseInt($(this.htmlPlayer).css("' + (i%2?'height':'width') + '").split("px")[0]) * ' + parseFloat(coord[0])/100 + ')';
+				}
+			}
+			this.anchors[id].calculatedCoords = coords;
+			// 'coords' is only supported by images
+			if (!this.p.checkType(['image'])) {
+				Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,'area',['coords',p.source.type]);
+			}
+		}
+		
+	}
+	
+	// When the media ends, we need to set every area to stopped
+	this.exec('end',$.proxy(function() {
+		for (i in this.anchors) {
+			if (this.anchors[i].temporal)
+				this.stopArea(i);
+		}
+	},this));
+
+	/*****************/
+
+    //p.enableKeyEvents();
+
+	
+}
+
+//Html5Player.prototype.keyEventHandler = function(e)
+//{
+//   console.log(this.htmlPlayer,e.key,e);
+//}
+
+Html5Player.prototype.stopArea = function (nodeInterface) {
+	if (this.anchors[nodeInterface].started) {
+		this.anchors[nodeInterface].started = false;
+		$(this.htmlPlayer).trigger('stop',[nodeInterface]);
+	} else {
+		$(this.htmlPlayer).trigger('presentation.onEnd',[nodeInterface]);
+	}
 }
 
 /**
  * Called when the player needs to unload its sources
- * (Precedes calls to unload, excepting the first call)
+ * (Precedes calls to load, excepting the first call)
  */
 Html5Player.prototype.unload = function()
 {
@@ -173,7 +247,8 @@ Html5Player.prototype.load = function(source)
 					url: source,
 					dataType: "text",
 					success: $.proxy(function (data) {
-						$(this.htmlPlayer).append(data);
+						this.textData = data;
+						this.loadTextData();
 					},this)
 				});
 			}// else {
@@ -213,15 +288,83 @@ Html5Player.prototype.exec = function(time,callback)
 /**
  * Start
  */
-Html5Player.prototype.start =  function()
+Html5Player.prototype.start =  function (nodeInterface)
 {
-    if (this.popcornPlayer) {
+	var alreadyPlaying = false;
+	
+	/***** Areas *****/
+	
+	if (this.playingArea) {
+		this.anchors[this.playingArea].started = false;
+	}
+	
+	if (nodeInterface) {
+	
+		// temporal anchors
+		if (this.anchors[nodeInterface].temporal) {
+			this.anchors[nodeInterface].started = true;
+			this.playingArea = nodeInterface;
+			var t = this.anchors[nodeInterface].beginTime;
+			if (t != 'begin' && !(t > this.getDuration()))
+				this.seekAndPlay(t);
+			else {
+				if (t != 'begin') {
+					Logger.warning(Logger.WARN_INVALID_AREA,'area',['begin','end']);
+				}
+				if (this.playing) {
+					this.seek(0);
+					alreadyPlaying = true;
+				}
+			}
+		}
+		
+		// textual anchors
+		if (this.anchors[nodeInterface].textual && this.p.checkType(['text'])) {
+			this.textualAnchor = this.anchors[nodeInterface];
+			if (this.textData) {
+				this.loadTextData();
+			}
+		}
+		
+		// spatial anchors
+		if (this.anchors[nodeInterface].spatial && !this.anchors[nodeInterface]._ignore && this.p.checkType(['image'])) {
+			var clip = 'rect(' +
+				eval(this.anchors[nodeInterface].calculatedCoords[1]) + 'px,' +
+				eval(this.anchors[nodeInterface].calculatedCoords[2]) + 'px,' +
+				eval(this.anchors[nodeInterface].calculatedCoords[3]) + 'px,' +
+				eval(this.anchors[nodeInterface].calculatedCoords[0]) + 'px)';
+			$(this.htmlPlayer).css('clip',clip);
+		}
+		
+	} else {
+		// no anchor defined
+		this.playingArea = undefined;
+		if (this.playing) {
+			alreadyPlaying = true;
+		}
+	}
+	
+	// restores full text if no textual anchor defined
+	if ((!nodeInterface || !this.anchors[nodeInterface].textual) && this.p.checkType(['text'])) {
+		this.textualAnchor = undefined;
+	}
+	
+	// restores full image if no spatial anchor defined
+	if ((!nodeInterface || !this.anchors[nodeInterface].spatial) && this.p.checkType(['image'])) {
+		$(this.htmlPlayer).css('clip','auto');
+	}
+	
+	/*****************/
+	
+	// if it wasn't playing yet, do it
+   if (!alreadyPlaying && this.popcornPlayer) {
 		this.popcornPlayer.play();
 		if (this.durationBind && !this.durationBinded && this.p.checkType(['image','text'])) {
 			// Bind the explicitDur callback again
 			eval(this.durationBind);
 		}
     }
+	
 };
 
 /**
@@ -229,12 +372,14 @@ Html5Player.prototype.start =  function()
  */
 Html5Player.prototype.stop = function()
 {
+	this.playing = false;
     if (this.popcornPlayer) {
 		this.popcornPlayer.pause(0);
     }
 	if (this.p.checkType(['image','text'])) {
 		this.durationBinded = false;
 	}
+	$(this.htmlPlayer).css('clip','auto');
 };
 
 /**
@@ -242,6 +387,7 @@ Html5Player.prototype.stop = function()
  */
 Html5Player.prototype.pause = function()
 {
+	this.playing = false;
     if (this.popcornPlayer) {
 		this.popcornPlayer.pause();
     }
@@ -252,6 +398,7 @@ Html5Player.prototype.pause = function()
  */
 Html5Player.prototype.resume = function()
 {
+	this.playing = true;
     if (this.popcornPlayer) {
 		this.popcornPlayer.play();
     }
@@ -414,4 +561,40 @@ Html5Player.prototype.getDuration = function() {
 		return Math.min(this.duration,this.popcornPlayer.duration());
 	else
 		return this.duration || this.popcornPlayer.duration();
+}
+
+/**
+ * loadTextData
+ */
+Html5Player.prototype.loadTextData = function() {
+	var beginText = this.textualAnchor.beginText || '';
+	var endText = this.textualAnchor.endText || '';
+	var beginPosition = this.textualAnchor.beginPosition || 1;
+	var endPosition = this.textualAnchor.endPosition || 1;
+	var data = this.textData;
+
+	if (beginText) {
+		var bdata = data;
+		data = data.split(beginText);
+		if (data.length > beginPosition) {
+			data = beginText + data.slice(beginPosition).join(beginText);
+		} else {
+			data = bdata;
+			Logger.warning(Logger.WARN_INVALID_AREA,'area',['beginText','beginPosition']);
+		}
+	}
+	
+	if (endText) {
+		var edata = data;
+		data = data.split(endText);
+		endPosition -= this.textData.split(endText).length - data.length;
+		if (data.length > endPosition && endPosition > 0) {
+			data = data.slice(0,endPosition).join(endText) + endText;
+		} else {
+			data = edata;
+			Logger.warning(Logger.WARN_INVALID_AREA,'area',['endText','endPosition']);
+		}
+	}
+	
+	$(this.htmlPlayer).append(data);
 }
