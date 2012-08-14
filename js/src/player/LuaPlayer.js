@@ -231,7 +231,7 @@ LuaPlayer.prototype.bindlibs = function() {
 			id : this.id,
 			p : this.p,
 			canvas_objects : this.canvas_objects
-		},
+		}
 	};
 
 	lua_libs["libCanvas"]["init"] = $.proxy(function() {
