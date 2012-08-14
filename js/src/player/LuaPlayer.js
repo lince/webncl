@@ -262,7 +262,7 @@ LuaPlayer.prototype.bindlibs = function() {
 			if (attr1 === undefined) {
 				url = attr0;
 
-				objCanvas = canvas_objects[self.str['id']];
+				objCanvas = this.variable.canvas_objects[self.str['id']];
 
 				newObject = objCanvas.newImage(url);
 				this.variable.id = this.variable.id + 1;
