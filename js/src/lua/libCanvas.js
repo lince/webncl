@@ -37,7 +37,7 @@ function libCanvas(ctx) {
 libCanvas.prototype.attrSize = function() {
 	console.log("attrSize");
 
-	var canvas = document.getElementById(ctx.canvas.id);
+	var canvas = document.getElementById(this.ctx.canvas.id);
 
 	return [this.width, this.height];
 
