@@ -422,6 +422,7 @@ libCanvas.prototype.getImage = function(){
 
 libCanvas.prototype.compose = function(x, y, img) {
 	
+	
 	console.log(img.attrSize());
 	console.log("compose");
 	var context = img.getImage();
