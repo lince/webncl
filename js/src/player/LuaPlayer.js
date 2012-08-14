@@ -246,8 +246,8 @@ LuaPlayer.prototype.bindlibs = function() {
 		var ctx = canvas.getContext("2d");
 
 		var object = new libCanvas(ctx);
-		console.log('init',object);
-		console.log(this.variable.id);
+		console.log('init');
+		
 		this.variable.canvas_objects[this.variable.id] = object;
 		var luaObject = lua_newtable();
 		luaObject.str['id'] = this.variable.id;
@@ -325,13 +325,16 @@ LuaPlayer.prototype.bindlibs = function() {
 		}, this);
 
 		luaObject.str['compose'] = $.proxy(function(self, x, y, img) {
+			
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
-			objCanvas.compose(x,y, img);
+			var objImg = this.variable.canvas_objects[img.str['id']];
+			objCanvas.compose(x,y, objImg);
 		}, this);
 
 		luaObject.str['attrCrop'] = $.proxy(function(self, x, y, w, h) {
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
-			return [objCanvas.attrCrop(x, y, w, h)];
+			var img = objCanvas.attrCrop(x, y, w, h);
+			return [img];
 		}, this);
 
 		luaObject.str['attrClip'] = $.proxy(function(self, x, y, w, h) {

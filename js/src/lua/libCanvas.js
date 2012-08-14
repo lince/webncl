@@ -2,7 +2,6 @@ function libCanvas(ctx) {
 
 	//context
 	this.ctx = ctx;
-	
 	this.width = ctx.canvas.width;
 	this.height = ctx.canvas.height;
 	
@@ -81,16 +80,18 @@ libCanvas.prototype.image_path = function(caminho, x, y, w, h) {
 	if (this.initX + w > this.x + this.sizeX || this.initY + h > this.y + this.sizeY)
 
 		console.log("Image exceeds the dimentions limited by canvas");
-	else
+	else{
 		this.ctx.drawImage(img, this.initX, this.initY, w, h);
+		this.cmp.drawImage(img, this.initX, this.initY, w, h);
+	}
+		
 
 }
 
 libCanvas.prototype.setData = function(x, y) {
-		
+	
 	this.width = x;
 	this.height = y;
-	
 }
 
 libCanvas.prototype.attrColor = function(r, g, b, a) {
@@ -406,21 +407,32 @@ libCanvas.prototype.image_path = function(caminho, x, y, w, h) {
 libCanvas.prototype.attrCrop = function(x, y, w, h) {
 	console.log("attrCrop");
 
-	canvasData = this.ctx.getImageData(x, y, w, h);
-	
+	var canvasData = this.ctx.getImageData(x, y, w, h);
 	this.ctx.clearRect(x,y,w,h);
 	
 	return canvasData;
 }
 
-libCanvas.prototype.compose = function(x,y, img) {
-	console.log("compose");
 
-	console.log(img);
-	this.ctx.putImageData(img, x, y);
+libCanvas.prototype.getImage = function(){
 	
-	
+	return this.ctx;
 }
+
+
+libCanvas.prototype.compose = function(x, y, img) {
+	
+	console.log(img.attrSize());
+	console.log("compose");
+	var context = img.getImage();
+	var dimension = img.attrSize();
+	console.log(context);
+	
+	var imageData = context.getImageData(x,y,dimension[0],dimension[1]);
+	this.ctx.putImageData(imageData, x, y);
+
+}
+
 
 libCanvas.prototype.save = function() {
 	console.log("save");
