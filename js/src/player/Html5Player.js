@@ -599,5 +599,7 @@ Html5Player.prototype.loadTextData = function() {
 		}
 	}
 	
-	$(this.htmlPlayer).append(data);
+	if (data) {
+		$(this.htmlPlayer).append(data.replace(/\n/g,'<br/>'));
+	}
 }
