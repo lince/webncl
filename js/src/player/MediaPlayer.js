@@ -229,8 +229,7 @@ MediaPlayer.prototype.create = function (node) {
 					postEvent: this.presentation.postEvent,
 
 				    enableKeyEvents: $.proxy(this.enableKeyEvents,this),
-					area: node.area,
-					path: this.presentation.path
+					area: node.area
 
 			};
 
