@@ -25,10 +25,7 @@ function libCanvas(ctx) {
 	this.sizeH = ctx.canvas.height;
 	this.widthEnd = ctx.canvas.width;
 	this.heightEnd = ctx.canvas.height;
-
 	
-	this.compositeTypes = ['source-over', 'source-in', 'source-out', 'source-atop', 'destination-over', 'destination-in', 'destination-out', 'destination-atop', 'lighter', 'darker', 'copy', 'xor'];
-
 	console.log("libCanvas");
 
 };
@@ -62,7 +59,7 @@ libCanvas.prototype.newImage = function(caminho) {
 	img.src = caminho;
 	newObject = new libCanvas(this.ctx);	
 	newObject.setData(img.width, img.height);
-	newObject.image_path(caminho, 0, 0, img.width, img.height);
+	newObject.image_path(img, 0, 0, img.width, img.height);
 	
 	return newObject;
 
@@ -79,7 +76,7 @@ libCanvas.prototype.image_path = function(img, x, y, w, h) {
 		console.log("Image exceeds the dimentions limited by canvas");
 	else{
 		this.ctx.drawImage(img, this.initX, this.initY, w, h);
-		this.cmp.drawImage(img, this.initX, this.initY, w, h);
+		
 	}
 		
 
@@ -294,12 +291,6 @@ libCanvas.prototype.iniVerifClip2 = function(x1, y1, x2, y2) {
 libCanvas.prototype.drawLine = function(x1, y1, x2, y2) {
 	console.log("drawLine");
 
-	if (this.ultimo)
-		this.ctx.globalCompostion = this.compositeTypes[0];
-	
-else
-		this.ctx.globalCompostion = this.compositeTypes[4];
-
 	verifica = this.iniVerifClip(x1, y1, x2, y2);
 
 	if (verifica) {
@@ -319,11 +310,6 @@ else
 libCanvas.prototype.drawRect = function(mode, x1, y1, x2, y2) {
 	console.log("drawRect");
 
-	if (this.ultimo)
-		this.ctx.globalCompostion = this.compositeTypes[0];
-	
-else
-		this.ctx.globalCompostion = this.compositeTypes[4];
 
 	var verifica = this.iniVerifClip2(x1, y1, x2, y2);
 
@@ -363,13 +349,7 @@ libCanvas.prototype.drawText = function(x, y, text) {
 
 	this.initX = this.x + x;
 	this.initY = this.y + y + height;
-
-	/*if (this.initX + width > this.x + this.sizeX || this.initY + height > this.y + this.sizeY)
-	 console.log("Text exceeds the dimentions limited by canvas");
-	 else {
-	 this.ctx.fillText(text, this.initX, this.initY);
-	 console.log("final attrText");
-	 }*/
+	
 	this.ctx.fillText(text, this.initX, this.initY);
 
 }
@@ -384,22 +364,6 @@ libCanvas.prototype.measureTextLua = function(text) {
 	return [textWidth.width, height];
 }
 
-libCanvas.prototype.image_path = function(caminho, x, y, w, h) {
-	console.log("image_path");
-
-	this.initX = this.x + x;
-	this.initY = this.y + y;
-
-	var img = new Image();
-	img.src = caminho;
-
-	if (this.initX + w > this.x + this.sizeX || this.initY + h > this.y + this.sizeY)
-
-		console.log("Image exceeds the dimentions limited by canvas");
-	else
-		this.ctx.drawImage(img, this.initX, this.initY, w, h);
-
-}
 
 libCanvas.prototype.attrCrop = function(x, y, w, h) {
 	console.log("attrCrop");

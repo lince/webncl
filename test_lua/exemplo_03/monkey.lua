@@ -14,7 +14,7 @@ local banana = { im=img, x=150, y=150, dx=dx, dy=dy }
 -- primeiro o fundo, depois a banana e por fim o macaco
 function redraw ()
 	canvas:attrColor('black')
-	--canvas:drawRect('fill', 0,0, canvas:attrSize()) -- ok até aqui
+	--canvas:drawRect('fill', 0,0, canvas:attrSize()) 
 	canvas:compose(banana.x, banana.y, banana.im)
 	canvas:compose(monkey.x, monkey.y, monkey.im)
 	--canvas:flush()
