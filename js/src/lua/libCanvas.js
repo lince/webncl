@@ -68,14 +68,11 @@ libCanvas.prototype.newImage = function(caminho) {
 
 }
 
-libCanvas.prototype.image_path = function(caminho, x, y, w, h) {
+libCanvas.prototype.image_path = function(img, x, y, w, h) {
 	console.log("image_path");
 
 	this.initX = this.x + x;
 	this.initY = this.y + y;
-
-	var img = new Image();
-	img.src = caminho;
 
 	if (this.initX + w > this.x + this.sizeX || this.initY + h > this.y + this.sizeY)
 
@@ -382,7 +379,7 @@ libCanvas.prototype.measureTextLua = function(text) {
 
 	var textWidth = this.ctx.measureText(text);
 
-	height = parseInt(this.ctx.fonsample/sample-lua.nclt[0] + this.ctx.font[1]);
+	height = parseInt(this.ctx.font[0] + this.ctx.font[1]);
 
 	return [textWidth.width, height];
 }
@@ -414,7 +411,7 @@ libCanvas.prototype.attrCrop = function(x, y, w, h) {
 }
 
 
-libCanvas.prototype.getImage = function(){
+libCanvas.prototype.getContext = function(){
 	
 	return this.ctx;
 }
@@ -425,21 +422,15 @@ libCanvas.prototype.compose = function(x, y, img) {
 	
 	console.log(img.attrSize());
 	console.log("compose");
-	var context = img.getImage();
+	var context = img.getContext();
 	var dimension = img.attrSize();
-	console.log(context);
+	console.log('dimensao imagem: ' + dimension);
 	
-	var imageData = context.getImageData(x,y,dimension[0],dimension[1]);
+	var imageData = context.getImageData(0,0,dimension[0],dimension[1]);
 	this.ctx.putImageData(imageData, x, y);
 
 }
 
-
-libCanvas.prototype.save = function() {
-	console.log("save");
-
-	ctx.save();
-}
 
 libCanvas.prototype.flush = function() {
 	console.log("restore");
