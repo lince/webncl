@@ -270,12 +270,7 @@ libCanvas.prototype.iniVerifClip2 = function(x1, y1, x2, y2) {
 	this.endY = y2;
 	var verifica = true;
 	var sub = 0;
-	console.log("x: " + this.x);
-	console.log("y: " + this.y);
-	console.log("initX: " + this.initX);
-	console.log("initY: " + this.initY);
-	console.log("endX: " + this.endX);
-	console.log("endY: " + this.endY);
+	
 
 	//#------------------------------------------------------------------------------#
 	//verifications for attrClip
@@ -294,8 +289,7 @@ libCanvas.prototype.iniVerifClip2 = function(x1, y1, x2, y2) {
 	}
 	//end of verifications for attrClip
 	//#-------------------------------------------------------------------------------#
-	console.log("endX: " + this.endX);
-	console.log("endY: " + this.endY);
+	
 
 	return verifica;
 }

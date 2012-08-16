@@ -6,7 +6,8 @@ function libEvents(luaplayer){
 	this.counter = 0;
 	tmp = this.player.id;
 	this.nodeId = tmp.substring(tmp.indexOf('_')+1);
-	this.t = 0;
+	var d = new Date();
+	this.t = d.getTime();
 	
 };
 
@@ -51,8 +52,7 @@ libEvents.prototype.post = function(evt){
 		this.luaplayer.eventQueue(evt);
 		
 	}
-	var d = new Date();
-	this.t = d.getTime();
+	
 }
 
 /*libEvents.prototype.timer = function(t, callback, manager){

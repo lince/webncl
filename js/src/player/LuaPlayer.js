@@ -42,7 +42,6 @@ function LuaPlayer(p) {
 	this.id = 0;
 	this.arrayUsers = [];
 	this.isHandlingEvent = false;
-	console.log(p.path);
 	p.createElement("<div class='player' id='" + p.id + "'></div>");
 	
 	
@@ -384,7 +383,7 @@ LuaPlayer.prototype.bindlibs = function() {
 			events.timer(timeout, fct);
 		},
 		"uptime" : function() {
-			return events.uptime();
+			return [events.uptime()];
 		}
 	}
 

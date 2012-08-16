@@ -3,7 +3,7 @@
 local img = canvas:new('test_lua/exemplo_04/runner.png')
 local dx, dy = img:attrSize()
 local runner = { img=img, frame=0, x=50-dx/2, y=10, dx=dx, dy=dy }
-
+local cont = 0;
 -- Funcao de redesenho:
 -- chamada a cada ciclo de animacao
 local dx, dy = canvas:attrSize()
@@ -14,7 +14,7 @@ function redraw ()
 	canvas:drawRect('fill', 0,0, dx,dy)
 
 	-- linha de largada e chegada
-	canvas:attrColor('white')
+	canvas:attrColor('red')
 	canvas:drawRect('fill', INI,0, 8,dy)
 	canvas:drawRect('fill', END,0, 8,dy)
 
@@ -31,7 +31,8 @@ function handler (evt)
 	if (evt.class == 'ncl' and evt.type == 'presentation' and evt.action == 'start') or
 	   (evt.class == 'user') then
 		local now = event.uptime()
-
+		print ('now')
+		print (now)
 		-- movimenta o corredor caso tempo ja tenha passado
 		if evt.time then
 			local dt = now - evt.time
@@ -40,7 +41,9 @@ function handler (evt)
 
 		-- caso nao tenha chegado a linha de chegada, continua dando ciclos a animacao
 		if runner.x < END then
+			
 			event.post({ class='user', time=now })
+			cont = cont + 1
 		end
 
 		-- muda o frame do corredor a cada 5 pixels
