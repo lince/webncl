@@ -42,6 +42,7 @@ function LuaPlayer(p) {
 	this.id = 0;
 	this.arrayUsers = [];
 	this.isHandlingEvent = false;
+	console.log(p.path);
 	p.createElement("<div class='player' id='" + p.id + "'></div>");
 	
 	
@@ -336,13 +337,21 @@ LuaPlayer.prototype.bindlibs = function() {
 			var img = objCanvas.attrCrop(x, y, w, h);
 			return [img];
 		}, this);
+		
+		luaObject.str['flush'] = $.proxy(function(self) {
+			
+			var objCanvas = this.variable.canvas_objects[self.str['id']];
+			objCanvas.flush();
+		}, this);
+		
 
 		luaObject.str['attrClip'] = $.proxy(function(self, x, y, w, h) {
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
 			objCanvas.attrClip(x, y, w, h);
 		}, this);
+		
 		return [luaObject];
-
+				
 	}, lua_libs["libCanvas"]);
 
 	persist = this.persitent;

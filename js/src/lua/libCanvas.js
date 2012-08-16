@@ -1,11 +1,18 @@
 function libCanvas(ctx) {
 
 	//context
-	this.ctx = ctx;
+	this.ctx2 = ctx;
 	this.width = ctx.canvas.width;
 	this.height = ctx.canvas.height;
 	
 	
+	var canvas = document.createElement("canvas");
+	canvas.id = "canvasCopy";
+	canvas.width = 500;
+	canvas.height = 500;
+	
+	this.ctx = canvas.getContext("2d");
+
 	//variables for attrClip
 	this.x = 0;
 	this.y = 0;
@@ -48,8 +55,6 @@ libCanvas.prototype.newCanvas = function(width, height) {
 	return newObject;
 
 }
-
-
 
 //TODO use function onload to first load the image then execute de code
 libCanvas.prototype.newImage = function(caminho) {
@@ -397,9 +402,8 @@ libCanvas.prototype.compose = function(x, y, img) {
 
 
 libCanvas.prototype.flush = function() {
-	console.log("restore");
-
-	ctx.restore();
-
+	console.log('flush');
+	var imageData = this.ctx.getImageData(0,0,500,500);
+	this.ctx2.putImageData(imageData, 0,0);
 }
 
