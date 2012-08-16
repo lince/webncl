@@ -12,6 +12,13 @@ function libCanvas(ctx) {
 	canvas.height = 500;
 	
 	this.ctx = canvas.getContext("2d");
+	
+	var canvasImage = document.createElement("canvas");
+	canvas.id = "canvasImage";
+	canvas.width = 500;
+	canvas.height = 500;
+	
+	this.ctx3 = canvas.getContext("2d");
 
 	//variables for attrClip
 	this.x = 0;
@@ -62,7 +69,7 @@ libCanvas.prototype.newImage = function(caminho) {
 	
 	var img = new Image();
 	img.src = caminho;
-	newObject = new libCanvas(this.ctx);	
+	newObject = new libCanvas(this.ctx3);	
 	newObject.setData(img.width, img.height);
 	newObject.image_path(img, 0, 0, img.width, img.height);
 	
@@ -387,13 +394,9 @@ libCanvas.prototype.getContext = function(){
 
 
 libCanvas.prototype.compose = function(x, y, img) {
-	
-	
-	console.log(img.attrSize());
-	console.log("compose");
+	console.log('compose');
 	var context = img.getContext();
 	var dimension = img.attrSize();
-	console.log('dimensao imagem: ' + dimension);
 	
 	var imageData = context.getImageData(0,0,dimension[0],dimension[1]);
 	this.ctx.putImageData(imageData, x, y);
@@ -403,7 +406,8 @@ libCanvas.prototype.compose = function(x, y, img) {
 
 libCanvas.prototype.flush = function() {
 	console.log('flush');
-	var imageData = this.ctx.getImageData(0,0,500,500);
+	var dimension = this.attrSize();
+	var imageData = this.ctx.getImageData(0,0,dimension[0],dimension[1]);
 	this.ctx2.putImageData(imageData, 0,0);
 }
 
