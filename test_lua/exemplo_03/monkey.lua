@@ -17,7 +17,7 @@ function redraw ()
 	--canvas:drawRect('fill', 0,0, canvas:attrSize()) 
 	canvas:compose(banana.x, banana.y, banana.im)
 	canvas:compose(monkey.x, monkey.y, monkey.im)
-	--canvas:flush()
+	canvas:flush()
 end
 
 -- Funcao de colisao:

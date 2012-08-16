@@ -69,7 +69,7 @@ libCanvas.prototype.newImage = function(caminho) {
 	
 	var img = new Image();
 	img.src = caminho;
-	newObject = new libCanvas(this.ctx3);	
+	newObject = new libCanvas(this.ctx);	
 	newObject.setData(img.width, img.height);
 	newObject.image_path(img, 0, 0, img.width, img.height);
 	
@@ -408,6 +408,8 @@ libCanvas.prototype.flush = function() {
 	console.log('flush');
 	var dimension = this.attrSize();
 	var imageData = this.ctx.getImageData(0,0,dimension[0],dimension[1]);
+	this.ctx2.clearRect(0,0,dimension[0],dimension[1]);
+	this.ctx.clearRect(0,0,dimension[0],dimension[1]);
 	this.ctx2.putImageData(imageData, 0,0);
 }
 
