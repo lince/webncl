@@ -19,110 +19,132 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function Parser () {
+function Parser (path) {
 
-	this.referenceMap = {
-		// Tabela de IDs que podem ser referenciados por outros objetos
-		map: [],
-		// ----- REFER -----
-		instReuse: [],
-		// -----------------
-		addSource: function (obj,attr,type) {
-			// TODO
-			// - salvar todos os sources e todos os targets e, no final do parse, ligar as referências
-			// - resolver o problema do transition (id1;id2;...)
-			if (!this.map[obj[attr]]) {
-				this.map[obj[attr]] = {
-					sources: []
-				};
-			}
-			this.map[obj[attr]].sources.push({
-				obj: obj,
-				attr: attr,
-				type: type
-			});
-		},
-		addTarget: function (ref,id,pid,refType) {
-			var newTarget = false;
-			if (this.map[id]) {
-				if (this.map[id].target) {
-					if (refType=="property" || refType=="connectorParam") {
-						// não pode repetir no mesmo pai
-						if (this.map[id].target.parents[pid]) {
-							return false;
-						}
-					} else {
-						// não pode repetir nunca
-						return false;
-					}
-				} else {
-					newTarget = true;
-				}
-			} else {
-				this.map[id] = {
-					sources: []
-				};
-				newTarget = true;
-			}
-			if (newTarget) {
-				this.map[id].target = {
-					obj: ref,
-					type: refType,
-					parents: []
-				};
-			}
-			this.map[id].target.parents[pid] = true;
-			return true;
-		},
-		pop: function (id) {
-			return (this.map[id] ? this.map[id].target : false);
-		},
-		createReferences: function () {
-			for (id in this.map) {
-				for (i in this.map[id].sources) {
-					var src = this.map[id].sources[i];
-					if (this.map[id].target && this.map[id].target.obj && $.inArray(this.map[id].target.type,src.type)!=-1) {
-						// --- REFER ---
-						if (src.attr=="refer") {
-							if (src.obj._type=="media") {
-								// TODO: é só DESCRIPTOR, SRC e TYPE que "herdam" do refer?
-								// (area, property, ... ?)
-								src.obj.descriptor = this.map[id].target.obj.descriptor;
-								src.obj.src = this.map[id].target.obj.src;
-								src.obj.type = this.map[id].target.obj.type;
-								if (src.obj.instance!="new") {
-									// instSame ou gradSame
-									this.instReuse[src.obj.id] = id;
-								}
-							} else if (src.obj._type=="context") {
-								// TODO
-							}
-						} else {
-						// -------------
-							src.obj[src.attr] = this.map[id].target.obj;
-						}
-					} else {
-						Logger.error(Logger.ERR_INVALID_ID_REFERENCE,src.type,[src.attr,src.obj[src.attr],src.type]);
-					}
-				}
-			}
-		}
-	};
+	this.referenceMap =  new ReferenceMap(this);
+	this.uniqueTable = {};
+	this.path = path;
+	this.url = '';
+	this.ncl = undefined;
+	this.parsers = {
+		/*
+		 url: {
+			loadTime: 0,
+		    xmlParse: 0,
+			parseTime: 0,
+		    parser: new Parser(),
+		    importedBy: url of document importing it,
+		 }
+		 
+		 */
+	}
+	
+	this.__callback = undefined;
+	this.loading = false;
 
-	this.uniqueTable = [];
 	
 };
 
-Parser.prototype.parse = function (ncl) {
-	this.ncl = this.createNode(ncl);
-	this.referenceMap.createReferences();
-	return this.ncl;
+Parser.prototype.load = function(url,parseCallback,div)
+{
+	if(this.loading)
+		return false;
+	
+	this.loading = true;
+	this.url = url;
+	this.parsers[url] = {
+		parser: this, 
+		loadTime: 0,
+		parseTime : 0,
+		xmlParse : 0
+	};
+	this.info = this.parsers[url];
+	this.__callback = parseCallback;
+	
+	this.__load(url,$.proxy(this.parse,this),div);
+	
+	return true;
+}
+
+//__load
+Parser.prototype.__load = function(url, callback, div)
+{
+	var datatype = div ? 'text' : 'xml';
+	this.info.loadTime = new Date();
+
+	$.ajax({
+		type: "GET",
+		url: url,
+		context: {times: this.info,
+				   callback: callback,
+				   div: div},
+		dataType: datatype,
+		success: function (data) {
+			var tm = this.times;
+			tm.loadTime = new Date() - tm.loadTime;
+			tm.xmlParse = new Date();
+			var d = div ? $($.parseXML(data)).find("#"+this.div)[0] : data;
+			tm.xmlParse = new Date() - tm.xmlParse;
+			this.callback(d);
+		},
+		error: function(jqXHR,textStatus, errorThrown)
+		{
+			var tm = this.times;
+			tm.loadTime = new Date() - tm.loadTime;
+			Logger.error('PARSER',[textStatus,errorThrown]);
+		}
+	});	
+}
+
+Parser.prototype.parse = function (data) {
+	if(!this.loading)
+		return;
+	
+	var i = this.info;
+	i.parseTime = new Date();	
+	this.ncl = this.createNode(data);
+
+	
+	if(!this.uniqueTable['aliasList'])
+	{
+	
+		this.referenceMap.createReferences();
+		i.parseTime = new Date() - i.parseTime;
+		
+		if(this.__callback)
+			this.__callback(this.ncl);
+
+		this.loading = false;		
+	} else {
+		i.parseTime = new Date() - i.parseTime;
+		this.importNcl();
+	}
+	//this.importNcl(nclstruct.importList,0);
+	
+
 };
+
+Parser.prototype.importNcl = function()
+{
+	var i = this.uniqueTable['aliasList'].splice(0,1);
+	if(i.length > 0)
+	{
+		i[0].parser.load(this.path + i[0].url, $.proxy(this.importNcl,this));
+	} else {
+		var x = new Date();
+		this.referenceMap.createReferences();
+		x = new Date() - x;
+		this.info.parseTime += x;
+		
+		if(this.__callback)
+			this.__callback(this.ncl);
+	}
+}
 
 Parser.prototype.createNode = function (parent, tagName, parentNode, tree) {
 	tagName = tagName || "ncl";
-	var data = $(parent).find(tagName=="ncl"?"ncl":"> "+tagName);
-	if (data.length==0) return false;
+	var data = $(parent).find(tagName==="ncl"?"ncl":"> "+tagName);
+	if (data.length===0) return false;
 	var nodes = [];
 	// attributes
 	var attrs = Parser.nclStructureMap[tagName].attrs;
@@ -147,7 +169,6 @@ Parser.prototype.createNode = function (parent, tagName, parentNode, tree) {
 		};
 		for (i in allAttrs) {
 			node[allAttrs[i]] = $(this).attr(allAttrs[i]);
-			//node[allAttrs[i]=="interface"?"nodeInterface":allAttrs[i]] = $(this).attr(allAttrs[i]);
 		}
 		var newTree = tree + ">" + tagName;
 		if (node.id) {
@@ -159,7 +180,7 @@ Parser.prototype.createNode = function (parent, tagName, parentNode, tree) {
 			node[allTags[i]] = parser.createNode(this,allTags[i],node,newTree);
 		}
 		nodes.push(node);
-		if (tagName == "ncl") {
+		if (tagName === "ncl") {
 			parser.parseNCL(node,tagName,parentNode,tree);
 		} else {
 			// TODO check why tagName[0] is undefined
@@ -175,12 +196,13 @@ Parser.prototype.parseAttributes = function (nodeXml, nodeObj) {
 	var attrObj = $(nodeXml).get(0).attributes;
 	var nodeType = nodeObj["_type"];
 	var attrs = Parser.nclStructureMap[nodeType].attrs;
+	var attr,i;
 	var foundAttrs = [];
-	for (var i=0; i<attrObj.length; i++) {
+	for ( i=0; i<attrObj.length; i++) {
 		foundAttrs.push(attrObj.item(i).name);
 	}
 	// # (source)
-	for (i in attrs.reference_source) {
+	for ( i in attrs.reference_source) {
 		for (attr in attrs.reference_source[i][0]) {
 			if ($(nodeXml).attr(attrs.reference_source[i][0][attr])) {
 				this.referenceMap.addSource(nodeObj,attrs.reference_source[i][0][attr],attrs.reference_source[i][1]);
@@ -188,9 +210,9 @@ Parser.prototype.parseAttributes = function (nodeXml, nodeObj) {
 		}
 	}
 	// # (target)
-	for (attr in attrs.reference_target) {
+	for ( attr in attrs.reference_target) {
 		if ($(nodeXml).attr(attrs.reference_target[attr])) {
-			var type = attrs.reference_target[attr]=="focusIndex" ? "focusIndex" : nodeType;
+			var type = attrs.reference_target[attr]==="focusIndex" ? "focusIndex" : nodeType;
 			if (!this.referenceMap.addTarget(nodeObj,$(nodeXml).attr(attrs.reference_target[attr]),$(nodeXml).parent().attr("id"),type)) {
 				Logger.error(Logger.ERR_DUPLICATED_ID,nodeType,[attrs.reference_target[attr],$(nodeXml).attr(attrs.reference_target[attr]),$(nodeXml).parent().attr("id")]);
 			}
@@ -317,3 +339,141 @@ Parser.prototype.parseContent = function (nodeXml,nodeObj) {
 		}
 	}
 };
+
+
+/**
+ * Class ReferenceMap
+ *
+ */
+
+function ReferenceMap(parser)
+{
+		// Tabela de IDs que podem ser referenciados por outros objetos
+		this.map= {};
+		// ----- REFER -----
+		this.instReuse = [];
+		// -----------------	
+		this.parser = parser;
+}
+
+ReferenceMap.prototype.addSource = function (obj,attr,type) {
+	var rid = obj[attr];
+	// TODO
+	// - salvar todos os sources e todos os targets e, no final do parse, ligar as referências
+	// - resolver o problema do transition (id1;id2;...)
+	if (!this.map[rid]) {
+		this.map[rid] = {
+			sources: []
+		};
+	}
+
+	this.map[rid].sources.push({
+		obj: obj,
+		attr: attr,
+		type: type
+	});
+	
+	if(rid.indexOf('#') !== -1)
+	{
+		//if alias was defined
+		var t = rid.split('#');
+		if(!this.map[rid].target)
+		{
+			this.map[rid].target = 
+			{
+				alias: t[0],
+				id: t[1],
+				obj: undefined,//ref,
+				type: undefined,//refType,
+				parents: []
+			}
+		}
+	}
+	
+};
+
+ReferenceMap.prototype.addTarget= function (ref,id,pid,refType) {
+	var newTarget = false;
+	if (this.map[id]) {
+		if (this.map[id].target) {
+			if (refType==="property" || refType==="connectorParam") {
+				// não pode repetir no mesmo pai
+				if (this.map[id].target.parents[pid]) {
+					return false;
+				}
+			} else {
+				// não pode repetir nunca
+				return false;
+			}
+		} else {
+			newTarget = true;
+		}
+	} else {
+		this.map[id] = {
+			sources: []
+		};
+		newTarget = true;
+	}
+	if (newTarget) {
+		this.map[id].target = {
+			obj: ref,
+			type: refType,
+			parents: []
+		};
+	}
+	this.map[id].target.parents[pid] = true;
+	return true;
+};
+
+
+ReferenceMap.prototype.pop= function (id) {
+	return (this.map[id] ? this.map[id].target : false);
+};
+		
+ReferenceMap.prototype.createReferences= function () {
+	for (var id in this.map) {
+		for (var i in this.map[id].sources) {
+			var src = this.map[id].sources[i];
+			var tg = this.map[id].target;
+			if(tg.alias)
+			{
+				var a = this.parser.uniqueTable.alias;
+				if(a && a[tg.alias])
+				{
+					var o = a[tg.alias].parser.referenceMap.map[tg.id];
+					if(o)
+					{
+						tg.obj = o.target.obj;
+						//tg.parents = o.target.parents;
+						tg.type = o.target.type;
+					}
+				} else {
+					Logger.error(ERR_INVALID_ALIAS,tg.alias,[src.attr,src.obj[src.attr],src.type]);
+				}
+			}
+			if (this.map[id].target && this.map[id].target.obj && $.inArray(this.map[id].target.type,src.type)!=-1) {
+				// --- REFER ---
+				if (src.attr=="refer") {
+					if (src.obj._type=="media") {
+						// TODO: é só DESCRIPTOR, SRC e TYPE que "herdam" do refer?
+						// (area, property, ... ?)
+						src.obj.descriptor = this.map[id].target.obj.descriptor;
+						src.obj.src = this.map[id].target.obj.src;
+						src.obj.type = this.map[id].target.obj.type;
+						if (src.obj.instance!="new") {
+							// instSame ou gradSame
+							this.instReuse[src.obj.id] = id;
+						}
+					} else if (src.obj._type=="context") {
+						// TODO
+					}
+				} else {
+				// -------------
+					src.obj[src.attr] = this.map[id].target.obj;
+				}
+			} else {
+				Logger.error(Logger.ERR_INVALID_ID_REFERENCE,src.type,[src.attr,src.obj[src.attr],src.type]);
+			}
+		}
+	}
+}

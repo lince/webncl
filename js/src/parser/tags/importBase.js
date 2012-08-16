@@ -22,8 +22,10 @@
 Parser.prototype.parseImportBase = function (obj,tag,parent,tree) {
 	// alias
 	if (!this.uniqueTable["alias"]) {
-		this.uniqueTable["alias"] = [];
+		this.uniqueTable["alias"] = {};
+		this.uniqueTable["aliasList"] = [];
 	}
+	
 	if (this.uniqueTable["alias"][obj.alias]) {
 		if (!this.uniqueTable["alias"][obj.alias].duplicated) {
 			this.uniqueTable["alias"][obj.alias].duplicated = true;
@@ -31,7 +33,18 @@ Parser.prototype.parseImportBase = function (obj,tag,parent,tree) {
 		}
 	} else {
 		this.uniqueTable["alias"][obj.alias] = {
-			duplicated: false
+			duplicated: false,
+			url : obj.documentURI,
+			//(imported flag can be implemented later for
+			//dinamic importing. Eg.: importing only when needed
+			//imported: false,
+			parser : new Parser(this.path),
+			//by what base this element is acessible
+			allBases: false,
+			base : parent._type
 		};
+		this.uniqueTable['aliasList'].push(this.uniqueTable["alias"][obj.alias]);
 	}	
+
+	// 
 };

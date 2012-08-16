@@ -84,7 +84,7 @@ function WebNclPlayer (file, div, directory) {
 			{
 					defaultPlayer: Html5Player
 			},
-		"application/x-ginga-NCLua" : { defaultPlayer: LuaPlayer},
+		"application/x-ginga-NCLua" : {defaultPlayer: LuaPlayer},
 		"application/x-ginga-NCLet" : undefined,
 		"application/x-ginga-settings" : {
 					defaultPlayer: Html5Player
@@ -169,53 +169,34 @@ function WebNclPlayer (file, div, directory) {
 	this.presentation.pausedElem = [];
 	this.presentation.notifyLink =$.proxy(this.nAction,this);
 	this.presentation.lastMediaAborted = false;
+	this.presentation.parser = new Parser(this.presentation.path);
 
 	/*
-        Comentar efeito do ajax!
+        Carrega o arquivo
     */
 	
 	if (file) {
-	
-		$.ajax({
-			type: "GET",
-			url: file,
-			dataType: "xml",
-			success: $.proxy(function (data) {
-				// TODO: checar a sintaxe do arquivo XML
-				//Logger.checkFile(file); ???
-				this.execute(data);
-			},this)
-			// TODO: checar se o arquivo XML foi aberto com sucesso
-		});
-	
+		this.presentation.parser.load(file,$.proxy(this.execute,this));
 	} else {
-	    
 		file = document.URL.split('/');
 		file = file[file.length-1];
-		
-		$.ajax({
-			type: "GET",
-			url: file,
-			dataType: "text",
-			success: $.proxy(function (data) {
-				// TODO: checar a sintaxe do arquivo XML
-				this.execute($($.parseXML(data)).find("#"+this.div)[0]);
-			},this)
-			// TODO: checar se o arquivo XML foi aberto com sucesso
-		});
-		
+	    this.presentation.parser.load(file,$.proxy(this.execute,this),this.div);
 	}
 	
 };
 
-// execute
-WebNclPlayer.prototype.execute = function (data) {
-	// cria o objeto NCL
-	var t = new Date();
-    var rb,i;
-	this.presentation.parser = new Parser();
-	this.presentation.ncl = this.presentation.parser.parse(data);
-	console.log('Player "'+this.div+'" loaded in ' + (new Date() - t) + 'ms');
+// execute (chamada após o parse)
+WebNclPlayer.prototype.execute = function (nclObj) {
+	//imprime os tempos
+	var p = this.presentation.parser;
+	for(var x in p.parsers)
+	{
+		console.log(['[',this.div,']  ',x,':    LOAD: ',p.parsers[x].loadTime,'ms;   PARSE XML: ', p.parsers[x].xmlParse , 'ms;   PARSE: ' , p.parsers[x].parseTime ,  'ms'].join(''));
+	}
+	
+	//
+	var rb,i;
+	this.presentation.ncl = nclObj;
 	this.presentation.inputManager = new InputManager(this.presentation);
 	this.presentation.systemSettings = new SystemSettings(this.presentation);
 	
@@ -233,13 +214,13 @@ WebNclPlayer.prototype.execute = function (data) {
 		}
 	}
         
-        // torna a div selecionavel
-        $playerDiv.attr('tabindex',this.presentation.playerId);
+	// torna a div selecionavel
+	$playerDiv.attr('tabindex',this.presentation.playerId);
 
-        // cria as divs de interface 
-        $playerDiv.append("<div id='" + this.presentation.loadingDiv + "' class='wncl_BlackDiv' style='display:none;'><image src='images/loader1.gif' width='32' height='32' style='position:relative; left: 50%; top: 50%; margin-top: -16px; margin-left:-16px'/></div>");
-        $playerDiv.append("<div id='" + this.presentation.playDiv + "' class='wncl_BlackDiv wncl_clickMe' ><image src='images/play.png' width='48' height='48' style='position:relative; left: 50%; top: 50%; margin-top: -24px; margin-left:-24px'/></div>");
-        $playerDiv.append("<div id='" + this.presentation.endDiv + "' class='wncl_BlackDiv wncl_clickMe' style='display:none;'><image src='images/replay.png' width='48' height='48' style='position:relative; left: 50%; top: 50%; margin-top: -24px; margin-left:-24px'/></div>");
+	// cria as divs de interface 
+	$playerDiv.append("<div id='" + this.presentation.loadingDiv + "' class='wncl_BlackDiv' style='display:none;'><image src='images/loader1.gif' width='32' height='32' style='position:relative; left: 50%; top: 50%; margin-top: -16px; margin-left:-16px'/></div>");
+	$playerDiv.append("<div id='" + this.presentation.playDiv + "' class='wncl_BlackDiv wncl_clickMe' ><image src='images/play.png' width='48' height='48' style='position:relative; left: 50%; top: 50%; margin-top: -24px; margin-left:-24px'/></div>");
+	$playerDiv.append("<div id='" + this.presentation.endDiv + "' class='wncl_BlackDiv wncl_clickMe' style='display:none;'><image src='images/replay.png' width='48' height='48' style='position:relative; left: 50%; top: 50%; margin-top: -24px; margin-left:-24px'/></div>");
        
         
 	// cria as divs iniciais
@@ -249,14 +230,7 @@ WebNclPlayer.prototype.execute = function (data) {
 	// cria o primeiro contexto (body)
 	this.presentation.context = new ContextPlayer(this.presentation.ncl.body,this.presentation);
 
-	// TODO: tratar evento de onEnd do contexto
-	
-	//$(this.presentation.context.htmlPlayer).on('presentation.onEnd presentation.onAbort',$.proxy(function(){
-	//    this.presentation.stop();
-	//},this));
-
 	// eventos para cada div de interface
-	
 	//start div
 	$('#'+this.presentation.playDiv).on("click",$.proxy(function(){
 		if (this.presentation.context.isStopped) {
@@ -486,12 +460,12 @@ WebNclPlayer.prototype.postEvent = function (event) {
 				this.triggerEvent(event.action,event.component,event.area);
 			} else {
 				switch (event.action) {
-					case 'start': this.start(); break;
-					case 'pause': this.pause(); break;
-					case 'resume': this.resume(); break;
-					case 'abort': this.abort(); break;
-					case 'stop': this.stop(); break;
-					case 'destroy': this.destroy(); break;
+					case 'start':this.start();break;
+					case 'pause':this.pause();break;
+					case 'resume':this.resume();break;
+					case 'abort':this.abort();break;
+					case 'stop':this.stop();break;
+					case 'destroy':this.destroy();break;
 				}
 			}
 		} else if (event.type == 'attribution' && event.action == 'start') {

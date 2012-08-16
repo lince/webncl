@@ -22,35 +22,35 @@
 var Logger = {
 
 	// Warnings
-	WARN_INVALID_ATTR:					100,	// Atributo inválido
+	WARN_INVALID_ATTR:						100,	// Atributo inválido
 	WARN_INVALID_TAG:						101,	// Tag inválida
-	WARN_INVALID_HEAD_STRUCTURE:		102,	// Estrutura do cabeçalho inválida
-	WARN_INVALID_REGION_DIMENSIONS:	103,	// Dimensões de região inválidas
-	WARN_DUPLICATED_ZINDEX:				104,	// zIndex duplicado
-	WARN_INVALID_AREA:					105,		// Area invalida
-	WARN_NOT_IMPLEMENTED_YET:			106,	// Recurso não implementado ainda
+	WARN_INVALID_HEAD_STRUCTURE:			102,	// Estrutura do cabeçalho inválida
+	WARN_INVALID_REGION_DIMENSIONS:			103,	// Dimensões de região inválidas
+	WARN_DUPLICATED_ZINDEX:					104,	// zIndex duplicado
+	WARN_INVALID_AREA:						105,		// Area invalida
+	WARN_NOT_IMPLEMENTED_YET:				106,	// Recurso não implementado ainda
 	
 	// Errors
 	ERR_MISSING_ATTR:						201,	// Atributo obrigatório faltando
-	ERR_MISSING_ATTR_ONEOF:				202,	// Atributo obrigatório faltando (um desses)
-	ERR_MISSING_ATTR_DEP:				203,	// Atributo dependente faltando
-	ERR_TOO_MANY_ATTRS:					204,	// Excesso de atributos repetidos
+	ERR_MISSING_ATTR_ONEOF:					202,	// Atributo obrigatório faltando (um desses)
+	ERR_MISSING_ATTR_DEP:					203,	// Atributo dependente faltando
+	ERR_TOO_MANY_ATTRS:						204,	// Excesso de atributos repetidos
 	ERR_MISSING_TAG:						205,	// Tag obrigatória faltando (+,1)
-	ERR_MISSING_TAG_ONEOF:				206,	// Tag obrigatória faltando (|+,|1)
-	ERR_TOO_MANY_TAGS:					207,	// Excesso de tags repetidas (?,1)
-	ERR_TOO_MANY_TAGS_ONEOF:			208,	// Excesso de tags (apenas uma permitida)
-	ERR_INVALID_ATTR_VALUE:				209,	// Valor de atributo inválido
-	ERR_INVALID_ID_REFERENCE:			210,	// Referência a um ID inválido
-	ERR_DUPLICATED_ID:					211,	// ID duplicado
-	ERR_INCOMPATIBLE_FILE_EXT:			212,	// Extensão de arquivo incompatível com o MIMETYPE
+	ERR_MISSING_TAG_ONEOF:					206,	// Tag obrigatória faltando (|+,|1)
+	ERR_TOO_MANY_TAGS:						207,	// Excesso de tags repetidas (?,1)
+	ERR_TOO_MANY_TAGS_ONEOF:				208,	// Excesso de tags (apenas uma permitida)
+	ERR_INVALID_ATTR_VALUE:					209,	// Valor de atributo inválido
+	ERR_INVALID_ID_REFERENCE:				210,	// Referência a um ID inválido
+	ERR_DUPLICATED_ID:						211,	// ID duplicado
+	ERR_INCOMPATIBLE_FILE_EXT:				212,	// Extensão de arquivo incompatível com o MIMETYPE
 	ERR_INVALID_URI:						213,	// URI inválida
 	ERR_DUPLICATED_ATTR:					214,	// Atributo duplicado
-	ERR_DUPLICATED_ALIAS:				215,	// Alias duplicado
-	ERR_INVALID_CONTEXT_REFERENCE:	216,	// Objeto referenciado em outro contexto
-	
-        ERR_MEDIAPLAYER_METHOD_NOTFOUND: 301,               // User defined media player has not a necessary method
-        ERR_MEDIAPLAYER_NOPLAYER: 302,                      // No player was defined for current mime type or file extension
-        
+	ERR_DUPLICATED_ALIAS:					215,	// Alias duplicado
+	ERR_INVALID_CONTEXT_REFERENCE:			216,	// Objeto referenciado em outro contexto
+	ERR_MEDIAPLAYER_METHOD_NOTFOUND:		217,	// User defined media player lacks defining a method
+	ERR_MEDIAPLAYER_NOPLAYER:				218,	// No player was defined for current mime type or file extension
+    ERR_PARSER_LOADINGERROR:				219,    // Error while loading NCL file
+	ERR_INVALID_ALIAS:						220,	// Invalid Alias
 	MESSAGES: {
 		100: "Atributo inválido",
 		101: "Tag inválida",
@@ -75,10 +75,11 @@ var Logger = {
 		213: "URI inválida",
 		214: "Atributo duplicado",
 		215: "Alias duplicado",
-		216: "Objeto referenciado em outro contexto",
-                
-                301: "Método não encontrado no media player",
-                302: "Nenhum player foi definido para este mime type/extensão"
+		216: "Objeto referenciado em outro contexto",         
+		217: "Método não encontrado no media player",
+		218: "Nenhum player foi definido para este mime type/extensão",
+		219: "Erro carregando arquivo",
+		220: "Alias inválido!"
 	},
 	
 	abort: false,

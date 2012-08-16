@@ -22,7 +22,8 @@
 Parser.prototype.parseImportNCL = function (obj,tag,parent,tree) {
 	// alias
 	if (!this.uniqueTable["alias"]) {
-		this.uniqueTable["alias"] = [];
+		this.uniqueTable["alias"] = {};
+		this.uniqueTable["aliasList"] = [];
 	}
 	if (this.uniqueTable["alias"][obj.alias]) {
 		if (!this.uniqueTable["alias"][obj.alias].duplicated) {
@@ -31,7 +32,13 @@ Parser.prototype.parseImportNCL = function (obj,tag,parent,tree) {
 		}
 	} else {
 		this.uniqueTable["alias"][obj.alias] = {
-			duplicated: false
+			duplicated: false,
+			url : obj.documentURI,
+			parser : new Parser(this.path),
+			allBases : true
 		};
+		this.uniqueTable['aliasList'].push(this.uniqueTable["alias"][obj.alias]);
 	}	
+	
+	//new information
 };
