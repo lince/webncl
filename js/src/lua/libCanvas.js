@@ -69,11 +69,16 @@ libCanvas.prototype.newImage = function(caminho) {
 	
 	var img = new Image();
 	img.src = caminho;
-	newObject = new libCanvas(this.ctx);	
-	newObject.setData(img.width, img.height);
-	newObject.image_path(img, 0, 0, img.width, img.height);
 	
-	return newObject;
+	if (img.complete) {
+		newObject = new libCanvas(this.ctx);
+		newObject.setData(img.width, img.height);
+		newObject.image_path(img, 0, 0, img.width, img.height);
+
+		return newObject;
+
+	}
+		
 
 }
 
@@ -378,7 +383,7 @@ libCanvas.prototype.attrCrop = function(x, y, w, h) {
 	this.ctx.clearRect(0,0,this.ctx.canvas.width, this.ctx.canvas.height);
 	this.ctx.putImageData(canvasData, 0, 0);
 	
-	
+
 }
 
 
