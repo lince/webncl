@@ -220,9 +220,7 @@ LuaPlayer.prototype.setProperty = function(name, value) {
 	}
 }
 
-LuaPlayer.prototype.createCanvasObject = function() {
 
-}
 
 LuaPlayer.prototype.bindlibs = function() {
 
@@ -325,10 +323,18 @@ LuaPlayer.prototype.bindlibs = function() {
 		}, this);
 
 		luaObject.str['compose'] = $.proxy(function(self, x, y, img) {
-			
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
-			var objImg = this.variable.canvas_objects[img.str['id']];
-			objCanvas.compose(x,y, objImg);
+			console.log(img);
+			if(img.data === undefined){
+				
+				var objImg = this.variable.canvas_objects[img.str['id']];
+				objCanvas.compose(x,y, objImg, 0);
+				
+			}
+			else{
+				objCanvas.compose(x,y, img, 1);
+			}
+			
 		}, this);
 
 		luaObject.str['attrCrop'] = $.proxy(function(self, x, y, w, h) {
