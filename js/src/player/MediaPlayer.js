@@ -242,14 +242,9 @@ MediaPlayer.prototype.create = function (node) {
 				var methods = 'load unload exec start stop pause resume abort seek seekAndPlay setProperty getDuration keyEventHandler'.split(' ');
 				for (i in methods) {
 					if (!this.player[methods[i]]) {
-                        if(!this.player.__playerName)
-                        {
-                            this.player.__playerName = this.playerName;
-                        }
-                        this.player[methods[i]] = function()
-                        {
-                            Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.__playerName,[arguments.callee.name]);
-                        }
+						eval('this.player[methods[i]] = function() {' +
+							'Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,"' + this.playerName + '",["' + methods[i] + '"]);' +
+							'};');
 					}
 				}
 
@@ -434,7 +429,9 @@ MediaPlayer.prototype.load = function (source) {
 	source = this.presentation.path + source;
 
 	this.player.unload(source);
-	this.player.load(source);
+	if (!this.player.load(source)) {
+		Logger.warning(Logger.WARN_MEDIA_NOT_FOUND,this.node.id,[source]);
+	}
 
 };
 

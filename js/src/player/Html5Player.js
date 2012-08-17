@@ -208,49 +208,77 @@ Html5Player.prototype.unload = function()
  * every call to load() with a call to unload() 
  * 
  */
-Html5Player.prototype.load = function(source)
-{
-
+Html5Player.prototype.load = function(source) {
+	
 	var filename = source.substr(0, source.lastIndexOf('.'));
+	var success = false;
+	var http = new XMLHttpRequest();
     
 	// load a new content base on file type
 	switch (this.p.source.type.split("/")[0]) {
 	
-		case "video": 
+		case "video":
 			// type = video/*
-			$(this.htmlPlayer).append("<source type='video/webm' src='" + filename + ".webm'></source>");
-			$(this.htmlPlayer).append("<source type='video/ogg' src='" + filename + ".ogg'></source>");
-			$(this.htmlPlayer).append("<source type='video/mp4' src='" + filename + ".mp4'></source>");
+			var ext = ['webm','ogg','mp4'];
+			for (i in ext) {
+				if (!success) {
+					http.open('HEAD',filename+'.'+ext[i],false);
+					http.send();
+					if (http.status != 404) {
+						$(this.htmlPlayer).append("<source type='video/"+ext[i]+"' src='"+filename+"."+ext[i]+"'></source>");
+						success = true;
+					}
+				}
+			}
 			break;
 		
-		case "audio": 
+		case "audio":
 			// type = audio/*
-			$(this.htmlPlayer).append("<source type='audio/mpeg' src='" + filename + ".mp3'></source>");
-			$(this.htmlPlayer).append("<source type='audio/ogg' src='" + filename + ".ogg'></source>");
+			var ext = ['mp3','ogg'];
+			for (i in ext) {
+				if (!success) {
+					http.open('HEAD',filename+'.'+ext[i],false);
+					http.send();
+					if (http.status != 404) {
+						$(this.htmlPlayer).append("<source type='audio/"+ext[i]+"' src='"+filename+"."+ext[i]+"'></source>");
+						success = true;
+					}
+				}
+			}
 			break;
 
-		case "image": 
+		case "image":
 			// type = image/*
-			$(this.htmlPlayer).attr("src",source);
+			http.open('HEAD',source,false);
+			http.send();
+			if (http.status != 404) {
+				$(this.htmlPlayer).attr("src",source);
+				success = true;
+			}
 			break;
 		
-		case "application": 
+		case "application":
 			// type = application/*
 			// não faz nada
             break;
 		
-		case "text": 
+		case "text":
 			if (this.p.checkType(["text/plain","text/html"])) {
 				// type = text/plain, text/html
-				$.ajax({
-					type: "GET",
-					url: source,
-					dataType: "text",
-					success: $.proxy(function (data) {
-						this.textData = data;
-						this.loadTextData();
-					},this)
-				});
+				http.open('HEAD',source,false);
+				http.send();
+				if (http.status != 404) {
+					$.ajax({
+						type: "GET",
+						url: source,
+						dataType: "text",
+						success: $.proxy(function (data) {
+							this.textData = data;
+							this.loadTextData();
+						},this)
+					});
+					success = true;
+				}
 			}// else {
 				// TODO
 			//}
@@ -258,6 +286,7 @@ Html5Player.prototype.load = function(source)
 		
 	}
     
+	return success;
 };
 
 /**
