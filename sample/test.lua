@@ -1,9 +1,8 @@
-h, w = canvas:attrSize()
-print (h)
+canvas:drawLine(0,0,50,50)
 
-canvas:drawRect('frame', 0,0,498,498)
-blender = canvas:new('images/blender.png')
+blender = canvas:new('images/crop.png')
 
-canvas:compose(100,100,blender)
 
+blender:attrCrop(50,50,100,100)
+canvas:compose(0,0,blender)
 canvas:flush()
