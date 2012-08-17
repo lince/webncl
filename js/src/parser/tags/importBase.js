@@ -32,18 +32,37 @@ Parser.prototype.parseImportBase = function (obj,tag,parent,tree) {
 			Logger.error(Logger.ERR_DUPLICATED_ALIAS,"importBase",[obj.alias]);
 		}
 	} else {
+		var url = obj.documentURI;
+		
 		this.uniqueTable["alias"][obj.alias] = {
 			duplicated: false,
-			url : obj.documentURI,
+			url : url,
 			//(imported flag can be implemented later for
-			//dinamic importing. Eg.: importing only when needed
+			//dinamic importing. Eg.: importing only when needed)
 			//imported: false,
-			parser : new Parser(this.path),
+
 			//by what base this element is acessible
 			allBases: false,
 			base : parent._type
 		};
-		this.uniqueTable['aliasList'].push(this.uniqueTable["alias"][obj.alias]);
+
+		var p = this.uniqueTable[this.path+url];
+		if(!p)
+		{
+			p = new Parser(this.path,obj.alias);
+			this.uniqueTable[this.path+url] = p;
+			this.uniqueTable['aliasList'].push(this.uniqueTable["alias"][obj.alias]);
+		}
+
+		var d =  this.uniqueTable["alias"][obj.alias];
+		d.parser = p;
+		if(parent._type === 'descriptorBase')
+		{
+			d['regionBase']= true;
+			d['transitionBase']= true;
+			d['ruleBase']= true;
+		}
+		
 	}	
 
 	// 

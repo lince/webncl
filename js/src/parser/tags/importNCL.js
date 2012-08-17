@@ -34,7 +34,7 @@ Parser.prototype.parseImportNCL = function (obj,tag,parent,tree) {
 		this.uniqueTable["alias"][obj.alias] = {
 			duplicated: false,
 			url : obj.documentURI,
-			parser : new Parser(this.path),
+			parser : new Parser(this.path,obj.alias),
 			allBases : true
 		};
 		this.uniqueTable['aliasList'].push(this.uniqueTable["alias"][obj.alias]);

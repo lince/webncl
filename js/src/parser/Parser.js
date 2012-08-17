@@ -19,21 +19,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function Parser (path) {
+function Parser (path,alias) {
 
 	this.referenceMap =  new ReferenceMap(this);
 	this.uniqueTable = {};
 	this.path = path;
+	this.alias = alias;
 	this.url = '';
 	this.ncl = undefined;
 	this.parsers = {
 		/*
-		 url: {
+		 alias#url: {
 			loadTime: 0,
 		    xmlParse: 0,
 			parseTime: 0,
 		    parser: new Parser(),
-		    importedBy: url of document importing it,
 		 }
 		 
 		 */
@@ -112,7 +112,7 @@ Parser.prototype.parse = function (data) {
 		i.parseTime = new Date() - i.parseTime;
 		
 		if(this.__callback)
-			this.__callback(this.ncl);
+			this.__callback(this);
 
 		this.loading = false;		
 	} else {
@@ -124,20 +124,25 @@ Parser.prototype.parse = function (data) {
 
 };
 
-Parser.prototype.importNcl = function()
+Parser.prototype.importNcl = function(lastParser)
 {
+	if(lastParser)
+		for(var k in lastParser.parsers)
+			this.parsers[[lastParser.alias,'#',k].join('')] = lastParser.parsers[k];
+
 	var i = this.uniqueTable['aliasList'].splice(0,1);
 	if(i.length > 0)
 	{
+		console.log(i[0]);
 		i[0].parser.load(this.path + i[0].url, $.proxy(this.importNcl,this));
 	} else {
 		var x = new Date();
 		this.referenceMap.createReferences();
 		x = new Date() - x;
 		this.info.parseTime += x;
-		
+			
 		if(this.__callback)
-			this.__callback(this.ncl);
+			this.__callback(this);
 	}
 }
 
@@ -435,23 +440,26 @@ ReferenceMap.prototype.createReferences= function () {
 		for (var i in this.map[id].sources) {
 			var src = this.map[id].sources[i];
 			var tg = this.map[id].target;
-			if(tg.alias)
+			if(tg && tg.alias)
 			{
 				var a = this.parser.uniqueTable.alias;
 				if(a && a[tg.alias])
 				{
-					var o = a[tg.alias].parser.referenceMap.map[tg.id];
-					if(o)
-					{
-						tg.obj = o.target.obj;
-						//tg.parents = o.target.parents;
-						tg.type = o.target.type;
-					}
+				//	if(a[tg.alias].allBases)
+				//	{
+						var o = a[tg.alias].parser.referenceMap.map[tg.id];
+						if(o)
+						{
+							tg.obj = o.target.obj;
+							tg.type = o.target.type;
+						}
+				//	}
+
 				} else {
 					Logger.error(ERR_INVALID_ALIAS,tg.alias,[src.attr,src.obj[src.attr],src.type]);
 				}
 			}
-			if (this.map[id].target && this.map[id].target.obj && $.inArray(this.map[id].target.type,src.type)!=-1) {
+			if (tg && tg.obj && $.inArray(this.map[id].target.type,src.type)!=-1) {
 				// --- REFER ---
 				if (src.attr=="refer") {
 					if (src.obj._type=="media") {

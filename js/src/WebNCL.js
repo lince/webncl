@@ -186,7 +186,7 @@ function WebNclPlayer (file, div, directory) {
 };
 
 // execute (chamada após o parse)
-WebNclPlayer.prototype.execute = function (nclObj) {
+WebNclPlayer.prototype.execute = function (parser) {
 	//imprime os tempos
 	var p = this.presentation.parser;
 	for(var x in p.parsers)
@@ -196,7 +196,7 @@ WebNclPlayer.prototype.execute = function (nclObj) {
 	
 	//
 	var rb,i;
-	this.presentation.ncl = nclObj;
+	this.presentation.ncl = parser.ncl;
 	this.presentation.inputManager = new InputManager(this.presentation);
 	this.presentation.systemSettings = new SystemSettings(this.presentation);
 	
