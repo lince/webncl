@@ -432,9 +432,7 @@ MediaPlayer.prototype.load = function (source) {
 	source = this.presentation.path + source;
 
 	this.player.unload(source);
-	if (!this.player.load(source)) {
-		Logger.warning(Logger.WARN_MEDIA_NOT_FOUND,this.node.id,[source]);
-	}
+	this.player.load(source);
 
 };
 
