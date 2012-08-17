@@ -33,6 +33,7 @@ Parser.prototype.parseImportBase = function (obj,tag,parent,tree) {
 		}
 	} else {
 		var url = obj.documentURI;
+		obj.__parent = parent;
 		
 		this.uniqueTable["alias"][obj.alias] = {
 			duplicated: false,
@@ -43,7 +44,7 @@ Parser.prototype.parseImportBase = function (obj,tag,parent,tree) {
 
 			//by what base this element is acessible
 			allBases: false,
-			base : parent._type
+			obj: obj
 		};
 
 		var p = this.uniqueTable[this.path+url];
@@ -52,15 +53,27 @@ Parser.prototype.parseImportBase = function (obj,tag,parent,tree) {
 			p = new Parser(this.path,obj.alias);
 			this.uniqueTable[this.path+url] = p;
 			this.uniqueTable['aliasList'].push(this.uniqueTable["alias"][obj.alias]);
+		} else {
+			p.alias += '-'+obj.alias;
 		}
 
 		var d =  this.uniqueTable["alias"][obj.alias];
 		d.parser = p;
+		
+		d[parent._type] =true;
 		if(parent._type === 'descriptorBase')
 		{
 			d['regionBase']= true;
 			d['transitionBase']= true;
 			d['ruleBase']= true;
+		}
+		
+		if(d['regionBase'])
+		{
+			if(!this.importBase)
+				this.importBase = [];
+			
+			this.importBase.push(obj);
 		}
 		
 	}	

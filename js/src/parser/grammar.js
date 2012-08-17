@@ -307,7 +307,7 @@ Parser.nclStructureMap = {
 		attrs: {
 			reference_source: [[["region"],["region"]]],
 			required: ["alias","documentURI"],
-			optional: ["region"]
+			optional: ["region","baseId"]
 		},
 		content: {}
 	},
