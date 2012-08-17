@@ -1,12 +1,25 @@
 function libCanvas(ctx) {
 
 	//context
-	this.ctx = ctx;
-	
+	this.ctx2 = ctx;
 	this.width = ctx.canvas.width;
 	this.height = ctx.canvas.height;
 	
 	
+	var canvas = document.createElement("canvas");
+	canvas.id = "canvasCopy";
+	canvas.width = 500;
+	canvas.height = 500;
+	
+	this.ctx = canvas.getContext("2d");
+	
+	var canvasImage = document.createElement("canvas");
+	canvas.id = "canvasImage";
+	canvas.width = 500;
+	canvas.height = 500;
+	
+	this.ctx3 = canvas.getContext("2d");
+
 	//variables for attrClip
 	this.x = 0;
 	this.y = 0;
@@ -26,10 +39,7 @@ function libCanvas(ctx) {
 	this.sizeH = ctx.canvas.height;
 	this.widthEnd = ctx.canvas.width;
 	this.heightEnd = ctx.canvas.height;
-
 	
-	this.compositeTypes = ['source-over', 'source-in', 'source-out', 'source-atop', 'destination-over', 'destination-in', 'destination-out', 'destination-atop', 'lighter', 'darker', 'copy', 'xor'];
-
 	console.log("libCanvas");
 
 };
@@ -37,7 +47,7 @@ function libCanvas(ctx) {
 libCanvas.prototype.attrSize = function() {
 	console.log("attrSize");
 
-	var canvas = document.getElementById(ctx.canvas.id);
+	var canvas = document.getElementById(this.ctx.canvas.id);
 
 	return [this.width, this.height];
 
@@ -53,8 +63,6 @@ libCanvas.prototype.newCanvas = function(width, height) {
 
 }
 
-
-
 //TODO use function onload to first load the image then execute de code
 libCanvas.prototype.newImage = function(caminho) {
 	console.log("newImage");
@@ -63,34 +71,33 @@ libCanvas.prototype.newImage = function(caminho) {
 	img.src = caminho;
 	newObject = new libCanvas(this.ctx);	
 	newObject.setData(img.width, img.height);
-	newObject.image_path(caminho, 0, 0, img.width, img.height);
+	newObject.image_path(img, 0, 0, img.width, img.height);
 	
 	return newObject;
 
 }
 
-libCanvas.prototype.image_path = function(caminho, x, y, w, h) {
+libCanvas.prototype.image_path = function(img, x, y, w, h) {
 	console.log("image_path");
 
 	this.initX = this.x + x;
 	this.initY = this.y + y;
 
-	var img = new Image();
-	img.src = caminho;
-
 	if (this.initX + w > this.x + this.sizeX || this.initY + h > this.y + this.sizeY)
 
 		console.log("Image exceeds the dimentions limited by canvas");
-	else
+	else{
 		this.ctx.drawImage(img, this.initX, this.initY, w, h);
+		
+	}
+		
 
 }
 
 libCanvas.prototype.setData = function(x, y) {
-		
+	
 	this.width = x;
 	this.height = y;
-	
 }
 
 libCanvas.prototype.attrColor = function(r, g, b, a) {
@@ -263,12 +270,7 @@ libCanvas.prototype.iniVerifClip2 = function(x1, y1, x2, y2) {
 	this.endY = y2;
 	var verifica = true;
 	var sub = 0;
-	console.log("x: " + this.x);
-	console.log("y: " + this.y);
-	console.log("initX: " + this.initX);
-	console.log("initY: " + this.initY);
-	console.log("endX: " + this.endX);
-	console.log("endY: " + this.endY);
+	
 
 	//#------------------------------------------------------------------------------#
 	//verifications for attrClip
@@ -287,20 +289,13 @@ libCanvas.prototype.iniVerifClip2 = function(x1, y1, x2, y2) {
 	}
 	//end of verifications for attrClip
 	//#-------------------------------------------------------------------------------#
-	console.log("endX: " + this.endX);
-	console.log("endY: " + this.endY);
+	
 
 	return verifica;
 }
 
 libCanvas.prototype.drawLine = function(x1, y1, x2, y2) {
 	console.log("drawLine");
-
-	if (this.ultimo)
-		this.ctx.globalCompostion = this.compositeTypes[0];
-	
-else
-		this.ctx.globalCompostion = this.compositeTypes[4];
 
 	verifica = this.iniVerifClip(x1, y1, x2, y2);
 
@@ -321,11 +316,6 @@ else
 libCanvas.prototype.drawRect = function(mode, x1, y1, x2, y2) {
 	console.log("drawRect");
 
-	if (this.ultimo)
-		this.ctx.globalCompostion = this.compositeTypes[0];
-	
-else
-		this.ctx.globalCompostion = this.compositeTypes[4];
 
 	var verifica = this.iniVerifClip2(x1, y1, x2, y2);
 
@@ -365,13 +355,7 @@ libCanvas.prototype.drawText = function(x, y, text) {
 
 	this.initX = this.x + x;
 	this.initY = this.y + y + height;
-
-	/*if (this.initX + width > this.x + this.sizeX || this.initY + height > this.y + this.sizeY)
-	 console.log("Text exceeds the dimentions limited by canvas");
-	 else {
-	 this.ctx.fillText(text, this.initX, this.initY);
-	 console.log("final attrText");
-	 }*/
+	
 	this.ctx.fillText(text, this.initX, this.initY);
 
 }
@@ -381,57 +365,45 @@ libCanvas.prototype.measureTextLua = function(text) {
 
 	var textWidth = this.ctx.measureText(text);
 
-	height = parseInt(this.ctx.fonsample/sample-lua.nclt[0] + this.ctx.font[1]);
+	height = parseInt(this.ctx.font[0] + this.ctx.font[1]);
 
 	return [textWidth.width, height];
 }
 
-libCanvas.prototype.image_path = function(caminho, x, y, w, h) {
-	console.log("image_path");
-
-	this.initX = this.x + x;
-	this.initY = this.y + y;
-
-	var img = new Image();
-	img.src = caminho;
-
-	if (this.initX + w > this.x + this.sizeX || this.initY + h > this.y + this.sizeY)
-
-		console.log("Image exceeds the dimentions limited by canvas");
-	else
-		this.ctx.drawImage(img, this.initX, this.initY, w, h);
-
-}
 
 libCanvas.prototype.attrCrop = function(x, y, w, h) {
 	console.log("attrCrop");
 
-	canvasData = this.ctx.getImageData(x, y, w, h);
-	
+	var canvasData = this.ctx.getImageData(x, y, w, h);
 	this.ctx.clearRect(x,y,w,h);
 	
 	return canvasData;
 }
 
-libCanvas.prototype.compose = function(x,y, img) {
-	console.log("compose");
 
-	console.log(img);
-	this.ctx.putImageData(img, x, y);
+libCanvas.prototype.getContext = function(){
 	
-	
+	return this.ctx;
 }
 
-libCanvas.prototype.save = function() {
-	console.log("save");
 
-	ctx.save();
+libCanvas.prototype.compose = function(x, y, img) {
+	console.log('compose');
+	var context = img.getContext();
+	var dimension = img.attrSize();
+	
+	var imageData = context.getImageData(0,0,dimension[0],dimension[1]);
+	this.ctx.putImageData(imageData, x, y);
+
 }
+
 
 libCanvas.prototype.flush = function() {
-	console.log("restore");
-
-	ctx.restore();
-
+	console.log('flush');
+	var dimension = this.attrSize();
+	var imageData = this.ctx.getImageData(0,0,dimension[0],dimension[1]);
+	this.ctx2.clearRect(0,0,dimension[0],dimension[1]);
+	this.ctx.clearRect(0,0,dimension[0],dimension[1]);
+	this.ctx2.putImageData(imageData, 0,0);
 }
 

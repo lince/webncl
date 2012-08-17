@@ -61,7 +61,7 @@ FlowPlayer.prototype.load = function(source)
       this.flowPlayer = $f(this.p.id, "http://releases.flowplayer.org/swf/flowplayer-3.2.12.swf", {
     	  clip: { autoPlay: false, autoBuffering: true, url: source, scaling: 'scale'},
     	  play: {replayLabel: null, label: null, opacity: 0 },
-    	  canvas: { background: '#000000', backgroundGradient: 'none',},
+    	  canvas: { background: '#000000', backgroundGradient: 'none'},
     	  plugins: {controls: null}
       });
   

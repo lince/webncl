@@ -57,6 +57,8 @@ function LuaPlayer(p) {
 
 	console.log(p.id);
 	
+	
+	
 
 };
 
@@ -75,7 +77,7 @@ LuaPlayer.prototype.unload = function() {
  *
  */
 LuaPlayer.prototype.load = function(source) {
-	console.log('load lua: ' + source);
+	//console.log('load lua: ' + source);
 
 	$.ajax({
 		type : "GET",
@@ -85,6 +87,7 @@ LuaPlayer.prototype.load = function(source) {
 		success : $.proxy(function(data) {
 			data = 'canvas = libCanvas.init();\n' + data;
 			this.luajscode = lua_load(data);
+			
 
 		}, this),
 		error : function() {
@@ -92,6 +95,7 @@ LuaPlayer.prototype.load = function(source) {
 		}
 	});
 
+	//console.log('largura: ' + this.p.getProperty('width'));
 	this.bindlibs();
 
 }
@@ -222,30 +226,29 @@ LuaPlayer.prototype.createCanvasObject = function() {
 
 LuaPlayer.prototype.bindlibs = function() {
 
-	canvas_objects = this.canvas_objects;
-	p = this.p;
-	id = this.id;
-
 	lua_libs["libCanvas"] = {
 		'variable' : {
 			id : this.id,
-			p : this.p
-		},
+			p : this.p,
+			canvas_objects : this.canvas_objects
+		}
 	};
 
 	lua_libs["libCanvas"]["init"] = $.proxy(function() {
 
 		var canvas = document.createElement("canvas");
 		canvas.id = "mycanvas_" + this.variable.id;
-		canvas.width = 500;
+		canvas.width = 500;//this.variable.p.getProperty('width');
 		canvas.height = 500;
 
 		$('#' + this.variable.p.id).append(canvas);
 
-		ctx = canvas.getContext("2d");
+		var ctx = canvas.getContext("2d");
 
-		object = new libCanvas(ctx);
-		canvas_objects[id] = object;
+		var object = new libCanvas(ctx);
+		console.log('init');
+		
+		this.variable.canvas_objects[this.variable.id] = object;
 		var luaObject = lua_newtable();
 		luaObject.str['id'] = this.variable.id;
 
@@ -259,11 +262,11 @@ LuaPlayer.prototype.bindlibs = function() {
 			if (attr1 === undefined) {
 				url = attr0;
 
-				objCanvas = canvas_objects[self.str['id']];
+				objCanvas = this.variable.canvas_objects[self.str['id']];
 
 				newObject = objCanvas.newImage(url);
 				this.variable.id = this.variable.id + 1;
-				canvas_objects[this.variable.id] = newObject;
+				this.variable.canvas_objects[this.variable.id] = newObject;
 				var newLuaObjet = $.extend(true, {}, self);
 				newLuaObjet.str['id'] = this.variable.id;
 
@@ -273,75 +276,81 @@ LuaPlayer.prototype.bindlibs = function() {
 				w = attr0;
 				h = attr1;
 
-				objCanvas = canvas_objects[self.str['id']];
+				objCanvas = this.variable.canvas_objects[self.str['id']];
 				newObject = objCanvas.newCanvas(w, h);
 				this.variable.id = this.variable.id + 1;
 				var newLuaObjet = $.extend(true, {}, self);
 
 				newLuaObjet.str['id'] = this.variable.id;
-				canvas_objects[this.variable.id] = newObject;
+				this.variable.canvas_objects[this.variable.id] = newObject;
 				return [newLuaObjet];
 			}
 
 		}, this);
 
-		luaObject.str['attrSize'] = function(self) {
-			objCanvas = canvas_objects[self.str['id']];
+		luaObject.str['attrSize'] = $.proxy(function(self) {
+			var objCanvas = this.variable.canvas_objects[self.str['id']];
 			return objCanvas.attrSize();
+		}, this);
 
-		};
-
-		luaObject.str['attrColor'] = function(self, r, g, b, a) {
-			
-			objCanvas = canvas_objects[self.str['id']];
+		luaObject.str['attrColor'] = $.proxy(function(self, r, g, b, a) {
+			var objCanvas = this.variable.canvas_objects[self.str['id']];
 			objCanvas.attrColor(r, g, b, a);
-			
-			
-		};
 
-		luaObject.str['drawLine'] = function(self, x1, y1, x2, y2) {
-			objCanvas = canvas_objects[self.str['id']];
+		}, this);
+
+		luaObject.str['drawLine'] = $.proxy(function(self, x1, y1, x2, y2) {
+			var objCanvas = this.variable.canvas_objects[self.str['id']];
 			objCanvas.drawLine(x1, y1, x2, y2);
-		};
+		}, this);
 
-		luaObject.str['drawRect'] = function(self, mode, x, y, w, h) {
-			objCanvas = canvas_objects[self.str['id']];
+		luaObject.str['drawRect'] = $.proxy(function(self, mode, x, y, w, h) {
+			var objCanvas = this.variable.canvas_objects[self.str['id']];
 			objCanvas.drawRect(mode, x, y, w, h);
-		};
+		}, this);
 
-		luaObject.str['drawText'] = function(self, x, y, text) {
-			objCanvas = canvas_objects[self.str['id']];
+		luaObject.str['drawText'] = $.proxy(function(self, x, y, text) {
+			var objCanvas = this.variable.canvas_objects[self.str['id']];
 			objCanvas.drawText(x, y, text);
-		};
+		}, this);
 
-		luaObject.str['measureText'] = function(self, text) {
-			objCanvas = canvas_objects[self.str['id']];
+		luaObject.str['measureText'] = $.proxy(function(self, text) {
+			var objCanvas = this.variable.canvas_objects[self.str['id']];
 			return objCanvas.measureTextLua(text);
-		};
+		}, this);
 
-		luaObject.str['attrText'] = function(self, text) {
-			objCanvas = canvas_objects[self.str['id']];
+		luaObject.str['attrText'] = $.proxy(function(self, text) {
+			var objCanvas = this.variable.canvas_objects[self.str['id']];
 			objCanvas.attrText(face, size, style);
-		};
+		}, this);
 
-		luaObject.str['compose'] = function(self, x, y, img) {
-			objCanvas = canvas_objects[self.str['id']];
-			objCanvas.compose(x,y, img);
-		};
+		luaObject.str['compose'] = $.proxy(function(self, x, y, img) {
+			
+			var objCanvas = this.variable.canvas_objects[self.str['id']];
+			var objImg = this.variable.canvas_objects[img.str['id']];
+			objCanvas.compose(x,y, objImg);
+		}, this);
 
-		luaObject.str['attrCrop'] = function(self, x, y, w, h) {
-			objCanvas = canvas_objects[self.str['id']];
-			console.log(x,y,w,h);
+		luaObject.str['attrCrop'] = $.proxy(function(self, x, y, w, h) {
+			var objCanvas = this.variable.canvas_objects[self.str['id']];
+			var img = objCanvas.attrCrop(x, y, w, h);
+			return [img];
+		}, this);
+		
+		luaObject.str['flush'] = $.proxy(function(self) {
+			
+			var objCanvas = this.variable.canvas_objects[self.str['id']];
+			objCanvas.flush();
+		}, this);
+		
 
-			return [objCanvas.attrCrop(x, y, w, h)];
-		};
-
-		luaObject.str['attrClip'] = function(self, x, y, w, h) {
-			objCanvas = canvas_objects[self.str['id']];
+		luaObject.str['attrClip'] = $.proxy(function(self, x, y, w, h) {
+			var objCanvas = this.variable.canvas_objects[self.str['id']];
 			objCanvas.attrClip(x, y, w, h);
-		};
+		}, this);
+		
 		return [luaObject];
-
+				
 	}, lua_libs["libCanvas"]);
 
 	persist = this.persitent;
@@ -374,7 +383,7 @@ LuaPlayer.prototype.bindlibs = function() {
 			events.timer(timeout, fct);
 		},
 		"uptime" : function() {
-			return events.uptime();
+			return [events.uptime()];
 		}
 	}
 

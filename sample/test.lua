@@ -1,19 +1,9 @@
 h, w = canvas:attrSize()
 print (h)
-canvas:drawLine(0,0,50,50)
 
-valor = 0
+canvas:drawRect('frame', 0,0,498,498)
+blender = canvas:new('images/blender.png')
 
-function handler (evt)
-	if evt.class == 'user' then
-		print (evt.v)
-		if valor < 10 then
-			valor = valor + 1
-			event.post({class = 'user', v = valor} )
-		end
-		print ('after post')
-	end
-end
+canvas:compose(100,100,blender)
 
-event.register(handler)
-event.post({class = 'user', v = valor} )
+canvas:flush()

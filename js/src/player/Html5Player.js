@@ -567,10 +567,13 @@ Html5Player.prototype.getDuration = function() {
  * loadTextData
  */
 Html5Player.prototype.loadTextData = function() {
-	var beginText = this.textualAnchor.beginText || '';
-	var endText = this.textualAnchor.endText || '';
-	var beginPosition = this.textualAnchor.beginPosition || 1;
-	var endPosition = this.textualAnchor.endPosition || 1;
+	var beginText='', endText='', beginPosition='', endPosition='';
+	if (this.textualAnchor) {
+		beginText = this.textualAnchor.beginText || '';
+		endText = this.textualAnchor.endText || '';
+		beginPosition = this.textualAnchor.beginPosition || 1;
+		endPosition = this.textualAnchor.endPosition || 1;
+	}
 	var data = this.textData;
 
 	if (beginText) {
@@ -596,5 +599,7 @@ Html5Player.prototype.loadTextData = function() {
 		}
 	}
 	
-	$(this.htmlPlayer).append(data);
+	if (data) {
+		$(this.htmlPlayer).append(data.replace(/\n/g,'<br/>'));
+	}
 }
