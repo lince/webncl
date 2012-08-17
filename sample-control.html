@@ -1,0 +1,91 @@
+<html>
+	<head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+		<!-- Bibliotecas -->
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+		<script type="text/javascript" src="js/popcorn.js"></script>
+		<script type="text/javascript" src="js/lua+parser.min.js"></script>
+		<!-- Parser -->
+		<script type="text/javascript" src="js/src/parser/Parser.js"></script>
+		<script type="text/javascript" src="js/src/parser/grammar.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/ncl.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/head.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/body.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/regionBase.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/region.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/media.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/context.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/area.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/port.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/property.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/switch.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/switchPort.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/mapping.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/descriptor.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/descriptorParam.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/descriptorBase.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/link.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/bind.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/linkParam.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/bindParam.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/connectorParam.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/assessmentStatement.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/attributeAssessment.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/valueAssessment.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/compoundStatement.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/simpleCondition.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/compoundCondition.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/simpleAction.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/compoundAction.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/causalConnector.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/connectorBase.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/ruleBase.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/rule.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/compositeRule.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/bindRule.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/defaultComponent.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/descriptorSwitch.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/defaultDescriptor.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/importBase.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/importedDocumentBase.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/importNCL.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/transitionBase.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/transition.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/meta.js"></script>
+		<script type="text/javascript" src="js/src/parser/tags/metadata.js"></script>
+		<!-- Player -->
+		<script type="text/javascript" src="js/src/player/Player.js"></script>
+		<script type="text/javascript" src="js/src/player/ContextPlayer.js"></script>
+		<script type="text/javascript" src="js/src/player/MediaPlayer.js"></script>
+        <script type="text/javascript" src="js/src/player/Html5Player.js"></script>
+        <script type="text/javascript" src="js/src/player/FlowPlayer.js"></script>
+		<script type="text/javascript" src="js/src/player/LuaPlayer.js"></script>
+		<!-- Formatter -->
+		<script type="text/javascript" src="js/src/formatter/SystemSettings.js"></script>
+		<script type="text/javascript" src="js/src/formatter/InputManager.js"></script>
+		<script type="text/javascript" src="js/src/formatter/Listener.js"></script>
+		<!-- Main -->
+		<script type="text/javascript" src="js/src/TimerManager.js"></script>
+		<script type="text/javascript" src="js/src/Logger.js"></script>
+		<script type="text/javascript" src="js/src/WebNCL.js"></script>
+		<!--libLua -->
+		<script type="text/javascript" src="js/src/lua/libCanvas.js"></script>
+		<script type="text/javascript" src="js/src/lua/libPersistent.js"></script>
+		<!--control -->
+		<script type="text/javascript" src="js/src/RemoteControl.js"></script>
+		
+	</head>
+	<body>
+
+		<div id="myPlayer" style="position:relative;width:300px;height:200px"></div>
+		
+		<div id="areaRemoteControl"></div>
+	
+		<script>
+			var player = new WebNclPlayer("sample/sample.ncl","myPlayer");
+			player.start();
+			var controler1 = new RemoteControl(player,"areaRemoteControl",0, 500, 1,1,1,1,1,1);
+		</script>
+		
+	</body>
+</html>
