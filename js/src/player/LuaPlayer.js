@@ -324,23 +324,15 @@ LuaPlayer.prototype.bindlibs = function() {
 
 		luaObject.str['compose'] = $.proxy(function(self, x, y, img) {
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
-			console.log(img);
-			if(img.data === undefined){
-				
-				var objImg = this.variable.canvas_objects[img.str['id']];
-				objCanvas.compose(x,y, objImg, 0);
-				
-			}
-			else{
-				objCanvas.compose(x,y, img, 1);
-			}
+			var objImg = this.variable.canvas_objects[img.str['id']];
+			objCanvas.compose(x, y, objImg); 			
 			
 		}, this);
 
 		luaObject.str['attrCrop'] = $.proxy(function(self, x, y, w, h) {
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
-			var img = objCanvas.attrCrop(x, y, w, h);
-			return [img];
+			objCanvas.attrCrop(x, y, w, h);
+			
 		}, this);
 		
 		luaObject.str['flush'] = $.proxy(function(self) {
