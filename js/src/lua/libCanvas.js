@@ -29,26 +29,14 @@ function libCanvas(ctx) {
 	this.sizeY = ctx.canvas.height;
 	this.endX = ctx.canvas.width;
 	this.endY = ctx.canvas.height;
-
-	//variables for new
-	this.w = 0;
-	this.h = 0;
-	this.initW = 0;
-	this.initH = 0;
-	this.sizeW = ctx.canvas.width;
-	this.sizeH = ctx.canvas.height;
-	this.widthEnd = ctx.canvas.width;
-	this.heightEnd = ctx.canvas.height;
 	
 	console.log("libCanvas");
 
 };
 
 libCanvas.prototype.attrSize = function() {
+	
 	console.log("attrSize");
-
-	var canvas = document.getElementById(this.ctx.canvas.id);
-
 	return [this.width, this.height];
 
 }
@@ -69,17 +57,21 @@ libCanvas.prototype.newImage = function(caminho) {
 	
 	var img = new Image();
 	img.src = caminho;
+	attachCode();
 	
-	if (img.complete) {
-		newObject = new libCanvas(this.ctx);
-		newObject.setData(img.width, img.height);
-		newObject.image_path(img, 0, 0, img.width, img.height);
-
-		return newObject;
-
-	}
-		
-
+	//$.proxy(function attachCode() {
+		//if (!img.complete) {
+			//setTimeout(attachCode, 100);
+			//return;
+		//} else {
+			newObject = new libCanvas(this.ctx);
+			newObject.setData(img.width, img.height);
+			newObject.image_path(img, 0, 0, img.width, img.height); 
+			return newObject;
+		//}
+	//},this);
+	
+	
 }
 
 libCanvas.prototype.image_path = function(img, x, y, w, h) {
@@ -380,7 +372,8 @@ libCanvas.prototype.attrCrop = function(x, y, w, h) {
 	console.log("attrCrop");
 	
 	var canvasData = this.ctx.getImageData(x, y, w, h);
-	this.ctx.clearRect(0,0,this.ctx.canvas.width, this.ctx.canvas.height);
+	this.ctx.clearRect(0,0,this.width, this.height);
+	this.setData(w-x,h-y);
 	this.ctx.putImageData(canvasData, 0, 0);
 	
 
