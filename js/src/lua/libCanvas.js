@@ -5,18 +5,19 @@ function libCanvas(ctx) {
 	this.width = ctx.canvas.width;
 	this.height = ctx.canvas.height;
 	
+	this.imageIsLoaded = false;
 	
 	var canvas = document.createElement("canvas");
 	canvas.id = "canvasCopy";
-	canvas.width = 500;
-	canvas.height = 500;
+	canvas.width = ctx.canvas.width;
+	canvas.height = ctx.canvas.height;
 	
 	this.ctx = canvas.getContext("2d");
 	
 	var canvasImage = document.createElement("canvas");
 	canvas.id = "canvasImage";
-	canvas.width = 500;
-	canvas.height = 500;
+	canvas.width = ctx.canvas.width;
+	canvas.height = ctx.canvas.height;
 	
 	this.ctx3 = canvas.getContext("2d");
 
@@ -57,21 +58,26 @@ libCanvas.prototype.newImage = function(caminho) {
 	
 	var img = new Image();
 	img.src = caminho;
-	attachCode();
+	if (!img.complete){
+		alert('Please press F5');
+	}
 	
-	//$.proxy(function attachCode() {
-		//if (!img.complete) {
-			//setTimeout(attachCode, 100);
-			//return;
-		//} else {
-			newObject = new libCanvas(this.ctx);
-			newObject.setData(img.width, img.height);
-			newObject.image_path(img, 0, 0, img.width, img.height); 
-			return newObject;
-		//}
-	//},this);
-	
-	
+	newObject = new libCanvas(this.ctx);
+	newObject.setData(img.width, img.height);
+	newObject.image_path(img, 0, 0, img.width, img.height);
+	return newObject;
+
+}
+
+libCanvas.prototype.attachCode = function(img) {
+		console.log('attchCode');
+		if (!img.complete) {
+			setTimeout(this.attachCode(img), 1000);
+			
+		} else {
+			this.imageIsLoaded = true;
+			
+		}
 }
 
 libCanvas.prototype.image_path = function(img, x, y, w, h) {
