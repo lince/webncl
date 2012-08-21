@@ -32,8 +32,14 @@ libEvents.prototype.post = function(evt){
 	} else if (evt.str['class'] == 'ncl') {
 		var json = undefined;
 		if (evt.str['type'] == 'presentation') {
-			json = {'class' : 'ncl', 'type' : evt.str['type'], 
+			if (evt.str['label'] != undefined) {
+				json = {'class' : 'ncl', 'type' : evt.str['type'], 
+			       'action' : evt.str['action'], 'component' : this.nodeId,
+			       'area' : evt.str['label']};
+			} else {
+				json = {'class' : 'ncl', 'type' : evt.str['type'], 
 			       'action' : evt.str['action'], 'component' : this.nodeId};
+			}
 		} else if (evt.str['type'] == 'attribution') {
 			if (evt.str['action'] == 'stop') {
 				$('#' + this.player.id).trigger(
@@ -47,6 +53,7 @@ libEvents.prototype.post = function(evt){
 			     'name' : evt.str['name'],
 			     'value' : evt.str['value']};
 		}
+		console.log(json);
 		this.player.postEvent(json);
 	} else if (evt.str['class'] == 'user') {
 		this.luaplayer.eventQueue(evt);

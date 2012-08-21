@@ -44,7 +44,7 @@ function LuaPlayer(p) {
 	this.isHandlingEvent = false;
 	p.createElement("<div class='player' id='" + p.id + "'></div>");
 	
-	
+	this.loaded = false;
 	this.p.onChangeProperty = {};
 	this.p.onChangeProperty.defaultAction = Player.propertyAction.OVERRIDE;
   	this.p.onChangeProperty.propertyMap = {}
@@ -109,20 +109,34 @@ LuaPlayer.prototype.exec = function(time, callback) {
 /**
  * Start
  */
-LuaPlayer.prototype.start = function() {
-	console.log('start lua');
+LuaPlayer.prototype.start = function(nodeInterface) {
+	console.log('start lua: ' + nodeInterface);
 	
-	var evt = lua_newtable();
-	evt.str['class'] = 'ncl';
-	evt.str['type'] = 'presentation';
-	evt.str['action'] = 'start';
-	this.eventQueue(evt, true);
+	if (this.loaded === false) {
+		this.loaded = true;
+		var evt = lua_newtable();
+		evt.str['class'] = 'ncl';
+		evt.str['type'] = 'presentation';
+		evt.str['action'] = 'start';
+		this.eventQueue(evt, true);
 
-	lua_call(this.luajscode);
-	
-	if (this.events.handlers) {
-		this.callHandlers();
+		lua_call(this.luajscode);
+
+		if (this.events.handlers) {
+			this.callHandlers();
+		}
 	}
+	
+	if (nodeInterface != undefined) {
+		var evt = lua_newtable();
+		evt.str['class'] = 'ncl';
+		evt.str['type'] = 'presentation';
+		evt.str['action'] = 'start';
+		evt.str['label'] = nodeInterface;
+		this.eventQueue(evt);
+	}
+
+	
 }
 /**
  * Stop
@@ -236,8 +250,8 @@ LuaPlayer.prototype.bindlibs = function() {
 
 		var canvas = document.createElement("canvas");
 		canvas.id = "mycanvas_" + this.variable.id;
-		canvas.width = 500;//this.variable.p.getProperty('width');
-		canvas.height = 500;
+		canvas.width = this.variable.p.getProperty('width').split('px')[0];
+		canvas.height = this.variable.p.getProperty('height').split('px')[0];
 
 		$('#' + this.variable.p.id).append(canvas);
 
@@ -322,25 +336,17 @@ LuaPlayer.prototype.bindlibs = function() {
 			objCanvas.attrText(face, size, style);
 		}, this);
 
-		luaObject.str['compose'] = $.proxy(function(self, x, y, img) {
+		luaObject.str['attrCrop'] = $.proxy(function(self, x, y, w, h) {
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
-			console.log(img);
-			if(img.data === undefined){
-				
-				var objImg = this.variable.canvas_objects[img.str['id']];
-				objCanvas.compose(x,y, objImg, 0);
-				
-			}
-			else{
-				objCanvas.compose(x,y, img, 1);
-			}
+			objCanvas.attrCrop(x, y, w, h);
 			
 		}, this);
 
-		luaObject.str['attrCrop'] = $.proxy(function(self, x, y, w, h) {
+		luaObject.str['compose'] = $.proxy(function(self, x, y, img) {
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
-			var img = objCanvas.attrCrop(x, y, w, h);
-			return [img];
+			var objImg = this.variable.canvas_objects[img.str['id']];
+			objCanvas.compose(x, y, objImg); 			
+			
 		}, this);
 		
 		luaObject.str['flush'] = $.proxy(function(self) {

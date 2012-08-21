@@ -1,24 +1,24 @@
 function libCanvas(ctx) {
 
+	this.iniCropX = 0;
+	this.iniCropY = 0;
+	this.endCropX = 0;
+	this.endCropY = 0;
+
 	//context
 	this.ctx2 = ctx;
 	this.width = ctx.canvas.width;
 	this.height = ctx.canvas.height;
 	
+	this.imageIsLoaded = false;
 	
 	var canvas = document.createElement("canvas");
 	canvas.id = "canvasCopy";
-	canvas.width = 500;
-	canvas.height = 500;
+	canvas.width = ctx.canvas.width;
+	canvas.height = ctx.canvas.height;
 	
 	this.ctx = canvas.getContext("2d");
 	
-	var canvasImage = document.createElement("canvas");
-	canvas.id = "canvasImage";
-	canvas.width = 500;
-	canvas.height = 500;
-	
-	this.ctx3 = canvas.getContext("2d");
 
 	//variables for attrClip
 	this.x = 0;
@@ -29,26 +29,16 @@ function libCanvas(ctx) {
 	this.sizeY = ctx.canvas.height;
 	this.endX = ctx.canvas.width;
 	this.endY = ctx.canvas.height;
-
-	//variables for new
-	this.w = 0;
-	this.h = 0;
-	this.initW = 0;
-	this.initH = 0;
-	this.sizeW = ctx.canvas.width;
-	this.sizeH = ctx.canvas.height;
-	this.widthEnd = ctx.canvas.width;
-	this.heightEnd = ctx.canvas.height;
 	
-	console.log("libCanvas");
+	
+	
+	//console.log("libCanvas");
 
 };
 
 libCanvas.prototype.attrSize = function() {
-	console.log("attrSize");
-
-	var canvas = document.getElementById(this.ctx.canvas.id);
-
+	
+	//console.log("attrSize");
 	return [this.width, this.height];
 
 }
@@ -65,17 +55,21 @@ libCanvas.prototype.newCanvas = function(width, height) {
 
 //TODO use function onload to first load the image then execute de code
 libCanvas.prototype.newImage = function(caminho) {
-	console.log("newImage");
+	//console.log("newImage");
 	
 	var img = new Image();
 	img.src = caminho;
-	newObject = new libCanvas(this.ctx);	
+	if (!img.complete){
+		alert('Please press F5');
+	}
+	
+	newObject = new libCanvas(this.ctx);
 	newObject.setData(img.width, img.height);
 	newObject.image_path(img, 0, 0, img.width, img.height);
-	
 	return newObject;
 
 }
+
 
 libCanvas.prototype.image_path = function(img, x, y, w, h) {
 	console.log("image_path");
@@ -98,6 +92,8 @@ libCanvas.prototype.setData = function(x, y) {
 	
 	this.width = x;
 	this.height = y;
+	this.endCropX = x;
+	this.endCropY = y;
 }
 
 libCanvas.prototype.attrColor = function(r, g, b, a) {
@@ -230,6 +226,7 @@ libCanvas.prototype.attrClip = function(x, y, w, h) {
 	this.ctx.strokeRect(this.x, this.y, this.sizeX, this.sizeY);
 
 }
+
 
 libCanvas.prototype.iniVerifClip = function(x1, y1, x2, y2) {
 	console.log("IniVerifClip");
@@ -370,44 +367,32 @@ libCanvas.prototype.measureTextLua = function(text) {
 	return [textWidth.width, height];
 }
 
-
-libCanvas.prototype.attrCrop = function(x, y, w, h) {
-	console.log("attrCrop");
-
-	var canvasData = this.ctx.getImageData(x, y, w, h);
-	//this.ctx.clearRect(x,y,w,h);
-	
-	return canvasData;
-}
-
-
 libCanvas.prototype.getContext = function(){
 	
 	return this.ctx;
 }
 
-
-libCanvas.prototype.compose = function(x, y, img, cond) {
-	console.log('compose');
+libCanvas.prototype.attrCrop = function(x, y, w, h) {
+	console.log("attrCrop");
 	
-	if (!cond) {
-		var context = img.getContext();
-		var dimension = img.attrSize();
-
-		var imageData = context.getImageData(0, 0, dimension[0], dimension[1]);
-		this.ctx.putImageData(imageData, x, y);
-	}
-	
-	else{
-		
-		
-		this.ctx.putImageData(img, x, y);
-	}
-
-	
-
+	this.iniCropX = x;
+	this.iniCropY = y;
+	this.endCropX = x+w;
+	this.endCropY = y+h;
 }
 
+
+libCanvas.prototype.compose = function(x, y, img) {
+	
+	console.log("compose");
+
+	var context = img.getContext();
+	var dimension = img.attrSize();
+
+	var imageData = context.getImageData(img.iniCropX, img.iniCropY, img.endCropX, img.endCropY);
+	this.ctx.putImageData(imageData, x, y);
+	
+}
 
 libCanvas.prototype.flush = function() {
 	console.log('flush');

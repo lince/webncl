@@ -20,9 +20,10 @@ function redraw ()
 
 	-- corredor
 	local dx2 = runner.dx/2
-    runner.img:attrCrop(runner.frame*dx2,0, dx2,runner.dy)
+    	runner.img:attrCrop(runner.frame*dx2,0, dx2,runner.dy)
 	canvas:compose(runner.x, runner.y, runner.img)
 	canvas:flush()
+	
 end
 
 -- Funcao de tratamento de eventos:
@@ -31,8 +32,7 @@ function handler (evt)
 	if (evt.class == 'ncl' and evt.type == 'presentation' and evt.action == 'start') or
 	   (evt.class == 'user') then
 		local now = event.uptime()
-		print ('now')
-		print (now)
+		
 		-- movimenta o corredor caso tempo ja tenha passado
 		if evt.time then
 			local dt = now - evt.time

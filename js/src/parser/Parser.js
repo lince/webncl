@@ -133,7 +133,6 @@ Parser.prototype.importNcl = function(lastParser)
 	var i = this.uniqueTable['aliasList'].splice(0,1);
 	if(i.length > 0)
 	{
-		console.log(i[0]);
 		i[0].parser.load(this.path + i[0].url, $.proxy(this.importNcl,this));
 	} else {
 		var x = new Date();
@@ -179,7 +178,7 @@ Parser.prototype.createNode = function (parent, tagName, parentNode, tree) {
 		if (node.id) {
 			newTree += "#" + node.id;
 		}
-		parser.parseAttributes(this,node);
+		parser.parseAttributes(this,node,parentNode);
 		parser.parseContent(this,node);
 		for (i in allTags) {
 			node[allTags[i]] = parser.createNode(this,allTags[i],node,newTree);
@@ -197,7 +196,7 @@ Parser.prototype.createNode = function (parent, tagName, parentNode, tree) {
 	return ($.inArray(tagName,Parser.isNotArray)==-1 ? nodes : nodes[0]);
 };
 
-Parser.prototype.parseAttributes = function (nodeXml, nodeObj) {
+Parser.prototype.parseAttributes = function (nodeXml, nodeObj,parentNode) {
 	var attrObj = $(nodeXml).get(0).attributes;
 	var nodeType = nodeObj["_type"];
 	var attrs = Parser.nclStructureMap[nodeType].attrs;
@@ -218,7 +217,7 @@ Parser.prototype.parseAttributes = function (nodeXml, nodeObj) {
 	for ( attr in attrs.reference_target) {
 		if ($(nodeXml).attr(attrs.reference_target[attr])) {
 			var type = attrs.reference_target[attr]==="focusIndex" ? "focusIndex" : nodeType;
-			if (!this.referenceMap.addTarget(nodeObj,$(nodeXml).attr(attrs.reference_target[attr]),$(nodeXml).parent().attr("id"),type)) {
+			if (!this.referenceMap.addTarget(nodeObj,$(nodeXml).attr(attrs.reference_target[attr]),parentNode,type)) {
 				Logger.error(Logger.ERR_DUPLICATED_ID,nodeType,[attrs.reference_target[attr],$(nodeXml).attr(attrs.reference_target[attr]),$(nodeXml).parent().attr("id")]);
 			}
 		}
@@ -397,7 +396,8 @@ ReferenceMap.prototype.addSource = function (obj,attr,type) {
 	
 };
 
-ReferenceMap.prototype.addTarget= function (ref,id,pid,refType) {
+ReferenceMap.prototype.addTarget= function (ref,id,parent,refType) {
+	var pid = parent.id;
 	var newTarget = false;
 	if (this.map[id]) {
 		if (this.map[id].target) {
@@ -423,7 +423,8 @@ ReferenceMap.prototype.addTarget= function (ref,id,pid,refType) {
 		this.map[id].target = {
 			obj: ref,
 			type: refType,
-			parents: []
+			parents: [],
+			ptype: parent._type
 		};
 	}
 	this.map[id].target.parents[pid] = true;
@@ -445,16 +446,14 @@ ReferenceMap.prototype.createReferences= function () {
 				var a = this.parser.uniqueTable.alias;
 				if(a && a[tg.alias])
 				{
-				//	if(a[tg.alias].allBases)
-				//	{
-						var o = a[tg.alias].parser.referenceMap.map[tg.id];
-						if(o)
-						{
-							tg.obj = o.target.obj;
-							tg.type = o.target.type;
-						}
-				//	}
-
+					var o = a[tg.alias].parser.referenceMap.map[tg.id];
+					if(a[tg.alias].allBases || a[tg.alias][o.target.ptype])
+					if(o)
+					{
+						tg.obj = o.target.obj;
+						tg.type = o.target.type;
+						tg.ptype = o.target.ptype;
+					}
 				} else {
 					Logger.error(ERR_INVALID_ALIAS,tg.alias,[src.attr,src.obj[src.attr],src.type]);
 				}
