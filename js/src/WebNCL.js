@@ -218,10 +218,10 @@ WebNclPlayer.prototype.execute = function (parser) {
 	$playerDiv.attr('tabindex',this.presentation.playerId);
 
 	// cria as divs de interface 
-	$playerDiv.append("<div id='" + this.presentation.loadingDiv + "' class='wncl_BlackDiv' style='display:none;'><image src='images/loader1.gif' width='32' height='32' style='position:relative; left: 50%; top: 50%; margin-top: -16px; margin-left:-16px'/></div>");
-	$playerDiv.append("<div id='" + this.presentation.playDiv + "' class='wncl_BlackDiv wncl_clickMe' ><image src='images/play.png' width='48' height='48' style='position:relative; left: 50%; top: 50%; margin-top: -24px; margin-left:-24px'/></div>");
-	$playerDiv.append("<div id='" + this.presentation.endDiv + "' class='wncl_BlackDiv wncl_clickMe' style='display:none;'><image src='images/replay.png' width='48' height='48' style='position:relative; left: 50%; top: 50%; margin-top: -24px; margin-left:-24px'/></div>");
-       
+	$playerDiv
+		.append($('<div></div>').attr({id:this.presentation.loadingDiv}).addClass('wncl_BlackDiv').hide().append($('<div></div>').addClass('wncl_loadingDiv')))
+		.append($('<div></div>').attr({id:this.presentation.playDiv}).addClass('wncl_BlackDiv wncl_clickMe').append($('<div></div>').addClass('wncl_playDiv')))
+		.append($('<div></div>').attr({id:this.presentation.endDiv}).addClass('wncl_BlackDiv wncl_clickMe').hide().append($('<div></div>').addClass('wncl_endDiv')));
         
 	// cria as divs iniciais
 	$playerDiv.append("<div id='" + this.presentation.settingsDiv + "'></div>");
