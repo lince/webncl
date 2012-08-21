@@ -336,16 +336,16 @@ LuaPlayer.prototype.bindlibs = function() {
 			objCanvas.attrText(face, size, style);
 		}, this);
 
+		luaObject.str['attrCrop'] = $.proxy(function(self, x, y, w, h) {
+			var objCanvas = this.variable.canvas_objects[self.str['id']];
+			objCanvas.attrCrop(x, y, w, h);
+			
+		}, this);
+
 		luaObject.str['compose'] = $.proxy(function(self, x, y, img) {
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
 			var objImg = this.variable.canvas_objects[img.str['id']];
 			objCanvas.compose(x, y, objImg); 			
-			
-		}, this);
-
-		luaObject.str['attrCrop'] = $.proxy(function(self, x, y, w, h) {
-			var objCanvas = this.variable.canvas_objects[self.str['id']];
-			objCanvas.attrCrop(x, y, w, h);
 			
 		}, this);
 		
