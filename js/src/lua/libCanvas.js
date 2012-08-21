@@ -10,8 +10,6 @@ function libCanvas(ctx) {
 	this.width = ctx.canvas.width;
 	this.height = ctx.canvas.height;
 	
-	this.imageIsLoaded = false;
-	
 	var canvas = document.createElement("canvas");
 	canvas.id = "canvasCopy";
 	canvas.width = ctx.canvas.width;
@@ -30,15 +28,15 @@ function libCanvas(ctx) {
 	this.endX = ctx.canvas.width;
 	this.endY = ctx.canvas.height;
 	
+	this.isSon = false;
 	
-	
-	//console.log("libCanvas");
+	console.log("libCanvas");
 
 };
 
 libCanvas.prototype.attrSize = function() {
 	
-	//console.log("attrSize");
+	console.log("attrSize");
 	return [this.width, this.height];
 
 }
@@ -55,7 +53,7 @@ libCanvas.prototype.newCanvas = function(width, height) {
 
 //TODO use function onload to first load the image then execute de code
 libCanvas.prototype.newImage = function(caminho) {
-	//console.log("newImage");
+	console.log("newImage");
 	
 	var img = new Image();
 	img.src = caminho;
@@ -64,6 +62,7 @@ libCanvas.prototype.newImage = function(caminho) {
 	}
 	
 	newObject = new libCanvas(this.ctx);
+	newObject.isSon = true;
 	newObject.setData(img.width, img.height);
 	newObject.image_path(img, 0, 0, img.width, img.height);
 	return newObject;
@@ -94,6 +93,8 @@ libCanvas.prototype.setData = function(x, y) {
 	this.height = y;
 	this.endCropX = x;
 	this.endCropY = y;
+	
+	
 }
 
 libCanvas.prototype.attrColor = function(r, g, b, a) {
@@ -379,6 +380,13 @@ libCanvas.prototype.attrCrop = function(x, y, w, h) {
 	this.iniCropY = y;
 	this.endCropX = x+w;
 	this.endCropY = y+h;
+	
+	if(this.endCropX + this.iniCropX> this.width)
+		this.endCropX = this.endCropX - x;
+		
+	if(this.endCropY + this.iniCropY> this.height)
+		this.endCropY = this.endCropY - y;
+	
 }
 
 
@@ -387,8 +395,6 @@ libCanvas.prototype.compose = function(x, y, img) {
 	console.log("compose");
 
 	var context = img.getContext();
-	var dimension = img.attrSize();
-
 	var imageData = context.getImageData(img.iniCropX, img.iniCropY, img.endCropX, img.endCropY);
 	this.ctx.putImageData(imageData, x, y);
 	
@@ -398,8 +404,8 @@ libCanvas.prototype.flush = function() {
 	console.log('flush');
 	var dimension = this.attrSize();
 	var imageData = this.ctx.getImageData(0,0,dimension[0],dimension[1]);
-	this.ctx2.clearRect(0,0,dimension[0],dimension[1]);
-	this.ctx.clearRect(0,0,dimension[0],dimension[1]);
+	//this.ctx2.clearRect(0,0,dimension[0],dimension[1]);
+	//this.ctx.clearRect(0,0,dimension[0],dimension[1]);
 	this.ctx2.putImageData(imageData, 0,0);
 }
 
