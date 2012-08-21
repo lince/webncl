@@ -379,6 +379,14 @@ libCanvas.prototype.attrCrop = function(x, y, w, h) {
 	this.iniCropY = y;
 	this.endCropX = x+w;
 	this.endCropY = y+h;
+	
+	if(this.endCropX + this.iniCropX> this.width)
+		this.endCropX = this.endCropX - x;
+		
+	if(this.endCropY + this.iniCropY> this.height)
+		this.endCropY = this.endCropY - y;
+	
+	console.log(this.iniCropX, this.iniCropY, this.endCropX, this.endCropY);
 }
 
 
@@ -387,8 +395,6 @@ libCanvas.prototype.compose = function(x, y, img) {
 	console.log("compose");
 
 	var context = img.getContext();
-	var dimension = img.attrSize();
-
 	var imageData = context.getImageData(img.iniCropX, img.iniCropY, img.endCropX, img.endCropY);
 	this.ctx.putImageData(imageData, x, y);
 	
@@ -398,8 +404,8 @@ libCanvas.prototype.flush = function() {
 	console.log('flush');
 	var dimension = this.attrSize();
 	var imageData = this.ctx.getImageData(0,0,dimension[0],dimension[1]);
-	this.ctx2.clearRect(0,0,dimension[0],dimension[1]);
-	this.ctx.clearRect(0,0,dimension[0],dimension[1]);
+	//this.ctx2.clearRect(0,0,dimension[0],dimension[1]);
+	//this.ctx.clearRect(0,0,dimension[0],dimension[1]);
 	this.ctx2.putImageData(imageData, 0,0);
 }
 

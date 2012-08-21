@@ -1,13 +1,26 @@
+crop = canvas:new('images/crop.png')
+--cima
+crop:attrCrop(0,0,50,50)
+canvas:compose(30,0,crop)
 
-local x,y = canvas:attrSize()
+crop:attrCrop(50,0,50,50)
+canvas:compose(30,10,crop)
 
+crop:attrCrop(0,0,50,50)
+canvas:compose(30,20,crop)
+------------------------
+--esquerda
+crop:attrCrop(0,0,50,50)
+canvas:compose(0,30,crop)
 
-blender = canvas:new('images/blender.png')
-x,y = blender:attrSize()
+crop:attrCrop(50,0,50,50)
+canvas:compose(10,30,crop)
 
-canvas:compose(0,0,blender)
-blender:attrCrop(0,0,60,60)
-canvas:compose(130,0,blender)
-blender:attrCrop(0,0,50,50)
-canvas:compose(200,45,blender)
+crop:attrCrop(0,0,50,50)
+canvas:compose(20,30,crop)
+------------------------
+--centro
+crop:attrCrop(50,0,50,50)
+canvas:compose(30,30,crop)
+--------------------------
 canvas:flush()

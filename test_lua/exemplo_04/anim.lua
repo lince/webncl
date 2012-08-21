@@ -10,11 +10,11 @@ local dx, dy = canvas:attrSize()
 local INI, END = 50, dx-58
 function redraw ()
 	-- fundo
-	canvas:attrColor('navy')
+	canvas:attrColor('black')
 	canvas:drawRect('fill', 0,0, dx,dy)
 
 	-- linha de largada e chegada
-	canvas:attrColor('lime')
+	canvas:attrColor('red')
 	canvas:drawRect('fill', INI,0, 8,dy)
 	canvas:drawRect('fill', END,0, 8,dy)
 
