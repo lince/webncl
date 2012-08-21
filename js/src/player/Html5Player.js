@@ -29,8 +29,9 @@
  */
 function Html5Player(p) {
     this.p = p;
-    this.popcornPlayer  = undefined;
+    this.popcornPlayer = undefined;
     this.htmlPlayer = "#" + p.id;
+	this.loadTries = 1;
 
 	// flags and callbacks for explicitDur treatment
 	this.duration = undefined;
@@ -51,17 +52,20 @@ function Html5Player(p) {
     switch (p.source.type.split("/")[0]) {
 		case "video": 
 			// type = video/*
-			p.createElement("<video class='player' poster='images/loading.gif' id='" + p.id + "'></video>");	
+			p.createElement("<video class='player' poster='images/loading.gif' id='" + p.id + "'></video>");
+			document.getElementById(this.p.id).addEventListener('error',$.proxy(this.mediaNotFound,this),true);
 			break;
 		
 		case "audio": 
 			// type = audio/*
 			p.createElement("<audio class='player' id='" + p.id+ "'></audio>");
+			document.getElementById(this.p.id).addEventListener('error',$.proxy(this.mediaNotFound,this),true);
 			break;
 		
 		case "image": 
 			// type = image/*
 			p.createElement("<img class='player' id='" + p.id + "'></img>");
+			$(this.htmlPlayer).error($.proxy(this.mediaNotFound,this));
 			break;
 		
 		case "application": 
@@ -203,58 +207,49 @@ Html5Player.prototype.unload = function()
 };
 
 /**
+ * Callback for error events (media not found)
+ */
+ Html5Player.prototype.mediaNotFound = function() {
+	this.loadTries--;
+	if (this.loadTries <= 0) {
+		Logger.warning(Logger.WARN_MEDIA_NOT_FOUND,this.p.id,[this.p.source.url]);
+	}
+};
+ 
+/**
  * Called when the player need to load (or reload) it sources 
  * After the first time it's called, MediaPlayer.js will precede
  * every call to load() with a call to unload() 
  * 
  */
-Html5Player.prototype.load = function(source) {
+Html5Player.prototype.load = function (source) {
 	
-	var filename = source.substr(0, source.lastIndexOf('.'));
-	var success = false;
-	var http = new XMLHttpRequest();
-    
-	// load a new content base on file type
-	switch (this.p.source.type.split("/")[0]) {
+	this.p.source.url = source;
+	this.loadTries = 1;
+	
+	// load a new content based on file type
+	var type = this.p.source.type.split("/")[0];
+	switch (type) {
 	
 		case "video":
-			// type = video/*
-			var ext = ['webm','ogg','mp4'];
-			for (i in ext) {
-				if (!success) {
-					http.open('HEAD',filename+'.'+ext[i],false);
-					http.send();
-					if (http.status != 404) {
-						$(this.htmlPlayer).append("<source type='video/"+ext[i]+"' src='"+filename+"."+ext[i]+"'></source>");
-						success = true;
-					}
-				}
-			}
-			break;
-		
 		case "audio":
-			// type = audio/*
-			var ext = ['mp3','ogg'];
-			for (i in ext) {
-				if (!success) {
-					http.open('HEAD',filename+'.'+ext[i],false);
-					http.send();
-					if (http.status != 404) {
-						$(this.htmlPlayer).append("<source type='audio/"+ext[i]+"' src='"+filename+"."+ext[i]+"'></source>");
-						success = true;
-					}
-				}
+			// type = video/*, audio/*
+			var filename = source.substr(0,source.lastIndexOf('.'));
+			var ext = source.substr(source.lastIndexOf('.')+1);
+			var exts = type=='video' ? ['webm','mp4','ogg'] : ['mp3','ogg'];
+			// sorts the array so that the real file extension (ext) is moved to the first position
+			exts.sort(function(a,b) {
+				return b==ext;
+			});
+			this.loadTries = exts.length;
+			for (i in exts) {
+				$(this.htmlPlayer).append('<source type="'+type+'/'+exts[i]+'" src="'+filename+'.'+exts[i]+'"></source>');
 			}
 			break;
-
+			
 		case "image":
 			// type = image/*
-			http.open('HEAD',source,false);
-			http.send();
-			if (http.status != 404) {
-				$(this.htmlPlayer).attr("src",source);
-				success = true;
-			}
+			$(this.htmlPlayer).attr("src",source);
 			break;
 		
 		case "application":
@@ -265,20 +260,16 @@ Html5Player.prototype.load = function(source) {
 		case "text":
 			if (this.p.checkType(["text/plain","text/html"])) {
 				// type = text/plain, text/html
-				http.open('HEAD',source,false);
-				http.send();
-				if (http.status != 404) {
-					$.ajax({
-						type: "GET",
-						url: source,
-						dataType: "text",
-						success: $.proxy(function (data) {
-							this.textData = data;
-							this.loadTextData();
-						},this)
-					});
-					success = true;
-				}
+				$.ajax({
+					type: "GET",
+					url: source,
+					dataType: "text",
+					success: $.proxy(function (data) {
+						this.textData = data;
+						this.loadTextData();
+					},this),
+					error: $.proxy(this.mediaNotFound,this)
+				});
 			}// else {
 				// TODO
 			//}
@@ -286,7 +277,6 @@ Html5Player.prototype.load = function(source) {
 		
 	}
     
-	return success;
 };
 
 /**
