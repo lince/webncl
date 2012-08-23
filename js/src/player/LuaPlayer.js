@@ -39,6 +39,10 @@ function LuaPlayer(p) {
 	this.persitent = new libPersistent(false);
 	this.canvas_objects = [];
 	this.events = new libEvents(this);
+    
+    //instance of broker controller
+	this.broker = new libBroker(this);
+    
 	this.id = 0;
 	this.arrayUsers = [];
 	this.isHandlingEvent = false;
@@ -396,6 +400,24 @@ LuaPlayer.prototype.bindlibs = function() {
 		},
 		"uptime" : function() {
 			return [events.uptime()];
+		}
+	}
+    
+    //broker functions
+	broker = this.broker;
+
+	lua_libs["broker"] = {
+		"init" : function(strURI, fnOptCallback) {
+			broker.init(strURI, fnOptCallback);
+		},
+		"post" : function(strDestination, strMessage) {
+			broker.post(strDestination, strMessage);
+		},
+		"register" : function(strDestination, fnHandler) {
+			broker.register(strDestination, fnHandler);
+		},
+		"unregister" : function(strDestination) {
+			broker.unregister(strDestination);
 		}
 	}
 
