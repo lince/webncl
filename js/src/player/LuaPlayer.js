@@ -41,7 +41,7 @@ function LuaPlayer(p) {
 	this.events = new libEvents(this);
     
     //instance of broker controller
-	this.broker = new libBroker(this);
+	//this.broker = new libBroker(this);
     
 	this.id = 0;
 	this.arrayUsers = [];

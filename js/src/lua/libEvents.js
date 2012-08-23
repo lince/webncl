@@ -24,56 +24,66 @@ libEvents.prototype.unregister = function(fct){
 		this.counter = this.counter - 1;
 }
 
-libEvents.prototype.post = function(mode, evt){
+libEvents.prototype.post = function(attr0, attr1){
 	//console.log('libEvents.post()')
+	console.log(attr0, attr1);
+	var evt;
+	if(attr0 === 'in'){
+		
+		evt = attr1;
+	} else if(attr1 == undefined){
+		
+		evt = attr0;
+	}
 	
-	console.log(evt);
 	
-	if (mode === 'in' || mode === undefined) {
-
-		if (evt.str['class'] == 'key') {
-			this.player.postEvent(evt.str);
-		} else if (evt.str['class'] == 'ncl') {
-			var json = undefined;
-			if (evt.str['type'] == 'presentation') {
-				if (evt.str['label'] != undefined) {
-					json = {
-						'class' : 'ncl',
-						'type' : evt.str['type'],
-						'action' : evt.str['action'],
-						'component' : this.nodeId,
-						'area' : evt.str['label']
-					};
-				} else {
-					json = {
-						'class' : 'ncl',
-						'type' : evt.str['type'],
-						'action' : evt.str['action'],
-						'component' : this.nodeId
-					};
-				}
-			} else if (evt.str['type'] == 'attribution') {
-				if (evt.str['action'] == 'stop') {
-					$('#' + this.player.id).trigger("attribution.onEndAttribution", [evt.str['name']]);
-				}
-
+	if (evt.str['class'] == 'key') {
+		this.player.postEvent(evt.str);
+	} else if (evt.str['class'] == 'ncl') {
+		var json = undefined;
+		if (evt.str['type'] == 'presentation') {
+			console.log('label:' + evt.str['label']);
+			if (evt.str['label'] != undefined) {
 				json = {
 					'class' : 'ncl',
 					'type' : evt.str['type'],
 					'action' : evt.str['action'],
 					'component' : this.nodeId,
-					'name' : evt.str['name'],
-					'value' : evt.str['value']
+					'area' : evt.str['label']
+
+				};
+
+			} else {
+				json = {
+					'class' : 'ncl',
+					'type' : evt.str['type'],
+					'action' : evt.str['action'],
+					'component' : this.nodeId
 				};
 			}
-			console.log(json);
-			this.player.postEvent(json);
-		} else if (evt.str['class'] == 'user') {
-			this.luaplayer.eventQueue(evt);
+		} else if (evt.str['type'] == 'attribution') {
+			if (evt.str['action'] == 'stop') {
+				$('#' + this.player.id).trigger("attribution.onEndAttribution", [evt.str['name']]);
+			}
 
+			json = {
+				'class' : 'ncl',
+				'type' : evt.str['type'],
+				'action' : evt.str['action'],
+				'component' : this.nodeId,
+				'name' : evt.str['name'],
+				'value' : evt.str['value']
+			};
 		}
+		console.log(json);
+		this.player.postEvent(json);
+	} else if (evt.str['class'] == 'user') {
+		this.luaplayer.eventQueue(evt);
 
 	}
+
+
+	
 
 }
 
