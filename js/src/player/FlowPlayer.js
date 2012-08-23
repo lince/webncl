@@ -42,7 +42,7 @@ function FlowPlayer(p) {
  * Called when the player needs to unload its sources
  * (Precedes calls to unload, excepting the first call)
  */
-Html5Player.prototype.unload = function()
+FlowPlayer.prototype.unload = function()
 {
 	     //erases older content
         $(this.htmlPlayer).empty();   
