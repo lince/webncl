@@ -382,8 +382,8 @@ LuaPlayer.prototype.bindlibs = function() {
 	events = this.events;
 
 	lua_libs["event"] = {
-		"post" : function(evnt) {
-			events.post(evnt);
+		"post" : function(mode,evnt) {
+			events.post(mode,evnt);
 		},
 		"register" : function(handler) {
 			events.register(handler);
