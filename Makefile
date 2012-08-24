@@ -13,7 +13,7 @@ FILES=$(wildcard $(SPATH)/*.js) $(wildcard $(SPATH)/formatter/*.js) $(wildcard $
 MINFILE=$(JSPATH)/webncl.min.js
 DEBFILE=$(JSPATH)/webncl.deb.js
 
-all: $(MINFILE)
+all: $(MINFILE) $(DEBFILE)
 
 min: $(MINFILE)
 mindeb: $(DEBFILE)
