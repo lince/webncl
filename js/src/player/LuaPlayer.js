@@ -419,18 +419,17 @@ LuaPlayer.prototype.bindlibs = function() {
 				
 	}, lua_libs["libCanvas"]);
 
-	persist = this.persitent;
-
 	lua_libs["persistent"] = {
+		"set" : $.proxy(function(prefix, key, value) {
+			console.log(this);
+			this.persitent.storeField(prefix, key, value);
 
-		"set" : function(prefix, key, value) {
-			persist.storeField(prefix, key, value);
+		}, this),
 
-		},
-
-		"get" : function(key) {
-			return [persist.recoverField(key)];
-		}
+		"get" : $.proxy(function(key) {
+			return [this.persitent.recoverField(key)];
+		}, this)
+		
 	};
 
 	events = this.events;
@@ -461,15 +460,12 @@ LuaPlayer.prototype.bindlibs = function() {
 			broker.init(strURI, fnOptCallback);
 		},
 		"post" : function(strDestination, strMessage) {
-			console.log('LuaPlayer.broker.post');
 			broker.post(strDestination, strMessage);
 		},
 		"register" : function(strDestination, fnHandler) {
-			console.log('LuaPlayer.broker.register');
 			broker.register(strDestination, fnHandler);
 		},
 		"unregister" : function(strDestination) {
-			console.log('LuaPlayer.broker.unregister');
 			broker.unregister(strDestination);
 		}
 	}

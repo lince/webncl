@@ -346,14 +346,13 @@ libCanvas.prototype.drawText = function(x, y, text) {
 
 	dimension = this.measureTextLua(text);
 
-	console.log(dimension);
-
 	width = dimension[0];
 	height = dimension[1];
 
 	this.initX = this.x + x;
 	this.initY = this.y + y + height;
 	
+	//console.log('Texto:', text)
 	this.ctx.fillText(text, this.initX, this.initY);
 
 }

@@ -31,12 +31,12 @@
 		
 		<media id="luascript" descriptor="dTV" src="test.lua" />
 		
-		<link xconnector="onKeySelectionStart">
+		<!--link xconnector="onKeySelectionStart">
 			<bind role="onSelection" component="luascript">
 				<bindParam name="keyCode" value="BLUE"/>
 			</bind>
 			<bind role="start" component="audio" />
-		</link>
+		</link-->
 		
 	</body>
 </ncl>

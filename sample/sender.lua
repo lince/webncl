@@ -5,6 +5,6 @@ function timerFunc(evt)
 	event.timer(200, timerFunc)
 end
 
-broker.init('http://200.18.98.24:8161/demo/amq')
+broker.init('http://lince.dc.ufscar.br/demo/amq')
 broker.post('topic://test', 'Primeira Mensagem!')
 event.timer(200, timerFunc)

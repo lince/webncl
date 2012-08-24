@@ -11,6 +11,7 @@ function libBroker(luaplayer){
 	this.t = d.getTime();
 	*/
    this.amq = org.activemq.Amq;
+   this.luaHandler = '';
 };
 
 libBroker.prototype.init = function(strURI, fnOptCallback){
@@ -31,14 +32,22 @@ libBroker.prototype.init = function(strURI, fnOptCallback){
     });
 }
 
-libBroker.prototype.register = function(strDestination, fnHandler){
+libBroker.prototype.fnHandler = function(param) {
+	this.luaHandler(param.textContent);	
+}
+
+libBroker.prototype.register = function(strDestination, handler){
 	console.log('libBroker.register()');
+	
+	this.luaHandler = handler;
     
    //Add listener to handle received messages
    this.amq.addListener( 
         "hdlBroker"+strDestination, //Handler name
         strDestination,             //Destination Topic
-        fnHandler                   //Handler Function
+        $.proxy(function(param) {
+        	this.luaHandler(param.textContent);
+        }, this)                   
     );
 }
 
