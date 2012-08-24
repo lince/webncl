@@ -252,6 +252,7 @@ LuaPlayer.prototype.bindlibs = function() {
 
 	lua_libs["libCanvas"]["init"] = $.proxy(function() {
 
+		try {
 		var canvas = document.createElement("canvas");
 		canvas.id = "mycanvas_" + this.variable.id;
 		canvas.width = this.variable.p.getProperty('width').split('px')[0];
@@ -265,6 +266,9 @@ LuaPlayer.prototype.bindlibs = function() {
 		console.log('init');
 		
 		this.variable.canvas_objects[this.variable.id] = object;
+		} catch(err) {
+			console.log("This lua hasn't a canvas'");
+		}
 		var luaObject = lua_newtable();
 		luaObject.str['id'] = this.variable.id;
 
@@ -305,48 +309,87 @@ LuaPlayer.prototype.bindlibs = function() {
 		}, this);
 
 		luaObject.str['attrSize'] = $.proxy(function(self) {
+			
+			if (this.variable.canvas_objects.length == 0) {
+				console.warn('This lua has no canvas.');
+				return [0,0];
+			}
+			
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
 			return objCanvas.attrSize();
 		}, this);
 
 		luaObject.str['attrColor'] = $.proxy(function(self, r, g, b, a) {
+			if (this.variable.canvas_objects.length == 0) {
+				console.warn('This lua has no canvas.');
+				return;
+			}
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
 			objCanvas.attrColor(r, g, b, a);
 
 		}, this);
 
 		luaObject.str['drawLine'] = $.proxy(function(self, x1, y1, x2, y2) {
+			if (this.variable.canvas_objects.length == 0) {
+				console.warn('This lua has no canvas.');
+				return;
+			}
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
 			objCanvas.drawLine(x1, y1, x2, y2);
 		}, this);
 
 		luaObject.str['drawRect'] = $.proxy(function(self, mode, x, y, w, h) {
+			
+			if (this.variable.canvas_objects.length == 0) {
+				console.warn('This lua has no canvas.');
+				return;
+			}
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
 			objCanvas.drawRect(mode, x, y, w, h);
 		}, this);
 
 		luaObject.str['drawText'] = $.proxy(function(self, x, y, text) {
+			if (this.variable.canvas_objects.length == 0) {
+				console.warn('This lua has no canvas.');
+				return;
+			}
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
 			objCanvas.drawText(x, y, text);
 		}, this);
 
 		luaObject.str['measureText'] = $.proxy(function(self, text) {
+			if (this.variable.canvas_objects.length == 0) {
+				console.warn('This lua has no canvas.');
+				return [0,0];
+			}
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
-			return objCanvas.measureTextLua(text);
+			return [objCanvas.measureTextLua(text)];
 		}, this);
 
-		luaObject.str['attrText'] = $.proxy(function(self, text) {
+		luaObject.str['attrText'] = $.proxy(function(self, face, size, style) {
+			if (this.variable.canvas_objects.length == 0) {
+				console.warn('This lua has no canvas.');
+				return;
+			}
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
 			objCanvas.attrText(face, size, style);
 		}, this);
 
 		luaObject.str['attrCrop'] = $.proxy(function(self, x, y, w, h) {
+			if (this.variable.canvas_objects.length == 0) {
+				console.warn('This lua has no canvas.');
+				return;
+			}
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
 			objCanvas.attrCrop(x, y, w, h);
 			
 		}, this);
 
 		luaObject.str['compose'] = $.proxy(function(self, x, y, img) {
+			if (this.variable.canvas_objects.length == 0) {
+				console.warn('This lua has no canvas.');
+				return;
+			}
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
 			var objImg = this.variable.canvas_objects[img.str['id']];
 			objCanvas.compose(x, y, objImg); 			
@@ -354,13 +397,20 @@ LuaPlayer.prototype.bindlibs = function() {
 		}, this);
 		
 		luaObject.str['flush'] = $.proxy(function(self) {
-			
+			if (this.variable.canvas_objects.length == 0) {
+				console.warn('This lua has no canvas.');
+				return;
+			}
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
 			objCanvas.flush();
 		}, this);
 		
 
 		luaObject.str['attrClip'] = $.proxy(function(self, x, y, w, h) {
+			if (this.variable.canvas_objects.length == 0) {
+				console.warn('This lua has no canvas.');
+				return;
+			}
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
 			objCanvas.attrClip(x, y, w, h);
 		}, this);
