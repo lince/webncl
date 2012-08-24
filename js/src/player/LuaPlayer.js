@@ -411,21 +411,21 @@ LuaPlayer.prototype.bindlibs = function() {
 			broker.init(strURI, fnOptCallback);
 		},
 		"post" : function(strDestination, strMessage) {
+			console.log('LuaPlayer.broker.post');
 			broker.post(strDestination, strMessage);
 		},
 		"register" : function(strDestination, fnHandler) {
+			console.log('LuaPlayer.broker.register');
 			broker.register(strDestination, fnHandler);
 		},
 		"unregister" : function(strDestination) {
+			console.log('LuaPlayer.broker.unregister');
 			broker.unregister(strDestination);
 		}
 	}
 
 }
 //
-
-
-
 
 LuaPlayer.prototype.callHandlers = function() {
 	//console.log('LuaPlayer.callHandlers() ' + this.isHandlingEvent);

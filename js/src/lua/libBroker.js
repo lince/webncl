@@ -18,7 +18,7 @@ libBroker.prototype.init = function(strURI, fnOptCallback){
     //optional callback when receiving first polling answer
     if (fnOptCallback === undefined) fnOptCallback = function(){};
     //initialize activemq object
-	amq.init({ 
+	this.amq.init({ 
         uri                         : strURI,                   //Broker
         logging                     : false,                    //Debug log
         timeout                     : 60,                       //Connection timeout (s)
@@ -35,7 +35,7 @@ libBroker.prototype.register = function(strDestination, fnHandler){
 	console.log('libBroker.register()');
     
    //Add listener to handle received messages
-   amq.addListener( 
+   this.amq.addListener( 
         "hdlBroker"+strDestination, //Handler name
         strDestination,             //Destination Topic
         fnHandler                   //Handler Function
@@ -46,7 +46,7 @@ libBroker.prototype.unregister = function(strDestination){
 	console.log('libBroker.unregister()');
     
     //Remove listener
-    amq.removeListener( 
+    this.amq.removeListener( 
         "hdlBroker"+strDestination, 
         strDestination 
     );
@@ -56,7 +56,7 @@ libBroker.prototype.post = function(strDestination, strMessage){
 	console.log('libBroker.post()')
     
     //send message to activemq using destination uri
-	amq.sendMessage(
+	this.amq.sendMessage(
         strDestination,         //Destination string like 'topic://TOPICNAME'
         strMessage              //Message
     );

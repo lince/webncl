@@ -80,25 +80,13 @@
 
 	</head>
 	<body>
-		<table border="1px">
-			<tr>
-				<td>
-					<div id="p1" style="position:relative;width:300px;height:200px"></div>
-				</td>
-				<td>
-					<div id="p2" style="position:relative;width:300px;height:200px"></div>
-				</td>
-			</tr>
-		<table>
+		<div id="playDiv" style="position:relative;width:300px;height:200px"></div>
 
 	
 		<script>
-			var myPlayer1 = new WebNclPlayer("sample/receiver.ncl","p1");
-			myPlayer1.start();
 			
-			var myPlayer2 = new WebNclPlayer("sample/sender.ncl","p2");
-			myPlayer2.start();
+			var myPlayer = new WebNclPlayer("sample/receiver.ncl","playDiv");
+			myPlayer.start();
 		</script>
-		
 	</body>
 </html>
