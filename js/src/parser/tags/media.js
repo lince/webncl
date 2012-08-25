@@ -29,4 +29,15 @@ Parser.prototype.parseMedia = function (obj,tag,parent,tree) {
 	if (obj.type!=null) {
 		obj.type = obj.type.toLowerCase();
 	}
+	// _ext
+	var ext = obj.src ? obj.src.split('.') : [];
+	var type = obj.type ? obj.type.split('/') : [];
+	if (ext.length > 1) {
+		obj._ext = ext[ext.length-1];
+	} else if (type.length > 1) {
+		obj._ext = type[type.length-1];
+	} else {
+		obj._ext = undefined;
+	}
+	
 };
