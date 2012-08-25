@@ -158,7 +158,6 @@ MediaPlayer.prototype.create = function (node) {
 		//Seta o valor de expliticDur
 		this.explicitDur = node.descriptor.explicitDur;
 	}
-	
 	// Verifica o tipo da mídia
 	if (node.type) {
 		this.type = node.type;
@@ -191,74 +190,64 @@ MediaPlayer.prototype.create = function (node) {
 		$(this.region).append("<div class='playerBkg' id='" + this.presentation.getDivId(node.id,"bkg") + "'></div>");
 
 		// Creates media player
-		var mediaPlayers = this.presentation.mediaPlayers;
-		if(mediaPlayers[this.type])
-		{
-			//creates the playerSettings data structure
-			this.playerSettings = 
-			{
-					source: 
-					{
-						type: this.type,
-						url: this.presentation.path + node.src
-					},
 
-
-					onChangeProperty:
-					{
-						defaultAction: Player.propertyAction.IGNORE, //IGNORE,OVERRIDE,OVERLOAD
-
-						//propertyMap has higher priority than defaultAction                                    
-						propertyMap:
-						{
-							//'property': IGNORE,OVERRIDE,OVERLOAD
-						}
-						//when overrided, user should trigger onEndAttribution
-						//using postEvent
-					},
-
-
-					id : this.divId,
-					parentId: this.presentation.getDivId(node.id,"bkg"),
-
-					createElement: $.proxy(this.createElement,this),
-					checkType: $.proxy(this.checkType,this),
-					getProperty: $.proxy(this.getProperty,this),
-					setProperty: $.proxy(this.setProperty,this),
-					postEvent: this.presentation.postEvent,
-
-				    enableKeyEvents: $.proxy(this.enableKeyEvents,this),
-					area: node.area
-
-			};
-
-			var playerClass = mediaPlayers[this.type][node._ext] || mediaPlayers[this.type].defaultPlayer;
-			if (playerClass) {
-				this.player = new playerClass(this.playerSettings);
-				this.playerName = playerClass.name;
-
-				// Creates templates for every method the players do not implement
-				var methods = 'load unload exec start stop pause resume abort seek seekAndPlay setProperty getDuration keyEventHandler'.split(' ');
-				for (i in methods) {
-					if (!this.player[methods[i]]) {
-						if (!this.player.__playerName) {
-							this.player.__playerName = this.playerName;
-						}
-						this.player[methods[i]] = function() {
-							Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.__playerName,[arguments.callee.name]);
-						}
-					}
+		this.playerSettings = {
+			source: {
+				type: this.type,
+				url: this.presentation.path + node.src
+			},
+			onChangeProperty: {
+				defaultAction: Player.propertyAction.IGNORE, //IGNORE,OVERRIDE,OVERLOAD
+				//propertyMap has higher priority than defaultAction                                    
+				propertyMap: {
+					//'property': IGNORE,OVERRIDE,OVERLOAD
 				}
-
+				//when overrided, user should trigger onEndAttribution
+				//using postEvent
+			},
+			id : this.divId,
+			parentId: this.presentation.getDivId(node.id,"bkg"),
+			createElement: $.proxy(this.createElement,this),
+			checkType: $.proxy(this.checkType,this),
+			getProperty: $.proxy(this.getProperty,this),
+			setProperty: $.proxy(this.setProperty,this),
+			postEvent: this.presentation.postEvent,
+			enableKeyEvents: $.proxy(this.enableKeyEvents,this),
+			area: node.area
+		};
+		
+		var playerClass;
+		var mediaPlayers = this.presentation.mediaPlayers;
+		if (node.descriptor.player) {
+			if (eval('typeof '+node.descriptor.player)=='function' && eval('typeof '+node.descriptor.player+'.prototype')=='object') {
+				playerClass = eval(node.descriptor.player);
 			} else {
-				Logger.error(Logger.ERR_MEDIAPLAYER_NOPLAYER,this.type,['no defaultPlayer or extension player']);
+				Logger.error(Logger.WARN_MEDIAPLAYER_NOT_FOUND,'Descriptor Player',[node.descriptor.player]);
 				this.player = {};
 			}
+		}
+		if (!playerClass && mediaPlayers[this.type]) {
+			playerClass = mediaPlayers[this.type][node._ext] || mediaPlayers[this.type].defaultPlayer;
+		}
+		if (playerClass) {
+			this.player = new playerClass(this.playerSettings);
+			this.playerName = playerClass.name;
+			// Creates templates for every method the players do not implement
+			var methods = 'load unload exec start stop pause resume abort seek seekAndPlay setProperty getDuration keyEventHandler'.split(' ');
+			for (i in methods) {
+				if (!this.player[methods[i]]) {
+					if (!this.player.__playerName) {
+						this.player.__playerName = this.playerName;
+					}
+					this.player[methods[i]] = function() {
+						Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.__playerName,[arguments.callee.name]);
+					}
+				}
+			}
 		} else {
-			Logger.error(Logger.ERR_MEDIAPLAYER_NOPLAYER,this.type);
+			Logger.error(Logger.ERR_MEDIAPLAYER_NOPLAYER,this.type,[]);
 			this.player = {};
 		}
-
 
 		$(this.htmlPlayerBkg).css("display","none");
 

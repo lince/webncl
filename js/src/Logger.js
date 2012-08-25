@@ -30,6 +30,7 @@ var Logger = {
 	WARN_INVALID_AREA:						105,	// Area invalida
 	WARN_NOT_IMPLEMENTED_YET:				106,	// Recurso não implementado ainda
 	WARN_MEDIA_NOT_FOUND:					107,	// Mídia não encontrada
+	WARN_MEDIAPLAYER_NOT_FOUND:				108,	// Media Player não encontrado
 	
 	// Errors
 	ERR_MISSING_ATTR:						201,	// Atributo obrigatório faltando
@@ -52,6 +53,7 @@ var Logger = {
 	ERR_MEDIAPLAYER_NOPLAYER:				218,	// No player was defined for current mime type or file extension
     ERR_PARSER_LOADINGERROR:				219,    // Error while loading NCL file
 	ERR_INVALID_ALIAS:						220,	// Invalid Alias
+	
 	MESSAGES: {
 		100: "Atributo inválido",
 		101: "Tag inválida",
@@ -61,6 +63,7 @@ var Logger = {
 		105: "Areaa invalida",
 		106: "Recurso não implementado ainda",
 		107: "Mídia não encontrada",
+		108: "Media Player não encontrado",
                 
 		201: "Atributo obrigatório faltando",
 		202: "Atributo obrigatório faltando (um desses)",
