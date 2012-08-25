@@ -52,7 +52,7 @@ function Html5Player(p) {
     switch (p.source.type.split("/")[0]) {
 		case "video": 
 			// type = video/*
-			p.createElement("<video class='player' poster='images/loading.gif' id='" + p.id + "'></video>");
+			p.createElement("<video class='player' id='" + p.id + "'></video>");
 			document.getElementById(this.p.id).addEventListener('error',$.proxy(this.mediaNotFound,this),true);
 			break;
 		
