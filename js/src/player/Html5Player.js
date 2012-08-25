@@ -234,16 +234,23 @@ Html5Player.prototype.load = function (source) {
 		case "video":
 		case "audio":
 			// type = video/*, audio/*
-			var filename = source.substr(0,source.lastIndexOf('.'));
-			var ext = source.substr(source.lastIndexOf('.')+1);
-			var exts = type=='video' ? ['webm','mp4','ogg'] : ['mp3','ogg'];
-			// sorts the array so that the real file extension (ext) is moved to the first position
-			exts.sort(function(a,b) {
-				return b==ext;
-			});
-			this.loadTries = exts.length;
-			for (i in exts) {
-				$(this.htmlPlayer).append('<source type="'+type+'/'+exts[i]+'" src="'+filename+'.'+exts[i]+'"></source>');
+			var ext = source.split('.');
+			if (ext.length > 1) {
+				// it has a file extension, so we should try other extensions
+				ext = ext[ext.length-1];
+				var filename = source.substr(0,source.lastIndexOf('.'));
+				var exts = type=='video' ? ['webm','mp4','ogg'] : ['mp3','ogg'];
+				// sorts the array so that the real file extension (ext) is moved to the first position
+				exts.sort(function(a,b) {
+					return b==ext;
+				});
+				this.loadTries = exts.length;
+				for (i in exts) {
+					$(this.htmlPlayer).append('<source type="'+type+'/'+exts[i]+'" src="'+filename+'.'+exts[i]+'"></source>');
+				}
+			} else {
+				// no file extension, it could be an url, for example
+				$(this.htmlPlayer).append('<source type="'+this.p.source.type+'" src="'+source+'"></source>');
 			}
 			break;
 			

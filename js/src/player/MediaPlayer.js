@@ -200,7 +200,6 @@ MediaPlayer.prototype.create = function (node) {
 					source: 
 					{
 						type: this.type,
-						ext: node._ext,
 						url: this.presentation.path + node.src
 					},
 
