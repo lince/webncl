@@ -342,6 +342,13 @@ InputManager.prototype.disableKeys = function(mediaId)
             this.presentation.keyEvents[mediaId] = false;
 };
 
+
+/**
+ * The double for in this method is not a mistake.
+ * It's necessary to determine the medias enabled to receive the key actions
+ * before start trigging the events because events can add inconsistency 
+ * to the used variables.
+ */
 InputManager.prototype.triggerKeyEvents = function(whichKey)
 {
 	var enabledMedias = [];
