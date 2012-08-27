@@ -344,14 +344,21 @@ InputManager.prototype.disableKeys = function(mediaId)
 
 InputManager.prototype.triggerKeyEvents = function(whichKey)
 {
+	var enabledMedias = [];
     for(var mediaId in this.presentation.keyEvents)
     {
         if(this.presentation.keyEvents[mediaId])
         {
-        	var e = $.Event('selection.onSelection');
-            e.which = whichKey;
-            $(mediaId).trigger(e);
+        	enabledMedias.push(mediaId);
         }
+    }
+    
+    for (i in enabledMedias) {
+    	var mediaId = enabledMedias[i];
+    	var e = $.Event('selection.onSelection');
+    	e.which = whichKey;
+    	$(mediaId).trigger(e);
+            
     }
 };
 
