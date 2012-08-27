@@ -218,7 +218,7 @@ MediaPlayer.prototype.create = function (node) {
 		
 		var playerClass;
 		var mediaPlayers = this.presentation.mediaPlayers;
-		if (node.descriptor.player) {
+		if (node.descriptor && node.descriptor.player) {
 			if (eval('typeof '+node.descriptor.player)=='function' && eval('typeof '+node.descriptor.player+'.prototype')=='object') {
 				playerClass = eval(node.descriptor.player);
 			} else {
