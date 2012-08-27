@@ -459,16 +459,16 @@ LuaPlayer.prototype.bindlibs = function() {
 
 	lua_libs["broker"] = {
 		"init" : $.proxy(function(strURI, fnOptCallback) {
-			broker.init(strURI, fnOptCallback);
+			this.broker.init(strURI, fnOptCallback);
 		},this),
 		"post" : $.proxy(function(strDestination, strMessage) {
-			broker.post(strDestination, strMessage);
+			this.broker.post(strDestination, strMessage);
 		},this),
 		"register" : $.proxy(function(strDestination, fnHandler) {
-			broker.register(strDestination, fnHandler);
+			this.broker.register(strDestination, fnHandler);
 		},this),
 		"unregister" : $.proxy(function(strDestination) {
-			broker.unregister(strDestination);
+			this.broker.unregister(strDestination);
 		},this)
 	}
 
