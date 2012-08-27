@@ -58,7 +58,7 @@ libCanvas.prototype.newImage = function(caminho) {
 	var img = new Image();
 	img.src = caminho;
 	if (!img.complete){
-		alert('Please press F5');
+		console.log('Please press F5');
 	}
 	
 	newObject = new libCanvas(this.ctx);

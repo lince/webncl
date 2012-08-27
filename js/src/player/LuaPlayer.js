@@ -253,22 +253,24 @@ LuaPlayer.prototype.bindlibs = function() {
 	lua_libs["libCanvas"]["init"] = $.proxy(function() {
 
 		try {
-		var canvas = document.createElement("canvas");
-		canvas.id = "mycanvas_" + this.variable.id;
-		canvas.width = this.variable.p.getProperty('width').split('px')[0];
-		canvas.height = this.variable.p.getProperty('height').split('px')[0];
-
-		$('#' + this.variable.p.id).append(canvas);
-
-		var ctx = canvas.getContext("2d");
-
-		var object = new libCanvas(ctx);
-		console.log('init');
+			canvas.width = this.variable.p.getProperty('width').split('px')[0];	
 		
-		this.variable.canvas_objects[this.variable.id] = object;
 		} catch(err) {
-			console.log("This lua hasn't a canvas'");
+			var canvas = document.createElement("canvas");
+			canvas.id = "mycanvas_" + this.variable.id;
+			canvas.width = 500;
+			canvas.height = 500;
+
+			$('#' + this.variable.p.id).append(canvas);
+
+			var ctx = canvas.getContext("2d");
+
+			var object = new libCanvas(ctx);
+			console.log('init');
+
+			this.variable.canvas_objects[this.variable.id] = object;
 		}
+
 		var luaObject = lua_newtable();
 		luaObject.str['id'] = this.variable.id;
 
@@ -283,7 +285,7 @@ LuaPlayer.prototype.bindlibs = function() {
 				url = attr0;
 
 				objCanvas = this.variable.canvas_objects[self.str['id']];
-
+				
 				newObject = objCanvas.newImage(url);
 				this.variable.id = this.variable.id + 1;
 				this.variable.canvas_objects[this.variable.id] = newObject;
@@ -432,42 +434,42 @@ LuaPlayer.prototype.bindlibs = function() {
 		
 	};
 
-	events = this.events;
+	//events = this.events;
 
 	lua_libs["event"] = {
-		"post" : function(mode,evnt) {
-			events.post(mode,evnt);
-		},
-		"register" : function(handler) {
-			events.register(handler);
-		},
-		"unregister" : function(handler) {
-			events.unregister(handler);
-		},
-		"timer" : function(timeout, fct) {
-			events.timer(timeout, fct);
-		},
-		"uptime" : function() {
-			return [events.uptime()];
-		}
+		"post" : $.proxy(function(mode,evnt) {
+			this.events.post(mode,evnt);
+		}, this),
+		"register" : $.proxy(function(handler) {
+			this.events.register(handler);
+		}, this),
+		"unregister" : $.proxy(function(handler) {
+			this.events.unregister(handler);
+		}, this),
+		"timer" : $.proxy(function(timeout, fct) {
+			this.events.timer(timeout, fct);
+		}, this),
+		"uptime" : $.proxy(function() {
+			return [this.events.uptime()];
+		}, this)
 	}
     
     //broker functions
-	broker = this.broker;
+	//broker = this.broker;
 
 	lua_libs["broker"] = {
-		"init" : function(strURI, fnOptCallback) {
+		"init" : $.proxy(function(strURI, fnOptCallback) {
 			broker.init(strURI, fnOptCallback);
-		},
-		"post" : function(strDestination, strMessage) {
+		},this),
+		"post" : $.proxy(function(strDestination, strMessage) {
 			broker.post(strDestination, strMessage);
-		},
-		"register" : function(strDestination, fnHandler) {
+		},this),
+		"register" : $.proxy(function(strDestination, fnHandler) {
 			broker.register(strDestination, fnHandler);
-		},
-		"unregister" : function(strDestination) {
+		},this),
+		"unregister" : $.proxy(function(strDestination) {
 			broker.unregister(strDestination);
-		}
+		},this)
 	}
 
 }
