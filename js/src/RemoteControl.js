@@ -1150,14 +1150,14 @@ function RemoteControl(player, divId, top, left, p_areaPowerEject, p_areaNumbers
 	this.setAreas();					
 
 	//Pressionando o botão quando hover (Chamada da Função apropriada para o botão)
-	var imgButtons = ['Eject', 'Power', 'Key_1', 'Key_2', 'Key_3', 'Key_4', 'Key_5', 'Key_6', 'Key_7', 'Key_8', 'Key_9', 'Key_Hash', 'Key_0', 'Key_Star', 'Volume_Up', 'Channel_Up', 'Volume_Down', 'Channel_Down', 'Menu', 'Mute', 'Help', 'Info','Guide', 'Exit', 'Back', 'Enter', 'Cursor_Up', 'Cursor_Down', 'Cursor_Left', 'Cursor_Right', 'Red', 'Green', 'Yellow', 'Blue', 'Rewind', 'Play', 'Forward', 'Pause', 'Record', 'Stop'];
+	var imgButtons = ['STart', 'Stop', 'Pause', 'Eject', 'Power', 'Key_1', 'Key_2', 'Key_3', 'Key_4', 'Key_5', 'Key_6', 'Key_7', 'Key_8', 'Key_9', 'Key_Hash', 'Key_0', 'Key_Star', 'Volume_Up', 'Channel_Up', 'Volume_Down', 'Channel_Down', 'Menu', 'Mute', 'Help', 'Info','Guide', 'Exit', 'Back', 'Enter', 'Cursor_Up', 'Cursor_Down', 'Cursor_Left', 'Cursor_Right', 'Red', 'Green', 'Yellow', 'Blue', 'Rewind', 'Play', 'Forward', 'Pause', 'Record', 'Stop'];
 
 	for(button in imgButtons){		
 		eval("$('#Button' + imgButtons[button]).click($.proxy(function(){"+
 				"this.functionButton('"+ imgButtons[button].toUpperCase() + "');" +		
 				"},this));"
 		);
-	}	
+	}
 
 }			
 
@@ -1173,7 +1173,27 @@ RemoteControl.prototype.setAreas = function(){
 
 //Chamada da função específica de cada botão			
 RemoteControl.prototype.functionButton = function(b){
-	this.player.keyPress(b);
+	console.log(b);
+	switch(b) {
+	case 'PLAY':
+		if (this.isPause) {
+			this.player.resume();
+		} else {
+			this.player.start();
+		}
+		break;
+	case 'STOP':
+		this.player.stop();
+		break;
+	case 'PAUSE':
+		this.player.pause();
+		this.isPause = true;
+		break;
+	default:
+		this.player.keyPress(b);
+		break;
+	}
+	
 }		
 
 //Para habilitar/desabilitar as áreas
