@@ -102,7 +102,7 @@ function WebNclPlayer (file, div, directory) {
 					defaultPlayer: Html5Player
 			},
 		"text/xml" : undefined,
-		"dummy": {defaultPlayer: Html5Player},
+		"dummy": {defaultPlayer: Html5Player}
 
 		},
 		

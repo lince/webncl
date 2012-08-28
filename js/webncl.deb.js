@@ -31,6 +31,7 @@ var Logger = {
 	WARN_NOT_IMPLEMENTED_YET:				106,	// Recurso não implementado ainda
 	WARN_MEDIA_NOT_FOUND:					107,	// Mídia não encontrada
 	WARN_MEDIAPLAYER_NOT_FOUND:				108,	// Media Player não encontrado
+	WARN_REGIONATTR_IMPORTBASE_NOTINTO_RB:  109,	// Atributo 'region' especificado em importeBase filho de um elemento que não é um regioBase
 	
 	// Errors
 	ERR_MISSING_ATTR:						201,	// Atributo obrigatório faltando
@@ -64,6 +65,7 @@ var Logger = {
 		106: "Recurso não implementado ainda",
 		107: "Mídia não encontrada",
 		108: "Media Player não encontrado",
+		109: "Atributo 'region' especificado em um importBase que não descendente de um regionBase",
                 
 		201: "Atributo obrigatório faltando",
 		202: "Atributo obrigatório faltando (um desses)",
@@ -1492,7 +1494,19 @@ function WebNclPlayer (file, div, directory) {
 			{
 					defaultPlayer: Html5Player
 			},
-		"audio": 
+		"image/png" : 
+			{
+					defaultPlayer: Html5Player
+			},
+		"image/jpeg" : 
+			{
+					defaultPlayer: Html5Player
+			},
+		"image/gif" : 
+			{
+					defaultPlayer: Html5Player
+			},
+		"audio":
 			{
 					defaultPlayer: Html5Player
 			},
@@ -1516,7 +1530,8 @@ function WebNclPlayer (file, div, directory) {
 		"application/x-ginga-settings" : {
 					defaultPlayer: Html5Player
 			},
-		"text/xml" : undefined
+		"text/xml" : undefined,
+		"dummy": {defaultPlayer: Html5Player}
 
 		},
 		
@@ -3464,6 +3479,7 @@ Parser.nclStructureMap = {
 	},
 	"regionBase": {
 		attrs: {
+			reference_target: ["id"],
 			optional: ["id","device"]
 		},
 		content: {
@@ -3660,6 +3676,7 @@ Parser.prototype.parse = function (data) {
 
 		this.loading = false;		
 	} else {
+		//start importing ncls
 		i.parseTime = new Date() - i.parseTime;
 		this.importNcl();
 	}
@@ -3679,11 +3696,70 @@ Parser.prototype.importNcl = function(lastParser)
 	{
 		i[0].parser.load(this.path + i[0].url, $.proxy(this.importNcl,this));
 	} else {
-		var x = new Date();
+		var x = new Date(),f,o;
+		
+		//create references
 		this.referenceMap.createReferences();
+		
+		//process regionBase importation
+		o = this.importBaseList.length;
+		for (f =0; f < o; f++)
+		{
+			var importBaseInfo = this.importBaseList[f];
+			var ibiObj = importBaseInfo.obj;
+
+			if(ibiObj.__parent._type === 'regionBase' && ibiObj.baseId)
+			{//consider 'baseId' attribute (other methods of importation
+			 //will import all regionBases)
+				var rBase;
+				if((rBase = importBaseInfo.parser.referenceMap.map[ibiObj.baseId]) && rBase.target)
+				{
+					
+					rBase = rBase.target.obj;
+					ibiObj.baseId = rBase;						//x reference
+					rBase._alias = ibiObj.alias;				//
+					
+					if(rBase.region)	//regions exist to be imported
+					{
+						if(ibiObj.region)
+						{
+							if(!ibiObj.region.region)
+								ibiObj.region.region  = [];
+							
+							$.merge(ibiObj.region.region,rBase.region);
+						} else {
+							this.ncl.head.regionBase.push(rBase);
+						}						
+					}
+
+					
+				} else {
+					Logger.error(Logger.ERR_INVALID_ID_REFERENCE,[ibiObj.alias,'#',ibiObj.baseId].join(''),['importBase']);
+					return;
+				}
+			} else {
+				if(ibiObj.region)
+				{
+					//merge
+					var l,u,v;
+					v = importBaseInfo.parser.ncl.head.regionBase;
+					u = v.length;
+					if(!ibiObj.region.region)
+						ibiObj.region.region  = [];
+					for(l = 0; l < u; l++)
+					{
+						$.merge(ibiObj.region.region,v[l].region);
+					}
+				} else {
+					if(importBaseInfo.parser.ncl.head.regionBase)
+						$.merge(this.ncl.head.regionBase,importBaseInfo.parser.ncl.head.regionBase);
+				}
+			}
+		}
+		
 		x = new Date() - x;
 		this.info.parseTime += x;
-			
+		this.loading = false;
 		if(this.__callback)
 			this.__callback(this);
 	}
@@ -3737,7 +3813,7 @@ Parser.prototype.createNode = function (parent, tagName, parentNode, tree) {
 			}
 		}
 	});
-	return ($.inArray(tagName,Parser.isNotArray)==-1 ? nodes : nodes[0]);
+	return ($.inArray(tagName,Parser.isNotArray)===-1 ? nodes : nodes[0]);
 };
 
 Parser.prototype.parseAttributes = function (nodeXml, nodeObj,parentNode) {
@@ -3872,8 +3948,9 @@ Parser.prototype.parseContent = function (nodeXml,nodeObj) {
 	}
 	// custom
 	if (tags.custom.length > 0) {
+		var errors;
 		tags.validate(tagCount,errors=[]);
-		for (err in errors) {
+		for (var err in errors) {
 			Logger.error(errors[err].code,nodeType,errors[err].params);
 		}
 		for (var tag in tags.custom) {
@@ -4634,7 +4711,12 @@ ContextPlayer.prototype.bindLinks = function()
 	    var actions = linkConnector.simpleAction;
 	    if(linkConnector.compoundAction)
 	    {
-	    	aOperator = linkConnector.compoundAction[0].operator.toLowerCase();
+	    	//Add just for compatibility issues with some ncls
+	    	if (linkConnector.compoundAction[0].operator) {
+	    		aOperator = linkConnector.compoundAction[0].operator.toLowerCase();
+	    	} else {
+	    		aOperator = 'seq';
+	    	}
 	    	actions = linkConnector.compoundAction[0].simpleAction; 
 	    }
 
@@ -5182,6 +5264,12 @@ function Html5Player(p) {
 					break;
 			}
 		break;
+		
+		case "dummy": {
+			p.createElement("<img class='player' id='" + p.id + "'></img>");
+			$(this.htmlPlayer).error($.proxy(this.mediaNotFound,this));
+			break;	
+		}
 	}
 
 	// creates the popcorn player
@@ -5190,7 +5278,7 @@ function Html5Player(p) {
 		do {	
 			this.popcornPlayer = new Popcorn(this.htmlPlayer);
 		} while (!this.popcornPlayer);
-	} else if(p.checkType(["image","text"])){
+	} else if(p.checkType(["image","text","dummy"])){
 		do {
 			Popcorn.player("baseplayer");
 			this.popcornPlayer = new Popcorn.baseplayer(this.htmlPlayer);
@@ -5792,7 +5880,7 @@ LuaPlayer.prototype.load = function(source) {
 	
 	var breakPath = source.split('/');
 	this.pathLua = breakPath[0] + '/' + breakPath[1] + '/';
-
+	console.log(this.pathLua);
 	$.ajax({
 		type : "GET",
 		url : source,
@@ -5963,28 +6051,28 @@ LuaPlayer.prototype.bindlibs = function() {
 
 	lua_libs["libCanvas"]["init"] = $.proxy(function() {
 
-		var canvas = document.createElement("canvas");
-			canvas.id = "mycanvas_" + this.variable.id;
+		
+		
 		
 		try {
+			var canvas = document.createElement("canvas");
+			canvas.id = "mycanvas_" + this.variable.id;
 			canvas.width = this.variable.p.getProperty('width').split('px')[0];
-			canvas.height = this.variable.p.getProperty('height').split('px')[0];	
-		
+			canvas.height = this.variable.p.getProperty('height').split('px')[0];
+			$('#' + this.variable.p.id).append(canvas);
+
+			var ctx = canvas.getContext("2d");
+
+			var object = new libCanvas(ctx);
+			console.log('init');
+			this.variable.canvas_objects[this.variable.id] = object;
+
 		} catch(err) {
-			
-			canvas.width = 500;
-			canvas.height = 500;
+
+			console.warn('region has to be defined');
 		}
+
 		
-		
-		$('#' + this.variable.p.id).append(canvas);
-
-		var ctx = canvas.getContext("2d");
-
-		var object = new libCanvas(ctx);
-		console.log('init');
-
-		this.variable.canvas_objects[this.variable.id] = object;
 
 		var luaObject = lua_newtable();
 		luaObject.str['id'] = this.variable.id; 
@@ -6043,7 +6131,11 @@ LuaPlayer.prototype.bindlibs = function() {
 				return;
 			}
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
-			objCanvas.attrColor(r, g, b, a);
+			if(r === undefined & g === undefined & b === undefined & a === undefined)
+				return [objCanvas.getColor()];
+			
+			else
+				objCanvas.attrColor(r, g, b, a);
 
 		}, this);
 
@@ -6084,13 +6176,17 @@ LuaPlayer.prototype.bindlibs = function() {
 			return [objCanvas.measureTextLua(text)];
 		}, this);
 
-		luaObject.str['attrText'] = $.proxy(function(self, face, size, style) {
+		luaObject.str['attrFont'] = $.proxy(function(self, face, size, style) {
 			if (this.variable.canvas_objects.length == 0) {
 				console.warn('This lua has no canvas.');
 				return;
 			}
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
-			objCanvas.attrText(face, size, style);
+			if(face === undefined & size === undefined & style === undefined)
+				return [objCanvas.getFont()];
+			
+			else
+				objCanvas.attrText(face, size, style);
 		}, this);
 
 		luaObject.str['attrCrop'] = $.proxy(function(self, x, y, w, h) {
@@ -6099,7 +6195,10 @@ LuaPlayer.prototype.bindlibs = function() {
 				return;
 			}
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
-			objCanvas.attrCrop(x, y, w, h);
+			if(x === undefined & y === undefined & w === undefined & h === undefined)
+				return [objCanvas.getCrop()];
+			else
+				objCanvas.attrCrop(x, y, w, h);
 			
 		}, this);
 
@@ -6130,7 +6229,10 @@ LuaPlayer.prototype.bindlibs = function() {
 				return;
 			}
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
-			objCanvas.attrClip(x, y, w, h);
+			if(x === undefined & y === undefined & w === undefined & h === undefined)
+				return [objCanvas.getClip()];
+			else
+				objCanvas.attrClip(x, y, w, h);
 		}, this);
 		
 		return [luaObject];
@@ -6238,7 +6340,20 @@ LuaPlayer.prototype.eventQueue = function(evt, notcallhandlers){
 		this.callHandlers();
 	}
 	
+
+var lua_print = function () {
+  try {
+  	
+    console.log.apply(console, arguments);
+  } catch (e) {
+    // do nothing
+  }
+  return [];
+};
+	
 }
+
+
 /*
  * Lince - Laboratory for Innovation on Computing and Engineering
  * UFSCar - Universidade Federal de São Carlos
@@ -6403,8 +6518,13 @@ MediaPlayer.prototype.create = function (node) {
 	if (node.type) {
 		this.type = node.type;
 	} else {
-		var buffer = node.src.split(".");
-		this.type = this.mediaTypes[buffer[buffer.length-1]];
+		if (node.src) {
+			var buffer = node.src.split(".");
+			this.type = this.mediaTypes[buffer[buffer.length-1]];
+		} else {
+			this.type = "dummy";
+		}
+		
 	}
 	// Cria os IDs (região e mídia)
 	this.htmlPlayer = "#" + this.divId;
@@ -6475,14 +6595,11 @@ MediaPlayer.prototype.create = function (node) {
 			this.playerName = playerClass.name;
 			// Creates templates for every method the players do not implement
 			var methods = 'load unload exec start stop pause resume abort seek seekAndPlay setProperty getDuration keyEventHandler'.split(' ');
-			for (i in methods) {
+			for (var i in methods) {
 				if (!this.player[methods[i]]) {
-					if (!this.player.__playerName) {
-						this.player.__playerName = this.playerName;
-					}
-					this.player[methods[i]] = function() {
-						Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.__playerName,[arguments.callee.name]);
-					}
+					this.player[methods[i]] = $.proxy(function() {
+						Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,[this.fname]);
+					}, {playerName: this.playerName, fname: methods[i]});
 				}
 			}
 		} else {
@@ -8303,15 +8420,18 @@ Parser.prototype.parseImportBase = function (obj,tag,parent,tree) {
 		
 		if(d['regionBase'])
 		{
-			if(!this.importBase)
-				this.importBase = [];
+			if(!this.importBaseList)
+				this.importBaseList = [];
 			
-			this.importBase.push(obj);
+			this.importBaseList.push(d);
 		}
 		
 	}	
 
-	// 
+	//base
+	if(parent._type !== 'regionBase' && obj.base)
+		Logger.warn(WARN_REGIONATTR_IMPORTBASE_NOTINTO_RB,obj.alias,[obj.parent._type,obj.documentURI]);
+
 };/*
  * Lince - Laboratory for Innovation on Computing and Engineering
  * UFSCar - Universidade Federal de São Carlos
@@ -8372,9 +8492,15 @@ Parser.prototype.parseImportNCL = function (obj,tag,parent,tree) {
 			duplicated: false,
 			url : obj.documentURI,
 			parser : new Parser(this.path,obj.alias),
-			allBases : true
+			allBases : true,
+			obj: obj
 		};
 		this.uniqueTable['aliasList'].push(this.uniqueTable["alias"][obj.alias]);
+		
+		if(!this.importBaseList)
+			this.importBaseList = [];
+			
+		this.importBaseList.push(this.uniqueTable["alias"][obj.alias]);
 	}	
 	
 	//new information
@@ -8708,7 +8834,7 @@ Parser.prototype.parseRegion = function (obj,tag,parent,tree) {
 	obj._parent = parent;
 	// left, right, top, bottom, height, width
 	attrs = ["left","right","top","bottom","height","width"];
-	values = ["(n�mero inteiro)","(n�mero inteiro)px","(n�mero real)%"];
+	values = ["(número inteiro)","(número inteiro)px","(número real)%"];
 	for (var i in attrs) {
 		attr = attrs[i]
 		value = obj[attr];
@@ -8738,7 +8864,7 @@ Parser.prototype.parseRegion = function (obj,tag,parent,tree) {
 		}
 	}
 	// zIndex
-	values = ["n�mero inteiro entre 0 e 255"];
+	values = ["número inteiro entre 0 e 255"];
 	patt = /^\d+$/;
 	if (obj.zIndex!=null && (!patt.test(obj.zIndex) || obj.zIndex<0 || obj.zIndex>255)) {
 		Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["zIndex",obj.zIndex,values]);
@@ -8757,7 +8883,16 @@ Parser.prototype.parseRegion = function (obj,tag,parent,tree) {
 				duplicated: false
 			};
 		}
-	}	
+	}
+
+	//(can be usefull one day ;] )
+	//parent regionBase
+	//if(parent.type === 'regionBase')
+	//	obj._regionBase = parent;
+	//else
+	//	obj._regionBase = parent._regionBase || undefined;
+
+		
 };/*
  * Lince - Laboratory for Innovation on Computing and Engineering
  * UFSCar - Universidade Federal de São Carlos
