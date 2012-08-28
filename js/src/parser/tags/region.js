@@ -23,7 +23,7 @@ Parser.prototype.parseRegion = function (obj,tag,parent,tree) {
 	obj._parent = parent;
 	// left, right, top, bottom, height, width
 	attrs = ["left","right","top","bottom","height","width"];
-	values = ["(n�mero inteiro)","(n�mero inteiro)px","(n�mero real)%"];
+	values = ["(número inteiro)","(número inteiro)px","(número real)%"];
 	for (var i in attrs) {
 		attr = attrs[i]
 		value = obj[attr];
@@ -53,7 +53,7 @@ Parser.prototype.parseRegion = function (obj,tag,parent,tree) {
 		}
 	}
 	// zIndex
-	values = ["n�mero inteiro entre 0 e 255"];
+	values = ["número inteiro entre 0 e 255"];
 	patt = /^\d+$/;
 	if (obj.zIndex!=null && (!patt.test(obj.zIndex) || obj.zIndex<0 || obj.zIndex>255)) {
 		Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["zIndex",obj.zIndex,values]);
@@ -72,5 +72,14 @@ Parser.prototype.parseRegion = function (obj,tag,parent,tree) {
 				duplicated: false
 			};
 		}
-	}	
+	}
+
+	//(can be usefull one day ;] )
+	//parent regionBase
+	//if(parent.type === 'regionBase')
+	//	obj._regionBase = parent;
+	//else
+	//	obj._regionBase = parent._regionBase || undefined;
+
+		
 };

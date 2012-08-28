@@ -70,13 +70,16 @@ Parser.prototype.parseImportBase = function (obj,tag,parent,tree) {
 		
 		if(d['regionBase'])
 		{
-			if(!this.importBase)
-				this.importBase = [];
+			if(!this.importBaseList)
+				this.importBaseList = [];
 			
-			this.importBase.push(obj);
+			this.importBaseList.push(d);
 		}
 		
 	}	
 
-	// 
+	//base
+	if(parent._type !== 'regionBase' && obj.base)
+		Logger.warn(WARN_REGIONATTR_IMPORTBASE_NOTINTO_RB,obj.alias,[obj.parent._type,obj.documentURI]);
+
 };

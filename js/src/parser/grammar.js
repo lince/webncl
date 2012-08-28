@@ -419,6 +419,7 @@ Parser.nclStructureMap = {
 	},
 	"regionBase": {
 		attrs: {
+			reference_target: ["id"],
 			optional: ["id","device"]
 		},
 		content: {

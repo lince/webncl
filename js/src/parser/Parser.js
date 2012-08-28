@@ -116,6 +116,7 @@ Parser.prototype.parse = function (data) {
 
 		this.loading = false;		
 	} else {
+		//start importing ncls
 		i.parseTime = new Date() - i.parseTime;
 		this.importNcl();
 	}
@@ -135,11 +136,70 @@ Parser.prototype.importNcl = function(lastParser)
 	{
 		i[0].parser.load(this.path + i[0].url, $.proxy(this.importNcl,this));
 	} else {
-		var x = new Date();
+		var x = new Date(),f,o;
+		
+		//create references
 		this.referenceMap.createReferences();
+		
+		//process regionBase importation
+		o = this.importBaseList.length;
+		for (f =0; f < o; f++)
+		{
+			var importBaseInfo = this.importBaseList[f];
+			var ibiObj = importBaseInfo.obj;
+
+			if(ibiObj.__parent._type === 'regionBase' && ibiObj.baseId)
+			{//consider 'baseId' attribute (other methods of importation
+			 //will import all regionBases)
+				var rBase;
+				if((rBase = importBaseInfo.parser.referenceMap.map[ibiObj.baseId]) && rBase.target)
+				{
+					
+					rBase = rBase.target.obj;
+					ibiObj.baseId = rBase;						//x reference
+					rBase._alias = ibiObj.alias;				//
+					
+					if(rBase.region)	//regions exist to be imported
+					{
+						if(ibiObj.region)
+						{
+							if(!ibiObj.region.region)
+								ibiObj.region.region  = [];
+							
+							$.merge(ibiObj.region.region,rBase.region);
+						} else {
+							this.ncl.head.regionBase.push(rBase);
+						}						
+					}
+
+					
+				} else {
+					Logger.error(Logger.ERR_INVALID_ID_REFERENCE,[ibiObj.alias,'#',ibiObj.baseId].join(''),['importBase']);
+					return;
+				}
+			} else {
+				if(ibiObj.region)
+				{
+					//merge
+					var l,u,v;
+					v = importBaseInfo.parser.ncl.head.regionBase;
+					u = v.length;
+					if(!ibiObj.region.region)
+						ibiObj.region.region  = [];
+					for(l = 0; l < u; l++)
+					{
+						$.merge(ibiObj.region.region,v[l].region);
+					}
+				} else {
+					if(importBaseInfo.parser.ncl.head.regionBase)
+						$.merge(this.ncl.head.regionBase,importBaseInfo.parser.ncl.head.regionBase);
+				}
+			}
+		}
+		
 		x = new Date() - x;
 		this.info.parseTime += x;
-			
+		this.loading = false;
 		if(this.__callback)
 			this.__callback(this);
 	}
@@ -193,7 +253,7 @@ Parser.prototype.createNode = function (parent, tagName, parentNode, tree) {
 			}
 		}
 	});
-	return ($.inArray(tagName,Parser.isNotArray)==-1 ? nodes : nodes[0]);
+	return ($.inArray(tagName,Parser.isNotArray)===-1 ? nodes : nodes[0]);
 };
 
 Parser.prototype.parseAttributes = function (nodeXml, nodeObj,parentNode) {
@@ -328,8 +388,9 @@ Parser.prototype.parseContent = function (nodeXml,nodeObj) {
 	}
 	// custom
 	if (tags.custom.length > 0) {
+		var errors;
 		tags.validate(tagCount,errors=[]);
-		for (err in errors) {
+		for (var err in errors) {
 			Logger.error(errors[err].code,nodeType,errors[err].params);
 		}
 		for (var tag in tags.custom) {

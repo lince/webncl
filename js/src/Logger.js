@@ -31,6 +31,7 @@ var Logger = {
 	WARN_NOT_IMPLEMENTED_YET:				106,	// Recurso não implementado ainda
 	WARN_MEDIA_NOT_FOUND:					107,	// Mídia não encontrada
 	WARN_MEDIAPLAYER_NOT_FOUND:				108,	// Media Player não encontrado
+	WARN_REGIONATTR_IMPORTBASE_NOTINTO_RB:  109,	// Atributo 'region' especificado em importeBase filho de um elemento que não é um regioBase
 	
 	// Errors
 	ERR_MISSING_ATTR:						201,	// Atributo obrigatório faltando
@@ -64,6 +65,7 @@ var Logger = {
 		106: "Recurso não implementado ainda",
 		107: "Mídia não encontrada",
 		108: "Media Player não encontrado",
+		109: "Atributo 'region' especificado em um importBase que não descendente de um regionBase",
                 
 		201: "Atributo obrigatório faltando",
 		202: "Atributo obrigatório faltando (um desses)",
