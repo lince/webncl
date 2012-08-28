@@ -2,8 +2,8 @@ function libCanvas(ctx) {
 
 	this.iniCropX = 0;
 	this.iniCropY = 0;
-	this.endCropX = 0;
-	this.endCropY = 0;
+	this.endCropX = ctx.canvas.width;
+	this.endCropY = ctx.canvas.height;
 
 	//context
 	this.ctx2 = ctx;
@@ -28,8 +28,14 @@ function libCanvas(ctx) {
 	this.endX = ctx.canvas.width;
 	this.endY = ctx.canvas.height;
 	
-	this.isSon = false;
+	//variable for return the values of color from attrColor
+	this.color = [];
+	this.color[0] = 0;
+	this.color[1] = 0;
+	this.color[2] = 0;
+	this.color[3] = 1;
 	
+	this.attrFont = [];
 	console.log("libCanvas");
 
 };
@@ -97,6 +103,12 @@ libCanvas.prototype.setData = function(x, y) {
 	
 }
 
+libCanvas.prototype.getColor = function(){
+		
+	return [this.color[0], this.color[1], this.color[2], this.color[3]];
+	
+}
+
 libCanvas.prototype.attrColor = function(r, g, b, a) {
 	console.log("attrColor");
 
@@ -105,61 +117,97 @@ libCanvas.prototype.attrColor = function(r, g, b, a) {
 		if (g === undefined) {
 			g = 1;
 		}
-
+		
 		switch(r) {
 
 			case 'lime' :
 				this.ctx.fillStyle = "rgba(0,255,0," + g + ")";
 				this.ctx.lineWidth = "2";
-				this.ctx.strokeStyle = "rgba(0,255,0,0.8)";
+				this.ctx.strokeStyle = "rgba(0,255,0," + g + ")";
+				this.color[0] = 0;
+				this.color[1] = 255;
+				this.color[2] = 0;
+				this.color[3] = g;
 				break;
 
 			case 'white':
 				this.ctx.fillStyle = "rgba(255,255,255," + g + ")";
 				this.ctx.lineWidth = "2";
 				this.ctx.strokeStyle = "rgba(255,255,255," + g + ")";
+				this.color[0] = 255;
+				this.color[1] = 255;
+				this.color[2] = 255;
+				this.color[3] = g;
 				break;
 
 			case 'aqua':
 				this.ctx.fillStyle = "rgba(0,255,255," + g + ")";
 				this.ctx.lineWidth = "2";
 				this.ctx.strokeStyle = "rgba(0,255,255," + g + ")";
+				this.color[0] = 0;
+				this.color[1] = 255;
+				this.color[2] = 255;
+				this.color[3] = g;
 				break;
 
 			case 'yellow':
 				this.ctx.fillStyle = "rgba(255,255,0," + g + ")";
 				this.ctx.lineWidth = "2";
 				this.ctx.strokeStyle = "rgba(255,255,0," + g + ")";
+				this.color[0] = 255;
+				this.color[1] = 255;
+				this.color[2] = 0;
+				this.color[3] = g;
 				break;
 
 			case 'red':
 				this.ctx.fillStyle = "rgba(255,0,0," + g + ")";
 				this.ctx.lineWidth = "2";
 				this.ctx.strokeStyle = "rgba(255,0,0," + g + ")";
+				this.color[0] = 255;
+				this.color[1] = 0;
+				this.color[2] = 0;
+				this.color[3] = g;
 				break;
 
 			case 'fuchsia':
 				this.ctx.fillStyle = "rgba(255,0,255," + g + ")";
 				this.ctx.lineWidth = "2";
 				this.ctx.strokeStyle = "rgba(255,0,255," + g + ")";
+				this.color[0] = 255;
+				this.color[1] = 0;
+				this.color[2] = 255;
+				this.color[3] = g;
 				break;
 
 			case 'purple':
 				this.ctx.fillStyle = "rgba(128,0,128," + g + ")";
 				this.ctx.lineWidth = "2";
 				this.ctx.strokeStyle = "rgba(128,0,128," + g + ")";
+				this.color[0] = 128;
+				this.color[1] = 0;
+				this.color[2] = 128;
+				this.color[3] = g;
 				break;
 
 			case 'maroon':
 				this.ctx.fillStyle = "rgba(128,0,0," + g + ")";
 				this.ctx.lineWidth = "2";
 				this.ctx.strokeStyle = "rgba(128,0,0," + g + ")";
+				this.color[0] = 128;
+				this.color[1] = 0;
+				this.color[2] = 0;
+				this.color[3] = g;
 				break;
 
 			case 'blue':
 				this.ctx.fillStyle = "rgba(0,0,255," + g + ")";
 				this.ctx.lineWidth = "2";
 				this.ctx.strokeStyle = "rgba(0,0,255," + g + ")";
+				this.color[0] = 0;
+				this.color[1] = 0;
+				this.color[2] = 255;
+				this.color[3] = g;
 
 				break;
 
@@ -167,51 +215,89 @@ libCanvas.prototype.attrColor = function(r, g, b, a) {
 				this.ctx.fillStyle = "rgba(0,0,128," + g + ")";
 				this.ctx.lineWidth = "2";
 				this.ctx.strokeStyle = "rgba(0,0,128," + g + ")";
+				this.color[0] = 0;
+				this.color[1] = 0;
+				this.color[2] = 128;
+				this.color[3] = g;
 				break;
 
 			case 'teal':
 				this.ctx.fillStyle = "rgba(0,128,128," + g + ")";
 				this.ctx.lineWidth = "2";
 				this.ctx.strokeStyle = "rgba(0,128,128," + g + ")";
+				this.color[0] = 0;
+				this.color[1] = 128;
+				this.color[2] = 128;
+				this.color[3] = g;
 				break;
 
 			case 'green':
 				this.ctx.fillStyle = "rgba(0,128,0," + g + ")";
 				this.ctx.lineWidth = "2";
 				this.ctx.strokeStyle = "rgba(0,128,0," + g + ")";
+				this.color[0] = 0;
+				this.color[1] = 128;
+				this.color[2] = 0;
+				this.color[3] = g;
 				break;
 
 			case 'olive':
 				this.ctx.fillStyle = "rgba(128,128,0," + g + ")";
 				this.ctx.lineWidth = "2";
 				this.ctx.strokeStyle = "rgba(128,128,0," + g + ")";
+				this.color[0] = 128;
+				this.color[1] = 128;
+				this.color[2] = 0;
+				this.color[3] = g;
 				break;
 
 			case 'silver':
 				this.ctx.fillStyle = "rgba(192,192,192," + g + ")";
 				this.ctx.lineWidth = "2";
 				this.ctx.strokeStyle = "rgba(192,192,192," + g + ")";
+				this.color[0] = 192;
+				this.color[1] = 192;
+				this.color[2] = 192;
+				this.color[3] = g;
 				break;
 
 			case 'gray':
 				this.ctx.fillStyle = "rgba(128,128,128," + g + ")";
 				this.ctx.lineWidth = "2";
 				this.ctx.strokeStyle = "rgba(128,128,128," + g + ")";
+				this.color[0] = 128;
+				this.color[1] = 128;
+				this.color[2] = 128;
+				this.color[3] = g;
 				break;
 
 			case 'black':
 				this.ctx.fillStyle = "rgba(0,0,0," + g + ")";
 				this.ctx.lineWidth = "2";
 				this.ctx.strokeStyle = "rgba(0,0,0," + g + ")";
+				this.color[0] = 0;
+				this.color[1] = 0;
+				this.color[2] = 0;
+				this.color[3] = g;
 				break;
 
 		}
 
 	}
 
-	this.ctx.fillStyle = "rgba(" + r + "," + g + "," + b + "," + a + ")";
-	this.ctx.lineWidth = "2";
-	this.ctx.strokeStyle = "rgba(" + r + "," + g + "," + b + "," + a + ")";
+	
+	else {
+
+		this.ctx.fillStyle = "rgba(" + r + "," + g + "," + b + "," + a + ")";
+		this.ctx.lineWidth = "2";
+		this.ctx.strokeStyle = "rgba(" + r + "," + g + "," + b + "," + a + ")";
+		this.color[0] = r;
+		this.color[1] = g;
+		this.color[2] = b;
+		this.color[3] = a;
+	}
+
+	
 
 }
 
@@ -226,6 +312,12 @@ libCanvas.prototype.attrClip = function(x, y, w, h) {
 	this.ctx.lineWidth = "1";
 	this.ctx.strokeRect(this.x, this.y, this.sizeX, this.sizeY);
 
+}
+
+libCanvas.prototype.getClip = function(){
+	
+	return [this.x, this.y, this.sizeX, this.sizeY];
+	
 }
 
 
@@ -332,12 +424,21 @@ libCanvas.prototype.drawRect = function(mode, x1, y1, x2, y2) {
 
 }
 
+libCanvas.prototype.getFont = function(){
+	
+	return [this.attrFont[0], this.attrFont[1], this.attrFont[2]];
+}
+
 libCanvas.prototype.attrText = function(face, size, style) {
-	console.log("attrText");
+	console.log("attrFont");
 
 	if (style === undefined)
 		style = "none";
-
+		
+	this.attrFont[0] = face;
+	this.attrFont[1] = size;
+	this.attrFont[2] = style;
+	
 	this.ctx.font = size + " " + face + " " + style;
 }
 
@@ -370,6 +471,10 @@ libCanvas.prototype.measureTextLua = function(text) {
 libCanvas.prototype.getContext = function(){
 	
 	return this.ctx;
+}
+
+libCanvas.prototype.getCrop = function(){
+	return [this.iniCropX, this.iniCropY, this.endCropX, this.endCropY];
 }
 
 libCanvas.prototype.attrCrop = function(x, y, w, h) {
