@@ -605,7 +605,12 @@ ContextPlayer.prototype.bindLinks = function()
 	    var actions = linkConnector.simpleAction;
 	    if(linkConnector.compoundAction)
 	    {
-	    	aOperator = linkConnector.compoundAction[0].operator.toLowerCase();
+	    	//Add just for compatibility issues with some ncls
+	    	if (linkConnector.compoundAction[0].operator) {
+	    		aOperator = linkConnector.compoundAction[0].operator.toLowerCase();
+	    	} else {
+	    		aOperator = 'seq';
+	    	}
 	    	actions = linkConnector.compoundAction[0].simpleAction; 
 	    }
 
