@@ -56,14 +56,14 @@ function LuaPlayer(p) {
   	this.p.onChangeProperty.propertyMap['height'] = Player.propertyAction.IGNORE;
   	this.p.onChangeProperty.propertyMap['left'] = Player.propertyAction.IGNORE;
   	this.p.onChangeProperty.propertyMap['top'] = Player.propertyAction.IGNORE;
+  	
+  	//path to load images correctly in .lua files
+  	this.pathlua = '';
 
     p.enableKeyEvents();
 
 	console.log(p.id);
 	
-	
-	
-
 };
 
 /**
@@ -82,6 +82,9 @@ LuaPlayer.prototype.unload = function() {
  */
 LuaPlayer.prototype.load = function(source) {
 	//console.log('load lua: ' + source);
+	
+	var breakPath = source.split('/');
+	this.pathLua = breakPath[0] + '/' + breakPath[1] + '/';
 
 	$.ajax({
 		type : "GET",
@@ -246,33 +249,39 @@ LuaPlayer.prototype.bindlibs = function() {
 		'variable' : {
 			id : this.id,
 			p : this.p,
-			canvas_objects : this.canvas_objects
+			canvas_objects : this.canvas_objects,
+			pathLua : this.pathLua
 		}
 	};
 
 	lua_libs["libCanvas"]["init"] = $.proxy(function() {
 
+		var canvas = document.createElement("canvas");
+			canvas.id = "mycanvas_" + this.variable.id;
+		
 		try {
-			canvas.width = this.variable.p.getProperty('width').split('px')[0];	
+			canvas.width = this.variable.p.getProperty('width').split('px')[0];
+			canvas.height = this.variable.p.getProperty('height').split('px')[0];	
 		
 		} catch(err) {
-			var canvas = document.createElement("canvas");
-			canvas.id = "mycanvas_" + this.variable.id;
+			
 			canvas.width = 500;
 			canvas.height = 500;
-
-			$('#' + this.variable.p.id).append(canvas);
-
-			var ctx = canvas.getContext("2d");
-
-			var object = new libCanvas(ctx);
-			console.log('init');
-
-			this.variable.canvas_objects[this.variable.id] = object;
 		}
+		
+		
+		$('#' + this.variable.p.id).append(canvas);
+
+		var ctx = canvas.getContext("2d");
+
+		var object = new libCanvas(ctx);
+		console.log('init');
+
+		this.variable.canvas_objects[this.variable.id] = object;
 
 		var luaObject = lua_newtable();
-		luaObject.str['id'] = this.variable.id;
+		luaObject.str['id'] = this.variable.id; 
+
 
 		
 
@@ -286,7 +295,7 @@ LuaPlayer.prototype.bindlibs = function() {
 
 				objCanvas = this.variable.canvas_objects[self.str['id']];
 				
-				newObject = objCanvas.newImage(url);
+				newObject = objCanvas.newImage(this.variable.pathLua + url);
 				this.variable.id = this.variable.id + 1;
 				this.variable.canvas_objects[this.variable.id] = newObject;
 				var newLuaObjet = $.extend(true, {}, self);
