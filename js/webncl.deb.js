@@ -30,6 +30,7 @@ var Logger = {
 	WARN_INVALID_AREA:						105,	// Area invalida
 	WARN_NOT_IMPLEMENTED_YET:				106,	// Recurso não implementado ainda
 	WARN_MEDIA_NOT_FOUND:					107,	// Mídia não encontrada
+	WARN_MEDIAPLAYER_NOT_FOUND:				108,	// Media Player não encontrado
 	
 	// Errors
 	ERR_MISSING_ATTR:						201,	// Atributo obrigatório faltando
@@ -52,6 +53,7 @@ var Logger = {
 	ERR_MEDIAPLAYER_NOPLAYER:				218,	// No player was defined for current mime type or file extension
     ERR_PARSER_LOADINGERROR:				219,    // Error while loading NCL file
 	ERR_INVALID_ALIAS:						220,	// Invalid Alias
+	
 	MESSAGES: {
 		100: "Atributo inválido",
 		101: "Tag inválida",
@@ -61,6 +63,7 @@ var Logger = {
 		105: "Areaa invalida",
 		106: "Recurso não implementado ainda",
 		107: "Mídia não encontrada",
+		108: "Media Player não encontrado",
                 
 		201: "Atributo obrigatório faltando",
 		202: "Atributo obrigatório faltando (um desses)",
@@ -1250,14 +1253,14 @@ function RemoteControl(player, divId, top, left, p_areaPowerEject, p_areaNumbers
 	this.setAreas();					
 
 	//Pressionando o botão quando hover (Chamada da Função apropriada para o botão)
-	var imgButtons = ['Eject', 'Power', 'Key_1', 'Key_2', 'Key_3', 'Key_4', 'Key_5', 'Key_6', 'Key_7', 'Key_8', 'Key_9', 'Key_Hash', 'Key_0', 'Key_Star', 'Volume_Up', 'Channel_Up', 'Volume_Down', 'Channel_Down', 'Menu', 'Mute', 'Help', 'Info','Guide', 'Exit', 'Back', 'Enter', 'Cursor_Up', 'Cursor_Down', 'Cursor_Left', 'Cursor_Right', 'Red', 'Green', 'Yellow', 'Blue', 'Rewind', 'Play', 'Forward', 'Pause', 'Record', 'Stop'];
+	var imgButtons = ['STart', 'Stop', 'Pause', 'Eject', 'Power', 'Key_1', 'Key_2', 'Key_3', 'Key_4', 'Key_5', 'Key_6', 'Key_7', 'Key_8', 'Key_9', 'Key_Hash', 'Key_0', 'Key_Star', 'Volume_Up', 'Channel_Up', 'Volume_Down', 'Channel_Down', 'Menu', 'Mute', 'Help', 'Info','Guide', 'Exit', 'Back', 'Enter', 'Cursor_Up', 'Cursor_Down', 'Cursor_Left', 'Cursor_Right', 'Red', 'Green', 'Yellow', 'Blue', 'Rewind', 'Play', 'Forward', 'Pause', 'Record', 'Stop'];
 
 	for(button in imgButtons){		
 		eval("$('#Button' + imgButtons[button]).click($.proxy(function(){"+
 				"this.functionButton('"+ imgButtons[button].toUpperCase() + "');" +		
 				"},this));"
 		);
-	}	
+	}
 
 }			
 
@@ -1273,7 +1276,27 @@ RemoteControl.prototype.setAreas = function(){
 
 //Chamada da função específica de cada botão			
 RemoteControl.prototype.functionButton = function(b){
-	this.player.keyPress(b);
+	console.log(b);
+	switch(b) {
+	case 'PLAY':
+		if (this.isPause) {
+			this.player.resume();
+		} else {
+			this.player.start();
+		}
+		break;
+	case 'STOP':
+		this.player.stop();
+		break;
+	case 'PAUSE':
+		this.player.pause();
+		this.isPause = true;
+		break;
+	default:
+		this.player.keyPress(b);
+		break;
+	}
+	
 }		
 
 //Para habilitar/desabilitar as áreas
@@ -2374,16 +2397,30 @@ InputManager.prototype.disableKeys = function(mediaId)
             this.presentation.keyEvents[mediaId] = false;
 };
 
+
+/**
+ * The double for in this method is not a mistake.
+ * It's necessary to determine the medias enabled to receive the key actions
+ * before start trigging the events because events can add inconsistency 
+ * to the used variables.
+ */
 InputManager.prototype.triggerKeyEvents = function(whichKey)
 {
+	var enabledMedias = [];
     for(var mediaId in this.presentation.keyEvents)
     {
         if(this.presentation.keyEvents[mediaId])
         {
-        	var e = $.Event('selection.onSelection');
-            e.which = whichKey;
-            $(mediaId).trigger(e);
+        	enabledMedias.push(mediaId);
         }
+    }
+    
+    for (i in enabledMedias) {
+    	var mediaId = enabledMedias[i];
+    	var e = $.Event('selection.onSelection');
+    	e.which = whichKey;
+    	$(mediaId).trigger(e);
+            
     }
 };
 
@@ -5091,7 +5128,7 @@ function Html5Player(p) {
     switch (p.source.type.split("/")[0]) {
 		case "video": 
 			// type = video/*
-			p.createElement("<video class='player' poster='images/loading.gif' id='" + p.id + "'></video>");
+			p.createElement("<video class='player' id='" + p.id + "'></video>");
 			document.getElementById(this.p.id).addEventListener('error',$.proxy(this.mediaNotFound,this),true);
 			break;
 		
@@ -5273,16 +5310,23 @@ Html5Player.prototype.load = function (source) {
 		case "video":
 		case "audio":
 			// type = video/*, audio/*
-			var filename = source.substr(0,source.lastIndexOf('.'));
-			var ext = source.substr(source.lastIndexOf('.')+1);
-			var exts = type=='video' ? ['webm','mp4','ogg'] : ['mp3','ogg'];
-			// sorts the array so that the real file extension (ext) is moved to the first position
-			exts.sort(function(a,b) {
-				return b==ext;
-			});
-			this.loadTries = exts.length;
-			for (i in exts) {
-				$(this.htmlPlayer).append('<source type="'+type+'/'+exts[i]+'" src="'+filename+'.'+exts[i]+'"></source>');
+			var ext = source.split('.');
+			if (ext.length > 1) {
+				// it has a file extension, so we should try other extensions
+				ext = ext[ext.length-1];
+				var filename = source.substr(0,source.lastIndexOf('.'));
+				var exts = type=='video' ? ['webm','mp4','ogg'] : ['mp3','ogg'];
+				// sorts the array so that the real file extension (ext) is moved to the first position
+				exts.sort(function(a,b) {
+					return b==ext;
+				});
+				this.loadTries = exts.length;
+				for (i in exts) {
+					$(this.htmlPlayer).append('<source type="'+type+'/'+exts[i]+'" src="'+filename+'.'+exts[i]+'"></source>');
+				}
+			} else {
+				// no file extension, it could be an url, for example
+				$(this.htmlPlayer).append('<source type="'+this.p.source.type+'" src="'+source+'"></source>');
 			}
 			break;
 			
@@ -5719,14 +5763,14 @@ function LuaPlayer(p) {
   	this.p.onChangeProperty.propertyMap['height'] = Player.propertyAction.IGNORE;
   	this.p.onChangeProperty.propertyMap['left'] = Player.propertyAction.IGNORE;
   	this.p.onChangeProperty.propertyMap['top'] = Player.propertyAction.IGNORE;
+  	
+  	//path to load images correctly in .lua files
+  	this.pathlua = '';
 
     p.enableKeyEvents();
 
 	console.log(p.id);
 	
-	
-	
-
 };
 
 /**
@@ -5745,6 +5789,9 @@ LuaPlayer.prototype.unload = function() {
  */
 LuaPlayer.prototype.load = function(source) {
 	//console.log('load lua: ' + source);
+	
+	var breakPath = source.split('/');
+	this.pathLua = breakPath[0] + '/' + breakPath[1] + '/';
 
 	$.ajax({
 		type : "GET",
@@ -5909,27 +5956,39 @@ LuaPlayer.prototype.bindlibs = function() {
 		'variable' : {
 			id : this.id,
 			p : this.p,
-			canvas_objects : this.canvas_objects
+			canvas_objects : this.canvas_objects,
+			pathLua : this.pathLua
 		}
 	};
 
 	lua_libs["libCanvas"]["init"] = $.proxy(function() {
 
 		var canvas = document.createElement("canvas");
-		canvas.id = "mycanvas_" + this.variable.id;
-		canvas.width = this.variable.p.getProperty('width').split('px')[0];
-		canvas.height = this.variable.p.getProperty('height').split('px')[0];
-
+			canvas.id = "mycanvas_" + this.variable.id;
+		
+		try {
+			canvas.width = this.variable.p.getProperty('width').split('px')[0];
+			canvas.height = this.variable.p.getProperty('height').split('px')[0];	
+		
+		} catch(err) {
+			
+			canvas.width = 500;
+			canvas.height = 500;
+		}
+		
+		
 		$('#' + this.variable.p.id).append(canvas);
 
 		var ctx = canvas.getContext("2d");
 
 		var object = new libCanvas(ctx);
 		console.log('init');
-		
+
 		this.variable.canvas_objects[this.variable.id] = object;
+
 		var luaObject = lua_newtable();
-		luaObject.str['id'] = this.variable.id;
+		luaObject.str['id'] = this.variable.id; 
+
 
 		
 
@@ -5942,8 +6001,8 @@ LuaPlayer.prototype.bindlibs = function() {
 				url = attr0;
 
 				objCanvas = this.variable.canvas_objects[self.str['id']];
-
-				newObject = objCanvas.newImage(url);
+				
+				newObject = objCanvas.newImage(this.variable.pathLua + url);
 				this.variable.id = this.variable.id + 1;
 				this.variable.canvas_objects[this.variable.id] = newObject;
 				var newLuaObjet = $.extend(true, {}, self);
@@ -5968,48 +6027,87 @@ LuaPlayer.prototype.bindlibs = function() {
 		}, this);
 
 		luaObject.str['attrSize'] = $.proxy(function(self) {
+			
+			if (this.variable.canvas_objects.length == 0) {
+				console.warn('This lua has no canvas.');
+				return [0,0];
+			}
+			
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
 			return objCanvas.attrSize();
 		}, this);
 
 		luaObject.str['attrColor'] = $.proxy(function(self, r, g, b, a) {
+			if (this.variable.canvas_objects.length == 0) {
+				console.warn('This lua has no canvas.');
+				return;
+			}
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
 			objCanvas.attrColor(r, g, b, a);
 
 		}, this);
 
 		luaObject.str['drawLine'] = $.proxy(function(self, x1, y1, x2, y2) {
+			if (this.variable.canvas_objects.length == 0) {
+				console.warn('This lua has no canvas.');
+				return;
+			}
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
 			objCanvas.drawLine(x1, y1, x2, y2);
 		}, this);
 
 		luaObject.str['drawRect'] = $.proxy(function(self, mode, x, y, w, h) {
+			
+			if (this.variable.canvas_objects.length == 0) {
+				console.warn('This lua has no canvas.');
+				return;
+			}
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
 			objCanvas.drawRect(mode, x, y, w, h);
 		}, this);
 
 		luaObject.str['drawText'] = $.proxy(function(self, x, y, text) {
+			if (this.variable.canvas_objects.length == 0) {
+				console.warn('This lua has no canvas.');
+				return;
+			}
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
 			objCanvas.drawText(x, y, text);
 		}, this);
 
 		luaObject.str['measureText'] = $.proxy(function(self, text) {
+			if (this.variable.canvas_objects.length == 0) {
+				console.warn('This lua has no canvas.');
+				return [0,0];
+			}
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
-			return objCanvas.measureTextLua(text);
+			return [objCanvas.measureTextLua(text)];
 		}, this);
 
-		luaObject.str['attrText'] = $.proxy(function(self, text) {
+		luaObject.str['attrText'] = $.proxy(function(self, face, size, style) {
+			if (this.variable.canvas_objects.length == 0) {
+				console.warn('This lua has no canvas.');
+				return;
+			}
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
 			objCanvas.attrText(face, size, style);
 		}, this);
 
 		luaObject.str['attrCrop'] = $.proxy(function(self, x, y, w, h) {
+			if (this.variable.canvas_objects.length == 0) {
+				console.warn('This lua has no canvas.');
+				return;
+			}
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
 			objCanvas.attrCrop(x, y, w, h);
 			
 		}, this);
 
 		luaObject.str['compose'] = $.proxy(function(self, x, y, img) {
+			if (this.variable.canvas_objects.length == 0) {
+				console.warn('This lua has no canvas.');
+				return;
+			}
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
 			var objImg = this.variable.canvas_objects[img.str['id']];
 			objCanvas.compose(x, y, objImg); 			
@@ -6017,13 +6115,20 @@ LuaPlayer.prototype.bindlibs = function() {
 		}, this);
 		
 		luaObject.str['flush'] = $.proxy(function(self) {
-			
+			if (this.variable.canvas_objects.length == 0) {
+				console.warn('This lua has no canvas.');
+				return;
+			}
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
 			objCanvas.flush();
 		}, this);
 		
 
 		luaObject.str['attrClip'] = $.proxy(function(self, x, y, w, h) {
+			if (this.variable.canvas_objects.length == 0) {
+				console.warn('This lua has no canvas.');
+				return;
+			}
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
 			objCanvas.attrClip(x, y, w, h);
 		}, this);
@@ -6032,63 +6137,59 @@ LuaPlayer.prototype.bindlibs = function() {
 				
 	}, lua_libs["libCanvas"]);
 
-	persist = this.persitent;
-
 	lua_libs["persistent"] = {
+		"set" : $.proxy(function(prefix, key, value) {
+			console.log(this);
+			this.persitent.storeField(prefix, key, value);
 
-		"set" : function(prefix, key, value) {
-			persist.storeField(prefix, key, value);
+		}, this),
 
-		},
-
-		"get" : function(key) {
-			return [persist.recoverField(key)];
-		}
+		"get" : $.proxy(function(key) {
+			return [this.persitent.recoverField(key)];
+		}, this)
+		
 	};
 
-	events = this.events;
+	//events = this.events;
 
 	lua_libs["event"] = {
-		"post" : function(mode,evnt) {
-			events.post(mode,evnt);
-		},
-		"register" : function(handler) {
-			events.register(handler);
-		},
-		"unregister" : function(handler) {
-			events.unregister(handler);
-		},
-		"timer" : function(timeout, fct) {
-			events.timer(timeout, fct);
-		},
-		"uptime" : function() {
-			return [events.uptime()];
-		}
+		"post" : $.proxy(function(mode,evnt) {
+			this.events.post(mode,evnt);
+		}, this),
+		"register" : $.proxy(function(handler) {
+			this.events.register(handler);
+		}, this),
+		"unregister" : $.proxy(function(handler) {
+			this.events.unregister(handler);
+		}, this),
+		"timer" : $.proxy(function(timeout, fct) {
+			this.events.timer(timeout, fct);
+		}, this),
+		"uptime" : $.proxy(function() {
+			return [this.events.uptime()];
+		}, this)
 	}
     
     //broker functions
-	broker = this.broker;
+	//broker = this.broker;
 
 	lua_libs["broker"] = {
-		"init" : function(strURI, fnOptCallback) {
-			broker.init(strURI, fnOptCallback);
-		},
-		"post" : function(strDestination, strMessage) {
-			broker.post(strDestination, strMessage);
-		},
-		"register" : function(strDestination, fnHandler) {
-			broker.register(strDestination, fnHandler);
-		},
-		"unregister" : function(strDestination) {
-			broker.unregister(strDestination);
-		}
+		"init" : $.proxy(function(strURI, fnOptCallback) {
+			this.broker.init(strURI, fnOptCallback);
+		},this),
+		"post" : $.proxy(function(strDestination, strMessage) {
+			this.broker.post(strDestination, strMessage);
+		},this),
+		"register" : $.proxy(function(strDestination, fnHandler) {
+			this.broker.register(strDestination, fnHandler);
+		},this),
+		"unregister" : $.proxy(function(strDestination) {
+			this.broker.unregister(strDestination);
+		},this)
 	}
 
 }
 //
-
-
-
 
 LuaPlayer.prototype.callHandlers = function() {
 	//console.log('LuaPlayer.callHandlers() ' + this.isHandlingEvent);
@@ -6298,7 +6399,6 @@ MediaPlayer.prototype.create = function (node) {
 		//Seta o valor de expliticDur
 		this.explicitDur = node.descriptor.explicitDur;
 	}
-	
 	// Verifica o tipo da mídia
 	if (node.type) {
 		this.type = node.type;
@@ -6331,75 +6431,64 @@ MediaPlayer.prototype.create = function (node) {
 		$(this.region).append("<div class='playerBkg' id='" + this.presentation.getDivId(node.id,"bkg") + "'></div>");
 
 		// Creates media player
-		var mediaPlayers = this.presentation.mediaPlayers;
-		if(mediaPlayers[this.type])
-		{
-			//creates the playerSettings data structure
-			this.playerSettings = 
-			{
-					source: 
-					{
-						type: this.type,
-						ext: node._ext,
-						url: this.presentation.path + node.src
-					},
 
-
-					onChangeProperty:
-					{
-						defaultAction: Player.propertyAction.IGNORE, //IGNORE,OVERRIDE,OVERLOAD
-
-						//propertyMap has higher priority than defaultAction                                    
-						propertyMap:
-						{
-							//'property': IGNORE,OVERRIDE,OVERLOAD
-						}
-						//when overrided, user should trigger onEndAttribution
-						//using postEvent
-					},
-
-
-					id : this.divId,
-					parentId: this.presentation.getDivId(node.id,"bkg"),
-
-					createElement: $.proxy(this.createElement,this),
-					checkType: $.proxy(this.checkType,this),
-					getProperty: $.proxy(this.getProperty,this),
-					setProperty: $.proxy(this.setProperty,this),
-					postEvent: this.presentation.postEvent,
-
-				    enableKeyEvents: $.proxy(this.enableKeyEvents,this),
-					area: node.area
-
-			};
-
-			var playerClass = mediaPlayers[this.type][node._ext] || mediaPlayers[this.type].defaultPlayer;
-			if (playerClass) {
-				this.player = new playerClass(this.playerSettings);
-				this.playerName = playerClass.name;
-
-				// Creates templates for every method the players do not implement
-				var methods = 'load unload exec start stop pause resume abort seek seekAndPlay setProperty getDuration keyEventHandler'.split(' ');
-				for (i in methods) {
-					if (!this.player[methods[i]]) {
-						if (!this.player.__playerName) {
-							this.player.__playerName = this.playerName;
-						}
-						this.player[methods[i]] = function() {
-							Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.__playerName,[arguments.callee.name]);
-						}
-					}
+		this.playerSettings = {
+			source: {
+				type: this.type,
+				url: this.presentation.path + node.src
+			},
+			onChangeProperty: {
+				defaultAction: Player.propertyAction.IGNORE, //IGNORE,OVERRIDE,OVERLOAD
+				//propertyMap has higher priority than defaultAction                                    
+				propertyMap: {
+					//'property': IGNORE,OVERRIDE,OVERLOAD
 				}
-
+				//when overrided, user should trigger onEndAttribution
+				//using postEvent
+			},
+			id : this.divId,
+			parentId: this.presentation.getDivId(node.id,"bkg"),
+			createElement: $.proxy(this.createElement,this),
+			checkType: $.proxy(this.checkType,this),
+			getProperty: $.proxy(this.getProperty,this),
+			setProperty: $.proxy(this.setProperty,this),
+			postEvent: this.presentation.postEvent,
+			enableKeyEvents: $.proxy(this.enableKeyEvents,this),
+			area: node.area
+		};
+		
+		var playerClass;
+		var mediaPlayers = this.presentation.mediaPlayers;
+		if (node.descriptor && node.descriptor.player) {
+			if (eval('typeof '+node.descriptor.player)=='function' && eval('typeof '+node.descriptor.player+'.prototype')=='object') {
+				playerClass = eval(node.descriptor.player);
 			} else {
-				Logger.error(Logger.ERR_MEDIAPLAYER_NOPLAYER,this.type,['no defaultPlayer or extension player']);
+				Logger.error(Logger.WARN_MEDIAPLAYER_NOT_FOUND,'Descriptor Player',[node.descriptor.player]);
 				this.player = {};
 			}
+		}
+		if (!playerClass && mediaPlayers[this.type]) {
+			playerClass = mediaPlayers[this.type][node._ext] || mediaPlayers[this.type].defaultPlayer;
+		}
+		if (playerClass) {
+			this.player = new playerClass(this.playerSettings);
+			this.playerName = playerClass.name;
+			// Creates templates for every method the players do not implement
+			var methods = 'load unload exec start stop pause resume abort seek seekAndPlay setProperty getDuration keyEventHandler'.split(' ');
+			for (i in methods) {
+				if (!this.player[methods[i]]) {
+					if (!this.player.__playerName) {
+						this.player.__playerName = this.playerName;
+					}
+					this.player[methods[i]] = function() {
+						Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.__playerName,[arguments.callee.name]);
+					}
+				}
+			}
 		} else {
-			Logger.error(Logger.ERR_MEDIAPLAYER_NOPLAYER,this.type);
+			Logger.error(Logger.ERR_MEDIAPLAYER_NOPLAYER,this.type,[]);
 			this.player = {};
 		}
-
 
 		$(this.htmlPlayerBkg).css("display","none");
 
@@ -8385,128 +8474,21 @@ Parser.prototype.parseMedia = function (obj,tag,parent,tree) {
 	if (obj.instance!=null && jQuery.inArray(obj.instance,values)==-1) {
 		Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,["instance",obj.instance,values]);
 	}
-	// type, src
-	values = [
-		"text/html","text/plain","text/css","text/xml","image/bmp","image/png","image/mng","image/gif","image/jpeg",
-		"audio/basic","audio/mp3","audio/mp2","audio/mpeg","audio/mpeg4","video/mpeg","video/x-flv", "application/x-ginga-NCLua",
-		"application/x-ginga-NCLet","application/x-ginga-settings","application/x-ginga-time","applications/x-ginga-NCL",
-		"application/x-ncl-NCL","application/x-ncl-NCLua","application/x-ncl-NCLet","application/x-ncl-settings",
-		"application/x-ncl-time"
-	];
-	// TODO: verificar o atributo "src" para os tipos "image/mng", "application/x-ncl-*", "applications/x-ginga-NCL"
-	// "application/x-ginga-settings" e "application/x-ginga-time"
+	// type
 	if (obj.type!=null) {
-
-                obj.type = obj.type.toLowerCase();
-
-		if (jQuery.inArray(obj.type,values)==-1) {
-			Logger.error(ERR_INVALID_ATTR_VALUE,tag,["type",obj.type,values]);
-		} else if (obj.src!=null) {
-			var ext = obj.src.split(".");
-
-                        obj._ext = ext[ext.length-1].toLowerCase();
-                        ext = obj._ext;
-                        //TODO: Verify attributes below using a dinamic table
-			switch (obj.type) {
-				case "text/html": {
-					if (ext!="htm" && ext!="html") {
-						Logger.error(Logger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"text/html",["htm","html"]]);
-					}
-					break;
-				}
-				case "text/plain": {
-					if (ext!="txt") {
-						Logger.error(Logger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"text/plain",["txt"]]);
-					}
-					break;
-				}
-				case "text/css": {
-					if (ext!="css") {
-						Logger.error(Logger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"text/css",["css"]]);
-					}
-					break;
-				}
-				case "text/xml": {
-					if (ext!="xml") {
-						Logger.error(Logger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"text/xml",["xml"]]);
-					}
-					break;
-				}
-				case "image/bmp": {
-					if (ext!="bmp") {
-						Logger.error(Logger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"image/bmp",["bmp"]]);
-					}
-					break;
-				}
-				case "image/png": {
-					if (ext!="png") {
-						Logger.error(Logger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"image/png",["png"]]);
-					}
-					break;
-				}
-				case "image/gif": {
-					if (ext!="gif") {
-						Logger.error(Logger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"image/gif",["gif"]]);
-					}
-					break;
-				}
-				case "image/jpeg": {
-					if (ext!="jpg" && ext!="jpeg") {
-						Logger.error(Logger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"image/jpeg",["jpg","jpeg"]]);
-					}
-					break;
-				}
-				case "audio/basic": {
-					if (ext!="wav") {
-						Logger.error(Logger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"audio/basic",["wav"]]);
-					}
-					break;
-				}
-				case "audio/mp3": {
-					if (ext!="mp3") {
-						Logger.error(Logger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"audio/mp3",["mp3"]]);
-					}
-					break;
-				}
-				case "audio/mp2": {
-					if (ext!="mp2") {
-						Logger.error(Logger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"audio/mp2",["mp2"]]);
-					}
-					break;
-				}
-				case "audio/mpeg": {
-					if (ext!="mpeg" && ext!="mpg") {
-						Logger.error(Logger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"audio/mpeg",["mpeg","mpg"]]);
-					}
-					break;
-				}
-				case "audio/mpeg4": {
-					if (ext!="mp4" && ext!="mpg4") {
-						Logger.error(Logger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"audio/mpeg4",["mp4","mpg4"]]);
-					}
-					break;
-				}
-				case "video/mpeg": {
-					if (ext!="mpeg" && ext!="mpg") {
-						Logger.error(Logger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"video/mpeg",["mpeg","mpg"]]);
-					}
-					break;
-				}
-				case "application/x-ginga-NCLua": {
-					if (ext!="lua") {
-						Logger.error(Logger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"application/x-ginga-NCLua",["lua"]]);
-					}
-					break;
-				}
-				case "application/x-ginga-NCLet": {
-					if (ext!="class" && ext!="jar") {
-						Logger.error(Logger.ERR_INCOMPATIBLE_FILE_EXT,tag,[ext,"application/x-ginga-NCLet",["class","jar"]]);
-					}
-					break;
-				}
-			}
-		}
+		obj.type = obj.type.toLowerCase();
 	}
+	// _ext
+	var ext = obj.src ? obj.src.split('.') : [];
+	var type = obj.type ? obj.type.split('/') : [];
+	if (ext.length > 1) {
+		obj._ext = ext[ext.length-1];
+	} else if (type.length > 1) {
+		obj._ext = type[type.length-1];
+	} else {
+		obj._ext = undefined;
+	}
+	
 };/*
  * Lince - Laboratory for Innovation on Computing and Engineering
  * UFSCar - Universidade Federal de São Carlos
