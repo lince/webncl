@@ -256,28 +256,28 @@ LuaPlayer.prototype.bindlibs = function() {
 
 	lua_libs["libCanvas"]["init"] = $.proxy(function() {
 
-		var canvas = document.createElement("canvas");
-			canvas.id = "mycanvas_" + this.variable.id;
+		
+		
 		
 		try {
+			var canvas = document.createElement("canvas");
+			canvas.id = "mycanvas_" + this.variable.id;
 			canvas.width = this.variable.p.getProperty('width').split('px')[0];
-			canvas.height = this.variable.p.getProperty('height').split('px')[0];	
-		
+			canvas.height = this.variable.p.getProperty('height').split('px')[0];
+			$('#' + this.variable.p.id).append(canvas);
+
+			var ctx = canvas.getContext("2d");
+
+			var object = new libCanvas(ctx);
+			console.log('init');
+			this.variable.canvas_objects[this.variable.id] = object;
+
 		} catch(err) {
-			
-			canvas.width = 500;
-			canvas.height = 500;
+
+			console.warn('region has to be defined');
 		}
+
 		
-		
-		$('#' + this.variable.p.id).append(canvas);
-
-		var ctx = canvas.getContext("2d");
-
-		var object = new libCanvas(ctx);
-		console.log('init');
-
-		this.variable.canvas_objects[this.variable.id] = object;
 
 		var luaObject = lua_newtable();
 		luaObject.str['id'] = this.variable.id; 
@@ -545,4 +545,17 @@ LuaPlayer.prototype.eventQueue = function(evt, notcallhandlers){
 		this.callHandlers();
 	}
 	
+
+var lua_print = function () {
+  try {
+  	
+    console.log.apply(console, arguments);
+  } catch (e) {
+    // do nothing
+  }
+  return [];
+};
+	
 }
+
+
