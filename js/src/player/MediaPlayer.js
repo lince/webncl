@@ -239,14 +239,11 @@ MediaPlayer.prototype.create = function (node) {
 			this.playerName = playerClass.name;
 			// Creates templates for every method the players do not implement
 			var methods = 'load unload exec start stop pause resume abort seek seekAndPlay setProperty getDuration keyEventHandler'.split(' ');
-			for (i in methods) {
+			for (var i in methods) {
 				if (!this.player[methods[i]]) {
-					if (!this.player.__playerName) {
-						this.player.__playerName = this.playerName;
-					}
-					this.player[methods[i]] = function() {
-						Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.__playerName,[arguments.callee.name]);
-					}
+					this.player[methods[i]] = $.proxy(function() {
+						Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,[this.fname]);
+					}, {playerName: this.playerName, fname: methods[i]});
 				}
 			}
 		} else {
