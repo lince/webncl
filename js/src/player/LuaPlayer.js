@@ -85,7 +85,7 @@ LuaPlayer.prototype.load = function(source) {
 	
 	var breakPath = source.split('/');
 	this.pathLua = breakPath[0] + '/' + breakPath[1] + '/';
-
+	console.log(this.pathLua);
 	$.ajax({
 		type : "GET",
 		url : source,
@@ -336,7 +336,11 @@ LuaPlayer.prototype.bindlibs = function() {
 				return;
 			}
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
-			objCanvas.attrColor(r, g, b, a);
+			if(r === undefined & g === undefined & b === undefined & a === undefined)
+				return [objCanvas.getColor()];
+			
+			else
+				objCanvas.attrColor(r, g, b, a);
 
 		}, this);
 
@@ -377,13 +381,17 @@ LuaPlayer.prototype.bindlibs = function() {
 			return [objCanvas.measureTextLua(text)];
 		}, this);
 
-		luaObject.str['attrText'] = $.proxy(function(self, face, size, style) {
+		luaObject.str['attrFont'] = $.proxy(function(self, face, size, style) {
 			if (this.variable.canvas_objects.length == 0) {
 				console.warn('This lua has no canvas.');
 				return;
 			}
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
-			objCanvas.attrText(face, size, style);
+			if(face === undefined & size === undefined & style === undefined)
+				return [objCanvas.getFont()];
+			
+			else
+				objCanvas.attrText(face, size, style);
 		}, this);
 
 		luaObject.str['attrCrop'] = $.proxy(function(self, x, y, w, h) {
@@ -392,7 +400,10 @@ LuaPlayer.prototype.bindlibs = function() {
 				return;
 			}
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
-			objCanvas.attrCrop(x, y, w, h);
+			if(x === undefined & y === undefined & w === undefined & h === undefined)
+				return [objCanvas.getCrop()];
+			else
+				objCanvas.attrCrop(x, y, w, h);
 			
 		}, this);
 
@@ -423,7 +434,10 @@ LuaPlayer.prototype.bindlibs = function() {
 				return;
 			}
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
-			objCanvas.attrClip(x, y, w, h);
+			if(x === undefined & y === undefined & w === undefined & h === undefined)
+				return [objCanvas.getClip()];
+			else
+				objCanvas.attrClip(x, y, w, h);
 		}, this);
 		
 		return [luaObject];
