@@ -106,6 +106,12 @@ function Html5Player(p) {
 					break;
 			}
 		break;
+		
+		case "dummy": {
+			p.createElement("<img class='player' id='" + p.id + "'></img>");
+			$(this.htmlPlayer).error($.proxy(this.mediaNotFound,this));
+			break;	
+		}
 	}
 
 	// creates the popcorn player
@@ -114,7 +120,7 @@ function Html5Player(p) {
 		do {	
 			this.popcornPlayer = new Popcorn(this.htmlPlayer);
 		} while (!this.popcornPlayer);
-	} else if(p.checkType(["image","text"])){
+	} else if(p.checkType(["image","text","dummy"])){
 		do {
 			Popcorn.player("baseplayer");
 			this.popcornPlayer = new Popcorn.baseplayer(this.htmlPlayer);

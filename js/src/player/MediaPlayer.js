@@ -162,8 +162,13 @@ MediaPlayer.prototype.create = function (node) {
 	if (node.type) {
 		this.type = node.type;
 	} else {
-		var buffer = node.src.split(".");
-		this.type = this.mediaTypes[buffer[buffer.length-1]];
+		if (node.src) {
+			var buffer = node.src.split(".");
+			this.type = this.mediaTypes[buffer[buffer.length-1]];
+		} else {
+			this.type = "dummy";
+		}
+		
 	}
 	// Cria os IDs (região e mídia)
 	this.htmlPlayer = "#" + this.divId;

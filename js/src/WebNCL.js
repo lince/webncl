@@ -101,7 +101,8 @@ function WebNclPlayer (file, div, directory) {
 		"application/x-ginga-settings" : {
 					defaultPlayer: Html5Player
 			},
-		"text/xml" : undefined
+		"text/xml" : undefined,
+		"dummy": {defaultPlayer: Html5Player},
 
 		},
 		
