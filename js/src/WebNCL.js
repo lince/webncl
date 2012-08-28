@@ -65,7 +65,19 @@ function WebNclPlayer (file, div, directory) {
 			{
 					defaultPlayer: Html5Player
 			},
-		"audio": 
+		"image/png" : 
+			{
+					defaultPlayer: Html5Player
+			},
+		"image/jpeg" : 
+			{
+					defaultPlayer: Html5Player
+			},
+		"image/gif" : 
+			{
+					defaultPlayer: Html5Player
+			},
+		"audio":
 			{
 					defaultPlayer: Html5Player
 			},
