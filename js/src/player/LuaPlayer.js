@@ -62,15 +62,10 @@ function LuaPlayer(p) {
   		
 	var tbl = document.createElement('table');
 	tbl.setAttribute('id', 'myTable');
+	tbl.setAttribute('class', 'panel');
 	var tblBody = document.createElement('tbody');
-	var row = document.createElement('tr');
-	var cell = document.createElement('td');
-	var cellText = document.createTextNode('Console lua');
-	cell.appendChild(cellText);
-	row.appendChild(cell);
-	tblBody.appendChild(row);
 	tbl.appendChild(tblBody);
-	$('#consoleLua').append(tbl);
+	$('#content').append(tbl);
     p.enableKeyEvents();
     
 
@@ -557,22 +552,21 @@ LuaPlayer.prototype.eventQueue = function(evt, notcallhandlers){
 		this.callHandlers();
 	}
 	
-
 	
+}
 
 lua_core["print"] = function () {
   try {
   	
     //console.log.apply(console, arguments);
     addCell(Array.prototype.slice.call(arguments));
-   // console.log(arguments);
+   
   } catch (e) {
     // do nothing
   }
   return [];
 };
-	
-}
+
 
 function addCell(info){
 	var tbl = document.getElementById('myTable');
