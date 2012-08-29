@@ -59,8 +59,20 @@ function LuaPlayer(p) {
   	
   	//path to load images correctly in .lua files
   	this.pathlua = '';
-
+  		
+	var tbl = document.createElement('table');
+	tbl.setAttribute('id', 'myTable');
+	var tblBody = document.createElement('tbody');
+	var row = document.createElement('tr');
+	var cell = document.createElement('td');
+	var cellText = document.createTextNode('Console lua');
+	cell.appendChild(cellText);
+	row.appendChild(cell);
+	tblBody.appendChild(row);
+	tbl.appendChild(tblBody);
+	$('#consoleLua').append(tbl);
     p.enableKeyEvents();
+    
 
 	console.log(p.id);
 	
@@ -546,10 +558,14 @@ LuaPlayer.prototype.eventQueue = function(evt, notcallhandlers){
 	}
 	
 
-var lua_print = function () {
+	
+
+lua_core["print"] = function () {
   try {
   	
-    console.log.apply(console, arguments);
+    //console.log.apply(console, arguments);
+    addCell(Array.prototype.slice.call(arguments));
+   // console.log(arguments);
   } catch (e) {
     // do nothing
   }
@@ -558,4 +574,10 @@ var lua_print = function () {
 	
 }
 
+function addCell(info){
+	var tbl = document.getElementById('myTable');
+	var row = tbl.insertRow(-1);
+	var cell = row.insertCell(0);
+	cell.innerHTML = info;
+}
 
