@@ -100,7 +100,13 @@
 				img.myurl = url; // img.src might be transformed to absolute path etc, so keep this as array-key
 				img.onload = function() { PreLoadImageFinishOne(this.myurl,ncl, container); }
 			}
+		} else {
+			// no preload list available, start immediately
+			runNCL(ncl, container);
 		}
+		
+	}
+	
 	
 	function PreLoadImageFinishOne (url,ncl, container) {
 		//~ MainPrint("preload image finished:"+url);
@@ -111,13 +117,12 @@
 	}
 	
 	function runNCL(ncl, container){
-	 	var myPlayer3 = new WebNclPlayer(ncl, container);
-		myPlayer3.start();	
+	 	var myPlayer = new WebNclPlayer(ncl, container);
+		myPlayer.start();	
 	}
 	
+	MainOnLoad([],'sample/sample-lua.ncl','myPlayer');
 	
-	MainOnLoad([],'sample/sample-lua.ncl','myPlayer3');
-
 
 	</script>
 	
