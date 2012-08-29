@@ -46,8 +46,10 @@ To build the minified version of the code, just do:
 
 To view the examples locally, you must have a local web server.
 Any web server will work; for example you can run Python's built-in server:
+
 `
 ` python -m SimpleHTTPServer 8888 &
+`
 `
 
 Once this is running, go to http://localhost:8888/ and select sample.html (or other samples)
