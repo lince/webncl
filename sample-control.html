@@ -4,11 +4,11 @@
 		<!-- Styles -->
 		<link rel="stylesheet" type="text/css" href="css/webncl.css" />
 		<!-- Bibliotecas -->
+		<script type="text/javascript" src="js/amq_jquery_adapter.js"></script>
+		<script type="text/javascript" src="js/amq.js"></script>
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 		<script type="text/javascript" src="js/popcorn.js"></script>
 		<script type="text/javascript" src="js/lua+parser.min.js"></script>
-		<script type="text/javascript" src="js/amq.js"></script>
-		<script type="text/javascript" src="js/amq_jquery_adapter.js"></script>
 		<!-- Parser -->
 		<script type="text/javascript" src="js/src/parser/Parser.js"></script>
 		<script type="text/javascript" src="js/src/parser/grammar.js"></script>
@@ -83,14 +83,14 @@
 	</head>
 	<body>
 
-		<div id="myPlayer" style="position:relative;width:300px;height:200px"></div>
+		<div id="myPlayer" style="position:relative;width:640px;height:480px"></div>
 		
 		<div id="areaRemoteControl"></div>
 	
 		<script>
-			var player = new WebNclPlayer("sample/sample.ncl","myPlayer");
+			var player = new WebNclPlayer("sample/sample-control.ncl","myPlayer");
 			player.start();
-			var controler1 = new RemoteControl(player,"areaRemoteControl",0, 500, 1,1,1,1,1,1);
+			var controler1 = new RemoteControl(player,"areaRemoteControl",0, 650, 1,1,1,1,1,1);
 		</script>
 		
 	</body>
