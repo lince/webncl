@@ -83,14 +83,14 @@
 	</head>
 	<body>
 
-		<div id="myPlayer" style="position:relative;width:300px;height:200px"></div>
+		<div id="myPlayer" style="position:relative;width:640px;height:480px"></div>
 		
 		<div id="areaRemoteControl"></div>
 	
 		<script>
-			var player = new WebNclPlayer("sample/sample.ncl","myPlayer");
+			var player = new WebNclPlayer("sample/sample-control.ncl","myPlayer");
 			player.start();
-			var controler1 = new RemoteControl(player,"areaRemoteControl",0, 500, 1,1,1,1,1,1);
+			var controler1 = new RemoteControl(player,"areaRemoteControl",0, 650, 1,1,1,1,1,1);
 		</script>
 		
 	</body>
