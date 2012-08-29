@@ -142,7 +142,12 @@ Parser.prototype.importNcl = function(lastParser)
 		this.referenceMap.createReferences();
 		
 		//process regionBase importation
-		o = this.importBaseList.length;
+		if (this.importBaseList) {
+			o = this.importBaseList.length;
+		} else {
+			o = 0;
+		}
+		
 		for (f =0; f < o; f++)
 		{
 			var importBaseInfo = this.importBaseList[f];
