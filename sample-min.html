@@ -4,48 +4,21 @@
 		<!-- Styles -->
 		<link rel="stylesheet" type="text/css" href="css/webncl.css" />
 		<!-- Bibliotecas -->
+		<script type="text/javascript" src="js/amq_jquery_adapter.js"></script>
+		<script type="text/javascript" src="js/amq.js"></script>
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 		<script type="text/javascript" src="js/popcorn.js"></script>
-        <script type="text/javascript" src="js/lua+parser.min.js"></script>
+		<script type="text/javascript" src="js/lua+parser.min.js"></script>
         <script type="text/javascript" src="js/webncl.min.js"></script>
-		<script type="text/javascript">
-			var player = new WebNclPlayer("sample/sample.ncl","myPlayer");
-        
-            player.start();
-		</script>
-		<style type="text/css">
-		
-		.context, #contexts, #settings {
-			display: none;
-		}
-		
-		.player {
-			position: absolute;
-			left: 0px;
-			top: 0px;
-			overflow: hidden;
-			display: inline;
-		}
-		
-		.playerBkg {
-			position: absolute;
-			overflow: hidden;
-			display: none;
-		}
-		
-		.nclPlayer {
-			position: fixed;
-			left: 0px;
-			top: 0px;
-			width: 854px;
-			height: 480px;
-		}
-		
-		</style>
 	</head>
 	<body>
 	
 		<div id="myPlayer" class="nclPlayer" />
+		
+		<script type="text/javascript">
+			var player = new WebNclPlayer("sample/sample.ncl","myPlayer");
+            player.start();
+		</script>
 		
 	</body>
 </html>
