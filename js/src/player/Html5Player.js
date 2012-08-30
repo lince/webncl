@@ -632,6 +632,10 @@ Html5Player.prototype.loadTextData = function() {
 	}
 	
 	if (data) {
-		$(this.htmlPlayer).append(data/*.replace(/\n/g,'<br/>')*/);
+		if (this.p.checkType(['text/plain']) ) {
+			$(this.htmlPlayer).append(data.replace(/\n/g,'<br/>'));
+		} else {
+			$(this.htmlPlayer).append(data);
+		}
 	}
 }
