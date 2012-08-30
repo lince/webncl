@@ -426,7 +426,7 @@ Player.prototype.setProperty = function (name, value, ignoreEvents) {
 					case "baseDeviceRegion":
 					case "deviceClass":
 					case "plan":
-					case "player":
+					//case "player": //Not possible to change player during presentation yet
 					case "playerLife":		// keep/close
 					case "reusePlayer": 	// true/false
 						// TODO

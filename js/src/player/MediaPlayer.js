@@ -223,14 +223,43 @@ MediaPlayer.prototype.create = function (node) {
 		
 		var playerClass;
 		var mediaPlayers = this.presentation.mediaPlayers;
+		console.log(node, node.descriptor)
+		
+		/*I'm assuming a precedence order for player definition: 
+		 * descriptor < descriptorParam < media.property
+		 */
+		var playerName = undefined;
 		if (node.descriptor && node.descriptor.player) {
-			if (eval('typeof '+node.descriptor.player)=='function' && eval('typeof '+node.descriptor.player+'.prototype')=='object') {
-				playerClass = eval(node.descriptor.player);
-			} else {
-				Logger.error(Logger.WARN_MEDIAPLAYER_NOT_FOUND,'Descriptor Player',[node.descriptor.player]);
-				this.player = {};
+			playerName = node.descriptor.player;
+			console.log('after descriptor: ' + playerName);
+			
+			for (i in node.descriptor.descriptorParam) {
+				var descParam = node.descriptor.descriptorParam[i];
+				if (descParam.name == 'player') {
+					playerName = descParam.value;
+					console.log('after descriptorParam: ' + playerName);
+					break;
+				}
 			}
 		}
+		for (i in node.property) {
+			var property = node.property[i];
+			if (property.name == 'player') {
+				playerName = property.value;
+				console.log('after media.property: ' + playerName);
+				break;
+			}
+		}
+		
+		if (playerName) {
+			if (eval('typeof '+ playerName)=='function' && eval('typeof '+playerName+'.prototype')=='object') {
+				playerClass = eval(playerName);
+			} else {
+				Logger.error(Logger.WARN_MEDIAPLAYER_NOT_FOUND,'Descriptor Player',[playerName]);
+			this.player = {};
+			}
+		}
+		
 		if (!playerClass && mediaPlayers[this.type]) {
 			playerClass = mediaPlayers[this.type][node._ext] || mediaPlayers[this.type].defaultPlayer;
 		}
