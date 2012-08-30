@@ -632,6 +632,6 @@ Html5Player.prototype.loadTextData = function() {
 	}
 	
 	if (data) {
-		$(this.htmlPlayer).append(data.replace(/\n/g,'<br/>'));
+		$(this.htmlPlayer).append(data/*.replace(/\n/g,'<br/>')*/);
 	}
 }

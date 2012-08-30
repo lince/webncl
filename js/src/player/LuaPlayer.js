@@ -229,7 +229,7 @@ LuaPlayer.prototype.keyEventHandler = function(kevent){
 		var evt = lua_newtable();
 		evt.str['class'] = 'key';
 		evt.str['type'] = kevent.type;
-        evt.str['key']  = kevent.key;
+        evt.str['key']  = kevent.key.split('KEY_')[1] || kevent.key;
 		this.eventQueue(evt);
 	}	
 	
@@ -558,7 +558,7 @@ LuaPlayer.prototype.eventQueue = function(evt, notcallhandlers){
 lua_core["print"] = function () {
   try {
   	
-    //console.log.apply(console, arguments);
+    console.log.apply(console, arguments);
     addCell(Array.prototype.slice.call(arguments));
    
   } catch (e) {
