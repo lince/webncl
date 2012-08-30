@@ -138,7 +138,6 @@ InputManager.prototype.removeMedia = function(focusIndex, mediaId)
    Define o foco nas medias do descriptor com focusIndex
  * */
 
-//HACK_FOCUS (begin)
 InputManager.prototype.__setCurrentFocus = function(focusIndex) {
 	if (this.presentation.settingsNode && focusIndex != undefined) {
 		htmlPlayer = this.presentation.settingsNode.htmlPlayer;
@@ -179,7 +178,6 @@ InputManager.prototype.setCurrentFocus = function(focusIndex)
 	} 
 	return false;
 };
-//HACK_FOCUS (end)
 
 /*
    Retorna o descriptor que esta atualmente com o foco
@@ -288,9 +286,6 @@ InputManager.prototype.keyEvent = function(keyCode)
 				}
 				
 			break;
-
-
-            
 			
 		}
 	}

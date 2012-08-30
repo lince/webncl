@@ -180,7 +180,9 @@ MediaPlayer.prototype.create = function (node) {
 	}
 	
 //HACK_FOCUS (begin)
-	if (this.type == 'application/x-ginga-settings') {
+	if (!this.presentation.settingsNode &&
+			this.type == 'application/x-ginga-settings') {
+		
 		this.presentation.settingsNode = this;
 	}
 //HACK_FOCUS (end)
@@ -217,13 +219,13 @@ MediaPlayer.prototype.create = function (node) {
 			getProperty: $.proxy(this.getProperty,this),
 			setProperty: $.proxy(this.setProperty,this),
 			postEvent: this.presentation.postEvent,
+			systemSettings: this.presentation.systemSettings,
 			enableKeyEvents: $.proxy(this.enableKeyEvents,this),
 			area: node.area
 		};
 		
 		var playerClass;
 		var mediaPlayers = this.presentation.mediaPlayers;
-		console.log(node, node.descriptor)
 		
 		/*I'm assuming a precedence order for player definition: 
 		 * descriptor < descriptorParam < media.property
@@ -231,13 +233,11 @@ MediaPlayer.prototype.create = function (node) {
 		var playerName = undefined;
 		if (node.descriptor && node.descriptor.player) {
 			playerName = node.descriptor.player;
-			console.log('after descriptor: ' + playerName);
 			
 			for (i in node.descriptor.descriptorParam) {
 				var descParam = node.descriptor.descriptorParam[i];
 				if (descParam.name == 'player') {
 					playerName = descParam.value;
-					console.log('after descriptorParam: ' + playerName);
 					break;
 				}
 			}
@@ -246,7 +246,6 @@ MediaPlayer.prototype.create = function (node) {
 			var property = node.property[i];
 			if (property.name == 'player') {
 				playerName = property.value;
-				console.log('after media.property: ' + playerName);
 				break;
 			}
 		}
@@ -256,13 +255,14 @@ MediaPlayer.prototype.create = function (node) {
 				playerClass = eval(playerName);
 			} else {
 				Logger.error(Logger.WARN_MEDIAPLAYER_NOT_FOUND,'Descriptor Player',[playerName]);
-			this.player = {};
+				this.player = {};
 			}
 		}
 		
 		if (!playerClass && mediaPlayers[this.type]) {
 			playerClass = mediaPlayers[this.type][node._ext] || mediaPlayers[this.type].defaultPlayer;
 		}
+		
 		if (playerClass) {
 			this.player = new playerClass(this.playerSettings);
 			this.playerName = playerClass.name;
@@ -271,7 +271,7 @@ MediaPlayer.prototype.create = function (node) {
 			for (var i in methods) {
 				if (!this.player[methods[i]]) {
 					this.player[methods[i]] = $.proxy(function() {
-						Logger.error(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,[this.fname]);
+						Logger.warning(Logger.ERR_MEDIAPLAYER_METHOD_NOTFOUND,this.playerName,[this.fname]);
 					}, {playerName: this.playerName, fname: methods[i]});
 				}
 			}
@@ -665,7 +665,6 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 		}
 	}
 	// --- quick fix ends here
-
 	this.player.start(nodeInterface);
 	
 	if (this.isStopped) {

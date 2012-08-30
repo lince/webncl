@@ -464,7 +464,7 @@ Player.prototype.setProperty = function (name, value, ignoreEvents) {
 
 					// SETTINGS
 
-					case "service.currentFocus":
+					/*case "service.currentFocus":
 					case "default.focusBorderColor":
 					case "default.selBorderColor":
 					case "default.focusBorderWidth":
@@ -472,7 +472,7 @@ Player.prototype.setProperty = function (name, value, ignoreEvents) {
 						if (this.checkType(["application"])) {
 							this.presentation.systemSettings.setPropertyValue(name,value);
 						}
-					break;
+					break;*/
 				
 			}
 

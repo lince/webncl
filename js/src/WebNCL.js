@@ -99,7 +99,7 @@ function WebNclPlayer (file, div, directory) {
 		"application/x-ginga-NCLua" : {defaultPlayer: LuaPlayer},
 		"application/x-ginga-NCLet" : undefined,
 		"application/x-ginga-settings" : {
-					defaultPlayer: Html5Player
+					defaultPlayer: GingaSettingsPlayer
 			},
 		"text/xml" : undefined,
 		"dummy": {defaultPlayer: Html5Player}

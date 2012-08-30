@@ -40,7 +40,6 @@ function SystemSettings(presentation)
 		'default.selBorderColor'   		 : 'yellow',
 		'default.focusBorderWidth'		 : 2,
 		'default.focusBorderTransparency': 0,
-		
 		'service.currentKeyMaster'       : ''
 	}
 	
