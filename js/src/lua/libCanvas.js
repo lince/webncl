@@ -431,6 +431,15 @@ libCanvas.prototype.getFont = function(){
 
 libCanvas.prototype.attrText = function(face, size, style) {
 	//console.log("attrFont");
+	
+var espaço = " ";
+				
+				styleCss = "@font-face{" 
+				+"font-family:" + "'" + face + "'" +";"
+				+"src: url('http://www.miketaylr.com/f/kulminoituva.ttf');}";
+				
+		
+	$('<style>').text(styleCss).appendTo('head');
 
 	if (style === undefined)
 		style = "none";
@@ -439,7 +448,8 @@ libCanvas.prototype.attrText = function(face, size, style) {
 	this.attrFont[1] = size;
 	this.attrFont[2] = style;
 	
-	this.ctx.font = size + " " + face + " " + style;
+	this.ctx.font = "'" + size + espaço + face + espaço  + "'";
+	console.log("'" + size + espaço + face + espaço   + "'");
 }
 
 libCanvas.prototype.drawText = function(x, y, text) {
