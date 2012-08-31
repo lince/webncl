@@ -567,6 +567,7 @@ lua_core["print"] = function () {
   	
     console.log.apply(console, arguments);
     addCell(Array.prototype.slice.call(arguments));
+    
    
   } catch (e) {
     // do nothing

@@ -12,13 +12,13 @@ function libEvents(luaplayer){
 };
 
 libEvents.prototype.register = function(fct){
-	console.log('libEvents.register()');
+	//console.log('libEvents.register()');
 	this.handlers[this.counter] = fct;
 	this.counter = this.counter + 1;
 }
 
 libEvents.prototype.unregister = function(fct){
-	console.log('libEvents.unregister()');
+	//console.log('libEvents.unregister()');
 	this.handlers[this.counter] = undefined;
 	if(!this.counter)
 		this.counter = this.counter - 1;

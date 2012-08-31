@@ -42,14 +42,14 @@ function libCanvas(ctx) {
 
 libCanvas.prototype.attrSize = function() {
 	
-	console.log("attrSize");
+	//console.log("attrSize");
 	return [this.width, this.height];
 
 }
 
 libCanvas.prototype.newCanvas = function(width, height) {
 
-	newObject = new libCanvas(this.ctx);
+	//newObject = new libCanvas(this.ctx);
 	
 	newObject.setData(width, height);
 	
@@ -59,7 +59,7 @@ libCanvas.prototype.newCanvas = function(width, height) {
 
 //TODO use function onload to first load the image then execute de code
 libCanvas.prototype.newImage = function(caminho) {
-	console.log("newImage");
+	//console.log("newImage");
 	
 	var img = new Image();
 	img.src = caminho;
@@ -77,7 +77,7 @@ libCanvas.prototype.newImage = function(caminho) {
 
 
 libCanvas.prototype.image_path = function(img, x, y, w, h) {
-	console.log("image_path");
+	//console.log("image_path");
 
 	this.initX = this.x + x;
 	this.initY = this.y + y;
@@ -110,7 +110,7 @@ libCanvas.prototype.getColor = function(){
 }
 
 libCanvas.prototype.attrColor = function(r, g, b, a) {
-	console.log("attrColor");
+	//console.log("attrColor");
 
 	if (b === undefined && a === undefined) {
 
@@ -302,7 +302,7 @@ libCanvas.prototype.attrColor = function(r, g, b, a) {
 }
 
 libCanvas.prototype.attrClip = function(x, y, w, h) {
-	console.log("attrClip");
+	//console.log("attrClip");
 
 	this.x = x;
 	this.y = y;
@@ -322,7 +322,7 @@ libCanvas.prototype.getClip = function(){
 
 
 libCanvas.prototype.iniVerifClip = function(x1, y1, x2, y2) {
-	console.log("IniVerifClip");
+	//console.log("IniVerifClip");
 
 	this.initX = this.x + x1;
 	this.initY = this.y + y1;
@@ -351,7 +351,7 @@ libCanvas.prototype.iniVerifClip = function(x1, y1, x2, y2) {
 }
 
 libCanvas.prototype.iniVerifClip2 = function(x1, y1, x2, y2) {
-	console.log("IniVerifClip2");
+	//console.log("IniVerifClip2");
 
 	//set for attrClip
 	this.initX = this.x + x1;
@@ -385,7 +385,7 @@ libCanvas.prototype.iniVerifClip2 = function(x1, y1, x2, y2) {
 }
 
 libCanvas.prototype.drawLine = function(x1, y1, x2, y2) {
-	console.log("drawLine");
+	//console.log("drawLine");
 
 	verifica = this.iniVerifClip(x1, y1, x2, y2);
 
@@ -404,7 +404,7 @@ libCanvas.prototype.drawLine = function(x1, y1, x2, y2) {
 }
 
 libCanvas.prototype.drawRect = function(mode, x1, y1, x2, y2) {
-	console.log("drawRect");
+	//console.log("drawRect");
 
 
 	var verifica = this.iniVerifClip2(x1, y1, x2, y2);
@@ -430,7 +430,7 @@ libCanvas.prototype.getFont = function(){
 }
 
 libCanvas.prototype.attrText = function(face, size, style) {
-	console.log("attrFont");
+	//console.log("attrFont");
 
 	if (style === undefined)
 		style = "none";
@@ -443,7 +443,7 @@ libCanvas.prototype.attrText = function(face, size, style) {
 }
 
 libCanvas.prototype.drawText = function(x, y, text) {
-	console.log("drawText");
+	//console.log("drawText");
 
 	dimension = this.measureTextLua(text);
 
@@ -459,7 +459,7 @@ libCanvas.prototype.drawText = function(x, y, text) {
 }
 
 libCanvas.prototype.measureTextLua = function(text) {
-	console.log("measureTextLua");
+	//console.log("measureTextLua");
 
 	var textWidth = this.ctx.measureText(text);
 
@@ -478,7 +478,7 @@ libCanvas.prototype.getCrop = function(){
 }
 
 libCanvas.prototype.attrCrop = function(x, y, w, h) {
-	console.log("attrCrop");
+	//console.log("attrCrop");
 	
 	this.iniCropX = x;
 	this.iniCropY = y;
@@ -496,7 +496,7 @@ libCanvas.prototype.attrCrop = function(x, y, w, h) {
 
 libCanvas.prototype.compose = function(x, y, img) {
 	
-	console.log("compose");
+	//console.log("compose");
 
 	var context = img.getContext();
 	var imageData = context.getImageData(img.iniCropX, img.iniCropY, img.endCropX, img.endCropY);
@@ -505,7 +505,7 @@ libCanvas.prototype.compose = function(x, y, img) {
 }
 
 libCanvas.prototype.flush = function() {
-	console.log('flush');
+	//console.log('flush');
 	var dimension = this.attrSize();
 	var imageData = this.ctx.getImageData(0,0,dimension[0],dimension[1]);
 	//this.ctx2.clearRect(0,0,dimension[0],dimension[1]);
