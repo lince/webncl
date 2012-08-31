@@ -3,6 +3,7 @@
         <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 		<!-- Styles -->
 		<link rel="stylesheet" type="text/css" href="css/webncl.css" />
+		<link rel="stylesheet" type="text/css" href="css/remotecontrol.css" />
 		<!-- Bibliotecas -->
 		<script type="text/javascript" src="js/amq_jquery_adapter.js"></script>
 		<script type="text/javascript" src="js/amq.js"></script>
@@ -64,6 +65,7 @@
         <script type="text/javascript" src="js/src/player/Html5Player.js"></script>
         <script type="text/javascript" src="js/src/player/FlowPlayer.js"></script>
 		<script type="text/javascript" src="js/src/player/LuaPlayer.js"></script>
+		<script type="text/javascript" src="js/src/player/GingaSettingsPlayer.js"></script>
 		<!-- Formatter -->
 		<script type="text/javascript" src="js/src/formatter/SystemSettings.js"></script>
 		<script type="text/javascript" src="js/src/formatter/InputManager.js"></script>
@@ -87,13 +89,12 @@
 	<body>
 
 		<div id="myPlayer" style="position:relative;width:640px;height:480px"></div>
-		
-		<div id="areaRemoteControl"></div>
+		<div id="areaRemoteControl" style="left:650"></div>
 
 	
 		<script>
 			var myPlayer = new WebNclPlayer("sample/sample-control-lua.ncl","myPlayer");
-			var controler1 = new RemoteControl(myPlayer,"areaRemoteControl",0, 650, 1,1,1,1,1,1);
+			var controler1 = new RemoteControl(myPlayer,"areaRemoteControl");
 			myPlayer.start();
 		</script>
 		
