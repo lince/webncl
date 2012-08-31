@@ -37,6 +37,7 @@ function LuaPlayer(p) {
 	this.htmlPlayer = "#" + p.id;
 	this.luajscode = undefined;
 	this.persitent = new libPersistent(false);
+	this.http = new libHttp();
 	this.canvas_objects = [];
 	this.events = new libEvents(this);
     
@@ -92,7 +93,7 @@ LuaPlayer.prototype.load = function(source) {
 	
 	var breakPath = source.split('/');
 	this.pathLua = breakPath[0] + '/' + breakPath[1] + '/';
-	console.log(this.pathLua);
+	
 	$.ajax({
 		type : "GET",
 		url : source,
@@ -481,6 +482,12 @@ LuaPlayer.prototype.bindlibs = function() {
 		}, this),
 		"uptime" : $.proxy(function() {
 			return [this.events.uptime()];
+		}, this)
+	}
+	
+	lua_libs["http"] = {
+		"request" : $.proxy(function(param){
+			return [this.http.request(param)];
 		}, this)
 	}
     
