@@ -40,7 +40,6 @@ function SystemSettings(presentation)
 		'default.selBorderColor'   		 : 'yellow',
 		'default.focusBorderWidth'		 : 2,
 		'default.focusBorderTransparency': 0,
-		'service.currentKeyMaster'       : ''
 	}
 	
 	//Mapa das funcoes de set de algumas propriedadees
@@ -52,6 +51,14 @@ function SystemSettings(presentation)
 	//(devem ser as mesmas que possuem funcao de set)
 	this.getMap= {
 		'service.currentFocus': $.proxy(presentation.inputManager.getCurrentFocus,presentation.inputManager)
+	}
+	
+	this.setMap=	{
+		'service.currentKeyMaster': $.proxy(presentation.inputManager.setCurrentKeyMaster,presentation.inputManager)
+	}
+	
+	this.getMap= {
+		'service.currentKeyMaster': $.proxy(presentation.inputManager.getCurrentKeyMaster,presentation.inputManager)
 	}
 	
 
