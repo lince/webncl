@@ -6,7 +6,7 @@ function drawBackGround()
 end
 
 function drawMessage(text)
-	canvas:attrFont('vera', height/3)
+	canvas:attrFont('garamond', height/3)
 	canvas:attrColor('yellow')
 	textSize = canvas:measureText(text)
 	beginX = (width-textSize)/2

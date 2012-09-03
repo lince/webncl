@@ -39,7 +39,7 @@ function SystemSettings(presentation)
 		'default.focusBorderColor' 		 : 'blue',
 		'default.selBorderColor'   		 : 'yellow',
 		'default.focusBorderWidth'		 : 2,
-		'default.focusBorderTransparency': 0,
+		'default.focusBorderTransparency': 0
 	}
 	
 	//Mapa das funcoes de set de algumas propriedadees

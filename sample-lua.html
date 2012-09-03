@@ -79,7 +79,11 @@
 		<script type="text/javascript" src="js/src/lua/libEvents.js"></script>
 		<script type="text/javascript" src="js/src/lua/libBroker.js"></script>
 		<script type="text/javascript" src="js/src/lua/libHttp.js"></script>
-
+		<!-- loader -->
+		<script type="text/javascript" src="js/src/loader/PxLoader.js"></script>
+		<script type="text/javascript" src="js/src/loader/PxLoaderImage.js"></script>
+		<script type="text/javascript" src="js/src/loader/PxLoaderFont.js"></script>
+		
 	</head>
 <body>
 
@@ -88,44 +92,13 @@
 	</div>
 		
 	<script>
-	var gPreloadImages=[];
-	var gMainRunAfterPreloadFinished = false;
-	
-	function MainOnLoad (preload_image_list, ncl, container) {
-		if (preload_image_list && preload_image_list.length > 0) {
-			// preload images before starting, MainRunAfterPreloadFinished() will be called when all are done loading
-			for (k in preload_image_list) {
-				var url = preload_image_list[k];
-				//~ MainPrint("preload image:"+url);
-				var img = new Image();
-				gPreloadImages[url] = img;
-				img.myurl = url; // img.src might be transformed to absolute path etc, so keep this as array-key
-				img.onload = function() { PreLoadImageFinishOne(this.myurl,ncl, container); }
-			}
-		} else {
-			// no preload list available, start immediately
-			runNCL(ncl, container);
-		}
-		
-	}
-	
-	
-	function PreLoadImageFinishOne (url,ncl, container) {
-		//~ MainPrint("preload image finished:"+url);
-		for (k in gPreloadImages) if (k != url && !gPreloadImages[k].complete) return; // still more to do
-		if (gMainRunAfterPreloadFinished) return; // only call once
-		gMainRunAfterPreloadFinished = true;
-		runNCL(ncl, container); // preload for all images finished
-	}
-	
-	function runNCL(ncl, container){
-	 	var myPlayer = new WebNclPlayer(ncl, container);
-		myPlayer.start();	
-	}
-	
-	MainOnLoad([],'sample/sample-lua.ncl','myPlayer');
-	
-
+		var loader = new PxLoader();
+		loader.addFont('garamond','sample/EBGaramond08-Regular.ttf');
+	 	loader.addCompletionListener(function() {
+	 		var myPlayer = new WebNclPlayer('sample/sample-lua.ncl', 'myPlayer');	
+	 		myPlayer.start();
+	 	});
+	 	loader.start();
 	</script>
 	
 </body>

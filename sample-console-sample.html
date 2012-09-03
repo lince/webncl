@@ -81,14 +81,9 @@
 		<script type="text/javascript" src="js/src/lua/libBroker.js"></script>
 		<script type="text/javascript" src="js/src/lua/libHttp.js"></script>
 		<!-- loader -->
-		
 		<script type="text/javascript" src="js/src/loader/PxLoader.js"></script>
 		<script type="text/javascript" src="js/src/loader/PxLoaderImage.js"></script>
 		<script type="text/javascript" src="js/src/loader/PxLoaderFont.js"></script>
-
-
-<link href='http://fonts.googleapis.com/css?family=Skranji' rel='stylesheet' type='text/css'>
-
 
 	</head>
 <body>
@@ -98,32 +93,24 @@
 	<div id="teste" style="display: none">
 		<h1>.</h1>
 	</div>
-	<script>
-		
-		
-
-		//var load = new Loader();
-		
+	<script>		
 		var loader = new PxLoader();
 		
-		loader.addFont('vera','test_lua/VivaMaisPeso/MeieScript-Regular.ttf'),
-		loader.addImage('test_lua/VivaMaisPeso/interativo.png'),
+		loader.addFont('garamond','sample/EBGaramond08-Regular.ttf');
+		loader.addImage('test_lua/VivaMaisPeso/interativo.png');
 		loader.addImage('test_lua/VivaMaisPeso/_livecd_preview.png');
-		loader.addCompletionListener(function() 
-				{ 
+		loader.addCompletionListener(function() { 
 					var myPlayer3 = new WebNclPlayer('sample/sample-lua.ncl', 'myPlayer3');
 					myPlayer3.start();
 		});
 		
 		loader.start();
-
-		
-		</script>
+	
+	</script>
 	
 	<div id="consoleLua">
-	<div><center><p>Console Lua</p></center></div>
-	<div id="content"></div>
-
+		<div><center><p>Console Lua</p></center></div>
+		<div id="content"></div>
 	</div>
 	
 	<script type="text/javascript">

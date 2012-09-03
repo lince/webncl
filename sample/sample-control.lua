@@ -13,7 +13,7 @@ function drawInput()
 	canvas:drawRect('fill',0,0,width,height)
 	
 	-- draw 'label'
-	canvas:attrFont('vera', height/3)
+	canvas:attrFont('garamond', height/3)
 	canvas:attrColor('black')
 	textSize = canvas:measureText(inputLabel)
 	beginX = width*0.03
@@ -30,7 +30,7 @@ function drawInput()
 	
 	-- draw text inside the text box
 	canvas:attrColor('black')
-	canvas:attrFont('times', height/3)
+	canvas:attrFont('garamond', height/3)
 	beginX = beginX*1.03
 	beginY = height/3
 	local text = number
@@ -46,7 +46,7 @@ function drawOutput()
 	canvas:drawRect('fill',0,0,width,height)
 	
 	-- draw 'label'
-	canvas:attrFont('vera', height/3)
+	canvas:attrFont('garamond', height/3)
 	canvas:attrColor('black')
 	local text = 'So, you are ' .. number .. ' years old.'
 	textSize = canvas:measureText(text)
