@@ -432,24 +432,20 @@ libCanvas.prototype.getFont = function(){
 libCanvas.prototype.attrText = function(face, size, style) {
 	//console.log("attrFont");
 	
-var espaço = " ";
-				
-				styleCss = "@font-face{" 
-				+"font-family:" + "'" + face + "'" +";"
-				+"src: url('http://www.miketaylr.com/f/kulminoituva.ttf');}";
-				
-		
-	$('<style>').text(styleCss).appendTo('head');
+
+	var blank = " ";
+
+	//size = size + 'px';
 
 	if (style === undefined)
-		style = "none";
+		style = "normal";
 		
 	this.attrFont[0] = face;
 	this.attrFont[1] = size;
 	this.attrFont[2] = style;
+	this.ctx.font = style + blank + size + blank +  face;	
 	
-	this.ctx.font = "'" + size + espaço + face + espaço  + "'";
-	console.log("'" + size + espaço + face + espaço   + "'");
+	
 }
 
 libCanvas.prototype.drawText = function(x, y, text) {
@@ -473,7 +469,7 @@ libCanvas.prototype.measureTextLua = function(text) {
 
 	var textWidth = this.ctx.measureText(text);
 
-	height = parseInt(this.ctx.font[0] + this.ctx.font[1]);
+	height = parseInt(this.attrFont[1]);
 
 	return [textWidth.width, height];
 }
@@ -518,8 +514,8 @@ libCanvas.prototype.flush = function() {
 	//console.log('flush');
 	var dimension = this.attrSize();
 	var imageData = this.ctx.getImageData(0,0,dimension[0],dimension[1]);
-	//this.ctx2.clearRect(0,0,dimension[0],dimension[1]);
-	//this.ctx.clearRect(0,0,dimension[0],dimension[1]);
 	this.ctx2.putImageData(imageData, 0,0);
 }
+
+
 
