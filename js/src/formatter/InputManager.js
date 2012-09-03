@@ -59,8 +59,16 @@ function InputManager(presentation) {
 	}
 		
 	this.bindKeyDown();
-	
 };
+
+//Mantem a informacao de qual objeto possui o foco atualmente
+InputManager.prototype.currentFocusIndex = undefined;
+
+//Mantem referencias para os descritores que possuem focusIndex
+InputManager.prototype.descriptors = {};
+
+//Mantem informacao dos descriptors com medias ativas
+InputManager.prototype.focusIndexArray = [];
 
 /*
     addMedia
@@ -145,7 +153,15 @@ InputManager.prototype.__setCurrentFocus = function(focusIndex) {
 	} else { 
 		this.setCurrentFocus(focusIndex);
 	}
-}
+};
+
+InputManager.prototype.setCurrentKeyMaster = function(keyMaster) {
+	this.keyMaster = keyMaster;
+};
+
+InputManager.prototype.getCurrentKeyMaster = function() {
+	return keyMaster;
+};
 
 InputManager.prototype.setCurrentFocus = function(focusIndex)
 {	
@@ -235,6 +251,26 @@ InputManager.prototype.unbindKeyDown=  function()
 	$(window).off('keydown');
 };
 
+InputManager.prototype.triggerKeyMaster = function(whichKey) {
+	var enabledMedias = [];	
+	var currentDescriptor = this.descriptors[this.keyMaster];
+		
+    for(var mediaIndex in currentDescriptor.mediaArray) {
+    	var mediaId = currentDescriptor.mediaArray[mediaIndex];
+        if(this.presentation.keyEvents[mediaId]) {
+        	enabledMedias.push(mediaId);
+        }
+    }
+    
+    for (i in enabledMedias) {
+    	var mediaId = enabledMedias[i];
+    	var e = $.Event('selection.onSelection');
+    	e.which = whichKey;
+    	$(mediaId).trigger(e);
+            
+    }
+};
+
 
 /*
     keyEvent
@@ -244,50 +280,56 @@ InputManager.prototype.unbindKeyDown=  function()
 
 InputManager.prototype.keyEvent = function(keyCode)
 {
-    this.triggerKeyEvents(keyCode);
-
-	if(this.currentFocusIndex)
-	{
-		currentDescriptor = this.descriptors[this.currentFocusIndex];
-                var Keys =  this.presentation.keys;
-		switch (keyCode)
+	console.log(this.keyMaster);
+	if (this.keyMaster && this.keyMaster  != '') {
+		this.triggerKeyMaster(keyCode);
+	} else {
+	    this.triggerKeyEvents(keyCode);
+	
+		if(this.currentFocusIndex)
 		{
-
-			case Keys.CURSOR_UP:
-				if(currentDescriptor.self.moveUp)
-					this.__setCurrentFocus(currentDescriptor.self.moveUp.focusIndex)
-                
-			break;		
-			
-			case Keys.CURSOR_DOWN:
-				if(currentDescriptor.self.moveDown)
-					this.__setCurrentFocus(currentDescriptor.self.moveDown.focusIndex)
-
-
-			break;
-			
-			case Keys.CURSOR_LEFT:
-				if(currentDescriptor.self.moveLeft)
-					this.__setCurrentFocus(currentDescriptor.self.moveLeft.focusIndex)
+			currentDescriptor = this.descriptors[this.currentFocusIndex];
+	                var Keys =  this.presentation.keys;
+			switch (keyCode)
+			{
+	
+				case Keys.CURSOR_UP:
+					if(currentDescriptor.self.moveUp)
+						this.__setCurrentFocus(currentDescriptor.self.moveUp.focusIndex)
+	                
+				break;		
+				
+				case Keys.CURSOR_DOWN:
+					if(currentDescriptor.self.moveDown)
+						this.__setCurrentFocus(currentDescriptor.self.moveDown.focusIndex)
+	
+	
+				break;
+				
+				case Keys.CURSOR_LEFT:
+					if(currentDescriptor.self.moveLeft)
+						this.__setCurrentFocus(currentDescriptor.self.moveLeft.focusIndex)
+						
+				break;
+				
+				case Keys.CURSOR_RIGHT:
+					if(currentDescriptor.self.moveRight)
+						this.__setCurrentFocus(currentDescriptor.self.moveRight.focusIndex)
 					
-			break;
-			
-			case Keys.CURSOR_RIGHT:
-				if(currentDescriptor.self.moveRight)
-					this.__setCurrentFocus(currentDescriptor.self.moveRight.focusIndex)
+				break;					
 				
-			break;					
-			
-			case Keys.ENTER:
-				for(var i in currentDescriptor.mediaArray)
-				{
-					currentMedia = currentDescriptor.mediaArray[i];
-					$(currentMedia).trigger('selection.onSelection');
-				}
+				case Keys.ENTER:
+					for(var i in currentDescriptor.mediaArray)
+					{
+						currentMedia = currentDescriptor.mediaArray[i];
+						$(currentMedia).trigger('selection.onSelection');
+					}
+					
+				break;
 				
-			break;
-			
+			}
 		}
+	
 	}
 };
 
@@ -365,20 +407,9 @@ InputManager.prototype.triggerKeyEvents = function(whichKey)
 };
 
 
-//Mantem a informacao de qual objeto possui o foco atualmente
-InputManager.prototype.currentFocusIndex = undefined;
-
-//Mantem referencias para os descritores que possuem focusIndex
-InputManager.prototype.descriptors = {};
-
-//Mantem informacao dos descriptors com medias ativas
-InputManager.prototype.focusIndexArray = [];
-
-
-
 /*
  * Funcoes estaticas da classe InputManager
- * */
+ */
 
 /*
   Rotina de ordenacao utilizada no metodo array.sort()

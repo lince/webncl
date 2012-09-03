@@ -28,7 +28,6 @@
  * @constructor
  */
 function GingaSettingsPlayer(p) {
-	console.log('creating GignaSettingsPlayer');
     this.p = p;
     this.htmlPlayer = "#" + p.id;
     this.flowPlayer = undefined;
@@ -46,6 +45,7 @@ function GingaSettingsPlayer(p) {
 GingaSettingsPlayer.prototype.setProperty = function(name, value) {
 	switch(name) {
 		case "service.currentFocus":
+		case "service.currentKeyMaster":
 		case "default.focusBorderColor":
 		case "default.selBorderColor":
 		case "default.focusBorderWidth":

@@ -11,7 +11,7 @@
 		
 		<descriptorBase>
 			<descriptor id="dImage" region="rgImage" />
-			<descriptor id="dLua" region="rgLua" />
+			<descriptor id="dLua" region="rgLua" focusIndex="luaIdx" />
 		</descriptorBase>
 		
 		<connectorBase>
@@ -53,6 +53,11 @@
 	<body>
 		
 		<port id="pLua" component="lua" />
+		<!--port id="pSett" component="settings" /-->
+		
+		<media id="settings" type="application/x-ginga-settings">
+			<property name="service.currentKeyMaster" value="luaIdx"/>
+		</media>
 		
 		<media id="lua" descriptor="dLua" src="sample-control.lua">
 			<property name="age" />

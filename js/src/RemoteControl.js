@@ -28,7 +28,7 @@ function RemoteControl(player, divId, initialAreas) {
 }
 
 RemoteControl.prototype.bindButtonFunctions = function() {
-	var imgButtons = ['STart', 'Stop', 'Pause', 'Eject', 'Power', 'Key_1', 'Key_2', 'Key_3', 'Key_4', 'Key_5', 
+	var imgButtons = ['Start', 'Stop', 'Pause', 'Eject', 'Power', 'Key_1', 'Key_2', 'Key_3', 'Key_4', 'Key_5', 
 					'Key_6', 'Key_7', 'Key_8', 'Key_9', 'Key_Hash', 'Key_0', 'Key_Star', 'Volume_Up', 'Channel_Up', 
 					'Volume_Down', 'Channel_Down', 'Menu', 'Mute', 'Help', 'Info','Guide', 'Exit', 'Back', 'Enter', 
 					'Cursor_Up', 'Cursor_Down', 'Cursor_Left', 'Cursor_Right', 'Red', 'Green', 'Yellow', 'Blue', 

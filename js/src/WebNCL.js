@@ -588,10 +588,10 @@ $(document).ready(function() {
 			+'	height: ' + ($(this).attr('height') || '480px') + ';'
 			+'}';
 
-		webNclPlayers.push(new WebNclPlayer(src,id,dir));
+		webNclPlayers[id] = new WebNclPlayer(src,id,dir);
                 
 		if (autoplay) {
-			webNclPlayers[webNclPlayers.length-1].start();   
+			webNclPlayers[id].start();   
 		}
 			
 	});
@@ -638,4 +638,4 @@ $(document).ready(function() {
 
 });
 
-webNclPlayers = [];
+webNclPlayers = {};
