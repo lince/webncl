@@ -44,24 +44,20 @@ function SystemSettings(presentation)
 	
 	//Mapa das funcoes de set de algumas propriedadees
 	this.setMap=	{
-		'service.currentFocus': $.proxy(presentation.inputManager.setCurrentFocus,presentation.inputManager)
+		'service.currentFocus': 
+			$.proxy(presentation.inputManager.setCurrentFocus,presentation.inputManager),
+		'service.currentKeyMaster': 
+			$.proxy(presentation.inputManager.setCurrentKeyMaster,presentation.inputManager)
 	}
 	
 	//Mapa das funcoes de get de algumas propriedades
 	//(devem ser as mesmas que possuem funcao de set)
 	this.getMap= {
-		'service.currentFocus': $.proxy(presentation.inputManager.getCurrentFocus,presentation.inputManager)
+		'service.currentFocus': 
+			$.proxy(presentation.inputManager.getCurrentFocus,presentation.inputManager),
+		'service.currentKeyMaster': 
+			$.proxy(presentation.inputManager.getCurrentKeyMaster,presentation.inputManager)
 	}
-	
-	this.setMap=	{
-		'service.currentKeyMaster': $.proxy(presentation.inputManager.setCurrentKeyMaster,presentation.inputManager)
-	}
-	
-	this.getMap= {
-		'service.currentKeyMaster': $.proxy(presentation.inputManager.getCurrentKeyMaster,presentation.inputManager)
-	}
-	
-
 	
 };
 
@@ -74,14 +70,10 @@ function SystemSettings(presentation)
  * 					  propriedade de sistema
  * 
  */
-SystemSettings.prototype.setPropertyValue = function(property, value)
-{
-	
-    if(property in this.settings)
-    {
+SystemSettings.prototype.setPropertyValue = function(property, value) {
+    if(property in this.settings) {
     	this.settings[property] = value;
-    } else if(property in this.setMap)
-    {
+    } else if(property in this.setMap) {
     	this.setMap[property](value);
     } else {
     	return false;
@@ -98,13 +90,10 @@ SystemSettings.prototype.setPropertyValue = function(property, value)
  * 					  Caso ela nao exista retorna vazio
  * 
  */
-SystemSettings.prototype.getPropertyValue = function(property)
-{
-	if(property in this.settings)
-    {
+SystemSettings.prototype.getPropertyValue = function(property) {
+	if(property in this.settings) {
     	return this.settings[property];
-    } else if(property in this.setMap)
-    {
+    } else if(property in this.setMap) {
     	return this.getMap[property]();
     } else {
     	return undefined;
