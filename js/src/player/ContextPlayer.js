@@ -308,7 +308,7 @@ ContextPlayer.prototype.pause = function (nodeInterface) {
 			this.portAction(this.port[nodeInterface],'pause');
 		}
 	} 
-	else {
+	else if (nodeInterface) {
 		//guess this case will never happen
 		//but its treated here as its possible
 		//and lua player might be able to treat the event

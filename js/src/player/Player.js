@@ -59,7 +59,7 @@ Player.prototype.trigger = function(event,args)
 			
 			b = $.inArray(this,this.parentContext.pausedElem);
 			if(b > -1)
-				this.parentContext.pausedElem.splice(b-1,1);	
+				this.parentContext.pausedElem.splice(b,1);	
 		break;
 
 		case 'presentation.onPause':
@@ -67,7 +67,7 @@ Player.prototype.trigger = function(event,args)
 						
 			b = $.inArray(this,this.parentContext.playingElem);
 			if(b > -1)
-				this.parentContext.playingElem.splice(b-1,1);		
+				this.parentContext.playingElem.splice(b,1);		
 		break;
 
 
@@ -75,12 +75,12 @@ Player.prototype.trigger = function(event,args)
 		case 'presentation.onAbort':
 			b = $.inArray(this,this.parentContext.playingElem);
 			if(b > -1)
-				this.parentContext.playingElem.splice(b-1,1);	
+				this.parentContext.playingElem.splice(b,1);	
 			else
 			{
 				b = $.inArray(this,this.parentContext.pausedElem);
 				if(b > -1)
-					this.parentContext.pausedElem.splice(b-1,1);					
+					this.parentContext.pausedElem.splice(b,1);					
 			}
 			
 
