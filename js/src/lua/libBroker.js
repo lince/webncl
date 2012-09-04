@@ -1,15 +1,5 @@
 function libBroker(luaplayer){
-    /*
-	this.luaplayer = luaplayer;
-	this.player = luaplayer.p;
-	this.handlers = [];
-	this.handlers[0] = undefined;
-	this.counter = 0;
-	tmp = this.player.id;
-	this.nodeId = tmp.substring(tmp.indexOf('_')+1);
-	var d = new Date();
-	this.t = d.getTime();
-	*/
+  
    this.amq = org.activemq.Amq;
    this.luaHandler = '';
 };

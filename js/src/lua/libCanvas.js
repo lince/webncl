@@ -5,7 +5,6 @@ function libCanvas(ctx) {
 	this.endCropX = ctx.canvas.width;
 	this.endCropY = ctx.canvas.height;
 
-	//context
 	this.ctx2 = ctx;
 	this.width = ctx.canvas.width;
 	this.height = ctx.canvas.height;
@@ -17,8 +16,6 @@ function libCanvas(ctx) {
 	
 	this.ctx = canvas.getContext("2d");
 	
-
-	//variables for attrClip
 	this.x = 0;
 	this.y = 0;
 	this.initX = 0;
@@ -28,7 +25,6 @@ function libCanvas(ctx) {
 	this.endX = ctx.canvas.width;
 	this.endY = ctx.canvas.height;
 	
-	//variable for return the values of color from attrColor
 	this.color = [];
 	this.color[0] = 0;
 	this.color[1] = 0;
@@ -42,24 +38,18 @@ function libCanvas(ctx) {
 
 libCanvas.prototype.attrSize = function() {
 	
-	//console.log("attrSize");
 	return [this.width, this.height];
 
 }
 
 libCanvas.prototype.newCanvas = function(width, height) {
-
-	//newObject = new libCanvas(this.ctx);
 	
 	newObject.setData(width, height);
-	
 	return newObject;
-
 }
 
-//TODO use function onload to first load the image then execute de code
+
 libCanvas.prototype.newImage = function(caminho) {
-	//console.log("newImage");
 	
 	var img = new Image();
 	img.src = caminho;
@@ -77,7 +67,6 @@ libCanvas.prototype.newImage = function(caminho) {
 
 
 libCanvas.prototype.image_path = function(img, x, y, w, h) {
-	//console.log("image_path");
 
 	this.initX = this.x + x;
 	this.initY = this.y + y;
@@ -89,8 +78,6 @@ libCanvas.prototype.image_path = function(img, x, y, w, h) {
 		this.ctx.drawImage(img, this.initX, this.initY, w, h);
 		
 	}
-		
-
 }
 
 libCanvas.prototype.setData = function(x, y) {
@@ -99,7 +86,6 @@ libCanvas.prototype.setData = function(x, y) {
 	this.height = y;
 	this.endCropX = x;
 	this.endCropY = y;
-	
 	
 }
 
@@ -110,7 +96,6 @@ libCanvas.prototype.getColor = function(){
 }
 
 libCanvas.prototype.attrColor = function(r, g, b, a) {
-	//console.log("attrColor");
 
 	if (b === undefined && a === undefined) {
 
@@ -285,7 +270,6 @@ libCanvas.prototype.attrColor = function(r, g, b, a) {
 
 	}
 
-	
 	else {
 
 		this.ctx.fillStyle = "rgba(" + r + "," + g + "," + b + "," + a + ")";
@@ -297,12 +281,9 @@ libCanvas.prototype.attrColor = function(r, g, b, a) {
 		this.color[3] = a;
 	}
 
-	
-
 }
 
 libCanvas.prototype.attrClip = function(x, y, w, h) {
-	//console.log("attrClip");
 
 	this.x = x;
 	this.y = y;
@@ -322,7 +303,6 @@ libCanvas.prototype.getClip = function(){
 
 
 libCanvas.prototype.iniVerifClip = function(x1, y1, x2, y2) {
-	//console.log("IniVerifClip");
 
 	this.initX = this.x + x1;
 	this.initY = this.y + y1;
@@ -351,9 +331,7 @@ libCanvas.prototype.iniVerifClip = function(x1, y1, x2, y2) {
 }
 
 libCanvas.prototype.iniVerifClip2 = function(x1, y1, x2, y2) {
-	//console.log("IniVerifClip2");
 
-	//set for attrClip
 	this.initX = this.x + x1;
 	this.initY = this.y + y1;
 	this.endX = x2;
@@ -361,9 +339,6 @@ libCanvas.prototype.iniVerifClip2 = function(x1, y1, x2, y2) {
 	var verifica = true;
 	var sub = 0;
 	
-
-	//#------------------------------------------------------------------------------#
-	//verifications for attrClip
 	if (this.initX + this.endX > this.x + this.sizeX) {
 		sub = (this.initX + this.endX) - (this.x + this.sizeX);
 		this.endX = this.endX - sub;
@@ -377,9 +352,6 @@ libCanvas.prototype.iniVerifClip2 = function(x1, y1, x2, y2) {
 	if (this.initX >= this.sizeX + this.x || this.initY >= this.sizeY + this.y) {
 		verifica = false;
 	}
-	//end of verifications for attrClip
-	//#-------------------------------------------------------------------------------#
-	
 
 	return verifica;
 }
@@ -404,8 +376,6 @@ libCanvas.prototype.drawLine = function(x1, y1, x2, y2) {
 }
 
 libCanvas.prototype.drawRect = function(mode, x1, y1, x2, y2) {
-	//console.log("drawRect");
-
 
 	var verifica = this.iniVerifClip2(x1, y1, x2, y2);
 
@@ -430,12 +400,8 @@ libCanvas.prototype.getFont = function(){
 }
 
 libCanvas.prototype.attrText = function(face, size, style) {
-	//console.log("attrFont");
 	
-
 	var blank = " ";
-
-	//size = size + 'px';
 
 	if (style === undefined)
 		style = "normal";
@@ -445,11 +411,9 @@ libCanvas.prototype.attrText = function(face, size, style) {
 	this.attrFont[2] = style;
 	this.ctx.font = style + blank + size + blank +  face;	
 	
-	
 }
 
 libCanvas.prototype.drawText = function(x, y, text) {
-	//console.log("drawText");
 
 	dimension = this.measureTextLua(text);
 
@@ -459,13 +423,11 @@ libCanvas.prototype.drawText = function(x, y, text) {
 	this.initX = this.x + x;
 	this.initY = this.y + y + height;
 	
-	//console.log('Texto:', text)
 	this.ctx.fillText(text, this.initX, this.initY);
 
 }
 
 libCanvas.prototype.measureTextLua = function(text) {
-	//console.log("measureTextLua");
 
 	var textWidth = this.ctx.measureText(text);
 

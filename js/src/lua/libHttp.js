@@ -1,7 +1,5 @@
 function libHttp(){
-	
-	
-	
+		
 };
 
 libHttp.prototype.request = function(attr0){
@@ -12,12 +10,7 @@ libHttp.prototype.request = function(attr0){
 	if (data != undefined || data != '') {
 		data = data.str;
 	}
-	
-	
-	
-	//var result = $.ajax(jsonParam);
-	
-	
+		
 	var http_response = '';
 
 	var result = $.ajax({
@@ -26,18 +19,7 @@ libHttp.prototype.request = function(attr0){
 		dataType : req.str['dataType'],
 		data: data,
 		async : false,
-		/*success : $.proxy(function(data) {
-			///console.log (data);
-			//http_response = data.toString();
-			
-
-		}, this),
-		error : function() {
-			//console.log('erro');
-			//http_response='error';
-		}*/
-	});
+		});
 	
-
 	return [result.responseText];
 }

@@ -386,7 +386,7 @@ LuaPlayer.prototype.bindlibs = function() {
 				return [0,0];
 			}
 			var objCanvas = this.variable.canvas_objects[self.str['id']];
-			return [objCanvas.measureTextLua(text)];
+			return objCanvas.measureTextLua(text);
 		}, this);
 
 		luaObject.str['attrFont'] = $.proxy(function(self, face, size, style) {
@@ -465,8 +465,6 @@ LuaPlayer.prototype.bindlibs = function() {
 		
 	};
 
-	//events = this.events;
-
 	lua_libs["event"] = {
 		"post" : $.proxy(function(mode,evnt) {
 			this.events.post(mode,evnt);
@@ -490,9 +488,6 @@ LuaPlayer.prototype.bindlibs = function() {
 			return [this.http.request(param)];
 		}, this)
 	}
-    
-    //broker functions
-	//broker = this.broker;
 
 	lua_libs["broker"] = {
 		"init" : $.proxy(function(strURI, fnOptCallback) {
@@ -513,9 +508,7 @@ LuaPlayer.prototype.bindlibs = function() {
 //
 
 LuaPlayer.prototype.callHandlers = function() {
-	//console.log('LuaPlayer.callHandlers() ' + this.isHandlingEvent);
-
-	//f (this.arrayUsers.length > 0) {
+	
 	if (this.isHandlingEvent) {
 		return;
 	} else {
@@ -544,9 +537,9 @@ LuaPlayer.prototype.callHandlers = function() {
 			evnt = this.arrayUsers.splice(0, 1);
 		}
 		this.isHandlingEvent = false;
-		//$(this.htmlPlayer).trigger('endCallHandlers');
+
 	}
-	//
+
 }
 
 
@@ -562,6 +555,7 @@ LuaPlayer.prototype.eventQueue = function(evt, notcallhandlers){
 	
 }
 
+//Functions to console lua
 lua_core["print"] = function () {
   try {
   	

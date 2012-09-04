@@ -12,20 +12,20 @@ function libEvents(luaplayer){
 };
 
 libEvents.prototype.register = function(fct){
-	//console.log('libEvents.register()');
+	
 	this.handlers[this.counter] = fct;
 	this.counter = this.counter + 1;
 }
 
 libEvents.prototype.unregister = function(fct){
-	//console.log('libEvents.unregister()');
+	
 	this.handlers[this.counter] = undefined;
 	if(!this.counter)
 		this.counter = this.counter - 1;
 }
 
 libEvents.prototype.post = function(attr0, attr1){
-	//console.log('libEvents.post()')
+	
 	var out;
 	var evt;
 	if(attr0 === 'in'){
@@ -131,15 +131,9 @@ libEvents.prototype.post = function(attr0, attr1){
 	} 
 	}
 	
-
-
-	
-
 }
 
-/*libEvents.prototype.timer = function(t, callback, manager){
-	manager.add(t,callback);	
-}*/
+
 libEvents.prototype.timer = function(timeout, fct){
 	setTimeout(fct, timeout);
 }
