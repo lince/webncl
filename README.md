@@ -29,7 +29,7 @@ $ make CLOSURE_COMPILER=/path/to/closure/compiler.jar
 ## Embedding NCL documents
 To embed the NCL document into a web-page, see the _sample.html_, _sample-dev.html_ or _sample-min.html_. To use the virtual remove control, see the _sample-control.html_.
 
-See the [WebNCL API](webncl/webncl/wiki/api) page for more details.
+See the [WebNCL API](webncl/wiki/api) page for more details.
 
 ## Running Examples
 Because of the [Same Origin Policy](http://www.w3.org/Security/webncl/wiki/Same_Origin_Policy) present in many modern browsers, it may be necessary to have a local web-server to execute NCL documents locally.
