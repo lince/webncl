@@ -280,7 +280,6 @@ InputManager.prototype.triggerKeyMaster = function(whichKey) {
 
 InputManager.prototype.keyEvent = function(keyCode)
 {
-	console.log(this.keyMaster);
 	if (this.keyMaster && this.keyMaster  != '') {
 		this.triggerKeyMaster(keyCode);
 	} else {

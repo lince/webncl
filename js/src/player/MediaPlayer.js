@@ -180,10 +180,13 @@ MediaPlayer.prototype.create = function (node) {
 	}
 	
 //HACK_FOCUS (begin)
-	if (!this.presentation.settingsNode &&
-			this.type == 'application/x-ginga-settings') {
-		
-		this.presentation.settingsNode = this;
+	if (this.type == 'application/x-ginga-settings') {
+		if (this.presentation.settingsNode) {
+			Logger.error(Logger.ERR_DUPLICATED_SETTINGS_NODE,'Settings Node',[node.id]);
+			return;
+		} else {
+			this.presentation.settingsNode = this;
+		}
 	}
 //HACK_FOCUS (end)
 
