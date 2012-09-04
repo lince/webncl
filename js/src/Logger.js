@@ -54,6 +54,7 @@ var Logger = {
 	ERR_MEDIAPLAYER_NOPLAYER:				218,	// No player was defined for current mime type or file extension
     ERR_PARSER_LOADINGERROR:				219,    // Error while loading NCL file
 	ERR_INVALID_ALIAS:						220,	// Invalid Alias
+	ERR_DUPLICATED_SETTINGS_NODE:			221,	// Two or more settings node found
 	
 	MESSAGES: {
 		100: "Atributo inválido",
@@ -86,7 +87,8 @@ var Logger = {
 		217: "Método não encontrado no media player",
 		218: "Nenhum player foi definido para este mime type/extensão",
 		219: "Erro carregando arquivo",
-		220: "Alias inválido!"
+		220: "Alias inválido!",
+		221: "Mais de um nó de propriedades encontra."
 	},
 	
 	abort: false,
