@@ -31,8 +31,6 @@
  */
 function LuaPlayer(p) {
 
-	console.log('constructor lua: ' + p.id);
-
 	this.p = p;
 	this.htmlPlayer = "#" + p.id;
 	this.luajscode = undefined;
@@ -70,7 +68,7 @@ function LuaPlayer(p) {
     p.enableKeyEvents();
     
 
-	console.log(p.id);
+	
 	
 };
 
@@ -89,7 +87,6 @@ LuaPlayer.prototype.unload = function() {
  *
  */
 LuaPlayer.prototype.load = function(source) {
-	//console.log('load lua: ' + source);
 	
 	var breakPath = source.split('/');
 	this.pathLua = breakPath[0] + '/' + breakPath[1] + '/';
@@ -110,7 +107,6 @@ LuaPlayer.prototype.load = function(source) {
 		}
 	});
 
-	//console.log('largura: ' + this.p.getProperty('width'));
 	this.bindlibs();
 
 }
@@ -119,13 +115,12 @@ LuaPlayer.prototype.load = function(source) {
  * progress in time
  */
 LuaPlayer.prototype.exec = function(time, callback) {
-	console.log('exec lua: ' + time);
+	//console.log('exec lua: ' + time);
 }
 /**
  * Start
  */
 LuaPlayer.prototype.start = function(nodeInterface) {
-	console.log('start lua: ' + nodeInterface);
 	
 	if (this.loaded === false) {
 		this.loaded = true;
@@ -157,7 +152,6 @@ LuaPlayer.prototype.start = function(nodeInterface) {
  * Stop
  */
 LuaPlayer.prototype.stop = function() {
-	console.log('stop lua');
 
 	if (this.events.handlers) {
 		var evt = lua_newtable();
@@ -185,7 +179,6 @@ LuaPlayer.prototype.pause = function() {
  * Resume
  */
 LuaPlayer.prototype.resume = function() {
-	console.log('resume lua');
 
 	if (this.events.handlers) {
 		var evt = lua_newtable();
@@ -199,7 +192,6 @@ LuaPlayer.prototype.resume = function() {
  * Abort
  */
 LuaPlayer.prototype.abort = function() {
-	console.log('abort lua');
 
 	if (this.events.handlers) {
 		var evt = lua_newtable();
@@ -213,14 +205,13 @@ LuaPlayer.prototype.abort = function() {
  * Seek
  */
 LuaPlayer.prototype.seek = function(newTime) {
-	console.log('seek lua');
+	
 	this.eventQueue(evt);
 }
 /**
  * SeekAndPLay
  */
 LuaPlayer.prototype.seekAndPlay = function(newTime) {
-	console.log('seek and play lua');
 
 }
 
@@ -277,7 +268,7 @@ LuaPlayer.prototype.bindlibs = function() {
 			var ctx = canvas.getContext("2d");
 
 			var object = new libCanvas(ctx);
-			console.log('init');
+			
 			this.variable.canvas_objects[this.variable.id] = object;
 
 		} catch(err) {
@@ -454,7 +445,6 @@ LuaPlayer.prototype.bindlibs = function() {
 
 	lua_libs["persistent"] = {
 		"set" : $.proxy(function(prefix, key, value) {
-			console.log(this);
 			this.persitent.storeField(prefix, key, value);
 
 		}, this),

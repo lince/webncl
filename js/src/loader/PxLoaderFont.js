@@ -24,19 +24,26 @@ function PxLoaderFont(alias, url, tags, priority) {
 
 
     this.start = function(pxLoader) {
-        // we need the loader ref so we can notify upon completion
+        
         loader = pxLoader;
 
      	var styleCss = "@font-face{" + 
 		"font-family: '"+ this.alias + "';" + 
 		"src: url('"+ this.url +"');}";
 	
-		//var divCss = "{font-family: '"+ this.alias + "'; visibility: hidden}";
-	
 		$('<style>').text(styleCss).appendTo('head');
-		//$('<div>').text(divCss).appendTo('body');
-
-
+		
+		var result = $.ajax({
+		type : "GET",
+		url : this.url,
+		async : false,
+		});
+		
+		
+		$('body').append('<div style="visibility:hidden"><h1>.</h1><div></div>');
+		
+		var h1 = "h1 { font-family: 'rye', arial, serif; }";
+		$('<style>').text(h1).appendTo('head');
     };
 
     // called by PxLoader to check status of image (fallback in case

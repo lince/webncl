@@ -32,7 +32,7 @@ function libCanvas(ctx) {
 	this.color[3] = 1;
 	
 	this.attrFont = [];
-	console.log("libCanvas");
+	
 
 };
 
@@ -357,7 +357,6 @@ libCanvas.prototype.iniVerifClip2 = function(x1, y1, x2, y2) {
 }
 
 libCanvas.prototype.drawLine = function(x1, y1, x2, y2) {
-	//console.log("drawLine");
 
 	verifica = this.iniVerifClip(x1, y1, x2, y2);
 
@@ -446,7 +445,6 @@ libCanvas.prototype.getCrop = function(){
 }
 
 libCanvas.prototype.attrCrop = function(x, y, w, h) {
-	//console.log("attrCrop");
 	
 	this.iniCropX = x;
 	this.iniCropY = y;
@@ -463,8 +461,6 @@ libCanvas.prototype.attrCrop = function(x, y, w, h) {
 
 
 libCanvas.prototype.compose = function(x, y, img) {
-	
-	//console.log("compose");
 
 	var context = img.getContext();
 	var imageData = context.getImageData(img.iniCropX, img.iniCropY, img.endCropX, img.endCropY);
@@ -473,7 +469,7 @@ libCanvas.prototype.compose = function(x, y, img) {
 }
 
 libCanvas.prototype.flush = function() {
-	//console.log('flush');
+
 	var dimension = this.attrSize();
 	var imageData = this.ctx.getImageData(0,0,dimension[0],dimension[1]);
 	this.ctx2.putImageData(imageData, 0,0);
