@@ -2,7 +2,7 @@
 
 **WebNCL** is a NCL (_Nested Context Language_) presentation machine developed on top of Web technologies stack (HTML5/JavaScript/CSS). It allows the execution of NCL Documents in any device which has a HTML5-compatible browser, such as PC, Tablets, Smartphones and Smart TVs.
 
-You can download a pre-compiled version of the WebNCL code [here](https://github.com/downloads/lince/webncl/WebNCL-0.3.tar.gz).
+You can download a pre-compiled version of the WebNCL code [here](https://github.com/downloads/lince/webncl/webncl.min.js).
 
 - For WebNCL's demos visit: [http://webncl.org](http://webncl.org)
 - For more information about the NCL language visit: [http://www.ncl.org.br](http://www.ncl.org.br)
