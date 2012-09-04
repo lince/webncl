@@ -40,9 +40,9 @@ function PxLoaderFont(alias, url, tags, priority) {
 		});
 		
 		
-		$('body').append('<div style="visibility:hidden"><h1>.</h1><div></div>');
+		$('body').append('<div class = "font_' + this.alias + '"  style="visibility:hidden"><h1>.</h1><div></div>');
 		
-		var h1 = "h1 { font-family: 'rye', arial, serif; }";
+		var h1 = ".font_" + this.alias + " { font-family: '" + this.alias + "'; }";
 		$('<style>').text(h1).appendTo('head');
     };
 

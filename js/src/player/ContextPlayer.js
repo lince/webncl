@@ -42,7 +42,7 @@ function ContextPlayer (node, p) {
     this.syncReadyElem = [];
         
 	
-	//this list of paused elements is used when the context recieves a pause
+	//this list of paused elements is used when the context receives a pause
 	this.pausedElemList = [];
 	this.playingElem = [];
 	this.pausedElem = [];

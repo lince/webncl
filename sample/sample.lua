@@ -5,8 +5,8 @@ function drawBackGround()
 	canvas:drawRect('fill',0,0,width,height)
 end
 
-function drawMessage(text)
-	canvas:attrFont('garamond', height/3)
+function drawMessage(text, fonte)
+	canvas:attrFont(fonte, height/3)
 	canvas:attrColor('yellow')
 	textSize = canvas:measureText(text)
 	beginX = (width-textSize)/2
@@ -16,7 +16,6 @@ end
 
 
 function handlerText(evt)
-	print (evt)
 	if evt.class ~= 'ncl' then return end
     if evt.type ~= 'presentation' then return end
     if evt.action ~= 'start' then return end
@@ -30,7 +29,6 @@ function handlerText(evt)
 end
 
 function handlerEnd(evt)
-	print (evt)
 	if evt.class ~= 'ncl' then return end
     if evt.type ~= 'presentation' then return end
     if evt.action ~= 'stop' then return end
@@ -42,19 +40,19 @@ end
 
 function text1()
 	drawBackGround()
-	drawMessage('This text is being drawed by a Lua Script');
+	drawMessage('This text is being drawed by a Lua Script', 'garamond');
 	canvas:flush()
 end
 
 function text2()
 	drawBackGround()
-	drawMessage('And the script is synchronized with the video');
+	drawMessage('And the script is synchronized with the video', 'onilesca');
 	canvas:flush()
 end
 
 function text3()
 	drawBackGround()
-	drawMessage('Pretty cool, hein?');
+	drawMessage('Pretty cool, hein?', 'garamond');
 	canvas:flush()
 end
 
