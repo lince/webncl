@@ -29,10 +29,10 @@ $ make CLOSURE_COMPILER=/path/to/closure/compiler.jar
 ## Embedding NCL documents
 To embed the NCL document into a web-page, see the _sample.html_, _sample-dev.html_ or _sample-min.html_. To use the virtual remove control, see the _sample-control.html_.
 
-See the [WebNCL API](wiki/api) page for more details.
+See the [WebNCL API](webncl/webncl/wiki/api) page for more details.
 
 ## Running Examples
-Because of the [Same Origin Policy](http://www.w3.org/Security/wiki/Same_Origin_Policy) present in many modern browsers, it may be necessary to have a local web-server to execute NCL documents locally.
+Because of the [Same Origin Policy](http://www.w3.org/Security/webncl/wiki/Same_Origin_Policy) present in many modern browsers, it may be necessary to have a local web-server to execute NCL documents locally.
 
 Any web server will work; for instance, you can run Python's built-in server:
 
@@ -51,11 +51,11 @@ It is a good practice to add a version of audio/video files for each different f
 
 ## Support NCL Documents
 
-Not all the NCL tags are implemented. Also, there is some functionalities that works only for some browsers. For a discussion of compatibility with NCL documents, see the [Compatibily Issues](wiki/Compatibily-Issues) page.
+Not all the NCL tags are implemented. Also, there is some functionalities that works only for some browsers. For a discussion of compatibility with NCL documents, see the [Compatibily Issues](webncl/wiki/Compatibily-Issues) page.
 
 ## Running Lua Scripts
 
-To run lua scripts it may necessary to preload images used by the canvas API. Also, some Lua constructions are not fully supported by the WebNCL. For a discussion about running Lua Scripts and NCLua API. see the [Lua Compatibily](wiki/Lua-Compatibily) page.
+To run lua scripts it may necessary to preload images used by the canvas API. Also, some Lua constructions are not fully supported by the WebNCL. For a discussion about running Lua Scripts and NCLua API. see the [Lua Compatibily](webncl/wiki/Lua-Compatibily) page.
 
 # CHANGE LOG
 ***
@@ -73,10 +73,10 @@ To run lua scripts it may necessary to preload images used by the canvas API. Al
  - New examples added
  - Several bugs related to media management fixed
 
-For older versions see our [wiki page](wiki/changelog).
+For older versions see the [changelog](webncl/wiki/changelog) page.
 
 # DEVELOPMENT
 ***
 You can use the [issues](https://github.com/lince/webncl/issues) to report bugs or to ask questions to the developers.
 
-To develop new players, see the [Media Page Interface](https://github.com/lince/webncl/wiki/Media-Players-interface) page.
+To develop new players, see the [Media Page Interface](https://github.com/lince/webncl/webncl/wiki/Media-Players-interface) page.
