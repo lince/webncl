@@ -90,10 +90,13 @@
 		
 		<div id="areaRemoteControl" style="left:650px"></div>
 	
-		<script>
+		<script>		
 			var player = new WebNclPlayer("sample/sample-control.ncl","myPlayer");
 			player.start();
 			var controler1 = new RemoteControl(player,"areaRemoteControl", ['interactive', 'multimedia', 'colorful']);
+			controler1.addListener(function(button) {
+				console.log(button);
+			})
 		</script>
 		
 	</body>

@@ -25,6 +25,15 @@ function RemoteControl(player, divId, initialAreas) {
 	this.createDivs();
 	this.createSetAreas();	
 	this.bindButtonFunctions();	
+	this.listeners = []
+}
+
+RemoteControl.prototype.addListener = function(listener) {
+	this.listeners.push(listener)
+}
+
+RemoteControl.prototype.removeListener = function(listener) {
+	this.listeners.splice( $.inArray(listener, this.listeners), 1);
 }
 
 RemoteControl.prototype.bindButtonFunctions = function() {
@@ -217,6 +226,9 @@ RemoteControl.prototype.createSetAreas = function(){
 
 //Chamada da função específica de cada botão			
 RemoteControl.prototype.functionButton = function(b){
+	for (index in this.listeners) {
+		this.listeners[index](b)
+	}
 	switch(b) {
 	case 'PLAY':
 		if (this.isPause) {
