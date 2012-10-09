@@ -20,6 +20,7 @@ mindeb: $(DEBFILE)
 
 clean:
 	rm -rf $(MINFILE)
+	rm -rf $(DEBFILE)
 
 $(MINFILE):	$(FILES)
 	java -jar $(CLOSURE_COMPILER) --compilation_level SIMPLE_OPTIMIZATIONS --js_output_file $(MINFILE) $(FILES)
