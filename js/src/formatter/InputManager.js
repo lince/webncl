@@ -160,11 +160,17 @@ InputManager.prototype.setCurrentKeyMaster = function(keyMaster) {
 };
 
 InputManager.prototype.getCurrentKeyMaster = function() {
-	return keyMaster;
+	return this.keyMaster;
 };
 
 InputManager.prototype.setCurrentFocus = function(focusIndex)
 {	
+	//If Keymaster is defined, No action should be takken
+	var keyMaster = this.getCurrentKeyMaster()
+	if (keyMaster != undefined && keyMaster!= "") {
+		return true;
+	}
+
 	//Verificamos em focusIndexArray pois um descritor soh pode receber foco
 	//se tiver medias ativas
 	if(focusIndex == undefined) {
