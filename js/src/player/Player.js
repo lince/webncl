@@ -54,7 +54,10 @@ Player.prototype.trigger = function(event,args)
 	switch(event)
 	{
 		case 'presentation.onBegin':
-		case 'presentation.onResume':			
+		case 'presentation.onResume':		
+			if ($.inArray(this,this.parentContext.playingElem) < 0) {
+				this.parentContext.playingElem.push(this);
+			}
 			this.parentContext.playingElem.push(this);
 			
 			b = $.inArray(this,this.parentContext.pausedElem);
