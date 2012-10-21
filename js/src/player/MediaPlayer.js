@@ -295,11 +295,11 @@ MediaPlayer.prototype.create = function (node) {
 			//onEnd trigger
 			this.player.exec('end',$.proxy(function() {
 
-				if (!this.playingArea) {
+				if (!this.player.playingArea) {
 					this.stop();
 				} else {
 					$(this.htmlPlayer).trigger('presentation.onEnd');
-					this.playingArea = undefined;
+					this.player.playingArea = undefined;
 				}
 			},this));
 		}
@@ -433,11 +433,11 @@ MediaPlayer.prototype.create = function (node) {
 	
 	// when the media ends, MediaPlayer.stop() needs to be called
 	this.player.exec('end',$.proxy(function() {
-		if (!this.playingArea) {
+		if (!this.player.playingArea) {
 			this.stop();
 		} else {
 			$(this.htmlPlayer).trigger('presentation.onEnd');
-			this.playingArea = undefined;
+			this.player.playingArea = undefined;
 		}
 	},this));
 	
