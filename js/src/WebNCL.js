@@ -19,7 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function WebNclPlayer (file, div, directory) {
+function WebNclPlayer (file, div, directory, passiveMode) {
 
 	if (directory && directory[directory.length-1] != '/') {
 		directory += '/';
@@ -106,11 +106,15 @@ function WebNclPlayer (file, div, directory) {
 
 		},
 		
+		passiveMode : false,
+		keyEventListener : [],
+		presentationEventListener : [],
 		keyEvents : {}
-                
-                
-
 	};
+	
+	if (passiveMode) {
+		this.presentation.passiveMode = passiveMode;
+	}
 	
 	var a = this.presentation.playerId;
 	this.presentation.bodyDiv = "wncl_body" + a;
@@ -196,6 +200,42 @@ function WebNclPlayer (file, div, directory) {
 	    this.presentation.parser.load(file,$.proxy(this.execute,this),this.div);
 	}
 	
+};
+
+WebNclPlayer.prototype.setFocusIndex = function (focusIndex) {	
+	if (this.presentation.settingsNode && focusIndex != undefined) {
+		htmlPlayer = this.presentation.settingsNode.htmlPlayer;
+		$(htmlPlayer).trigger('set', ['service.currentFocus', null, null, focusIndex]);
+	} else { 
+		this.inputManager.setCurrentFocus(focusIndex);
+	}
+};
+
+
+WebNclPlayer.prototype.setPassiveMode = function (mode) {
+	this.presentation.passiveMode = mode
+};
+
+WebNclPlayer.prototype.getPassiveMode = function() {
+	return this.presentation.passiveMode;
+};
+
+WebNclPlayer.prototype.addKeyEventListener = function (listener) {
+	this.presentation.keyEventListener.push(listener);
+};
+
+WebNclPlayer.prototype.addPresentationEventListener = function(listener) {
+	this.presentation.presentationEventListener.push(listener);
+};
+
+WebNclPlayer.prototype.removeKeyEventListener = function(listener) {
+	this.presentation.keyEventListener.splice(
+			$.inArray(listener, this.presentation.keyEventListener), 1);
+};
+
+WebNclPlayer.prototype.removePresentationEventListener = function(listener) {
+	this.presentation.presentationEventListener.splice(
+			$.inArray(listener, this.presentation.presentationEventListener), 1);
 };
 
 // execute (chamada após o parse)

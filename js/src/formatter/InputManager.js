@@ -147,6 +147,10 @@ InputManager.prototype.removeMedia = function(focusIndex, mediaId)
  * */
 
 InputManager.prototype.__setCurrentFocus = function(focusIndex) {
+	if (this.presentation.passiveMode === true) {
+		return;
+	}
+	
 	if (this.presentation.settingsNode && focusIndex != undefined) {
 		htmlPlayer = this.presentation.settingsNode.htmlPlayer;
 		$(htmlPlayer).trigger('set', ['service.currentFocus', null, null, focusIndex]);
@@ -195,6 +199,12 @@ InputManager.prototype.setCurrentFocus = function(focusIndex)
 			this.setMediaFocus(currentMedia);
 		}
 		this.currentFocusIndex = focusIndex;
+		
+		for (index in this.presentation.keyEventListener) {
+			this.presentation.keyEventListener[index](
+					{ type : 'setFocus',
+					  focusIndex : this.currentFocusIndex});
+		}
 		
 		return true;
 	} 
@@ -335,6 +345,14 @@ InputManager.prototype.keyEvent = function(keyCode)
 			}
 		}
 	
+	}
+	
+	
+	var keyName =  this.presentation.reverseKeys[keyCode];
+	for (index in this.presentation.keyEventListener) {
+		this.presentation.keyEventListener[index](
+				{ type : 'keyPress',
+				  keyCode : keyName});
 	}
 };
 
