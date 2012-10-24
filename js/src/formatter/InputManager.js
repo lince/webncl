@@ -202,8 +202,8 @@ InputManager.prototype.setCurrentFocus = function(focusIndex)
 		
 		for (index in this.presentation.keyEventListener) {
 			this.presentation.keyEventListener[index](
-					{ type : 'setFocus',
-					  focusIndex : this.currentFocusIndex});
+					{ 'type' : 'setFocus',
+					  'focusIndex' : this.currentFocusIndex});
 		}
 		
 		return true;
@@ -351,8 +351,8 @@ InputManager.prototype.keyEvent = function(keyCode)
 	var keyName =  this.presentation.reverseKeys[keyCode];
 	for (index in this.presentation.keyEventListener) {
 		this.presentation.keyEventListener[index](
-				{ type : 'keyPress',
-				  keyCode : keyName});
+				{ 'type' : 'keyPress',
+				  'keyCode' : keyName});
 	}
 };
 
