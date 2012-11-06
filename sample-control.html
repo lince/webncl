@@ -94,6 +94,10 @@
 			var player = new WebNclPlayer("sample/sample-control.ncl","myPlayer");
 			player.start();
 			var controler1 = new RemoteControl(player,"areaRemoteControl", ['interactive', 'multimedia', 'colorful']);
+			player.addPresentationEventListener(function(event) {
+				console.log(event);
+			});
+			
 			controler1.addListener(function(button) {
 				console.log(button);
 			})

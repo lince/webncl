@@ -458,32 +458,36 @@ WebNclPlayer.prototype.destroy = function() {
 WebNclPlayer.prototype.start = function() {
 	if (this.presentation.readyToPlay) {
 		this.presentation.context.start();
+		this.notifyPresentationEvent('START');
 	} else {
 		this.presentation.playRequested = true;
 	}
+	
 }
 
 // pause
 WebNclPlayer.prototype.pause = function() {
 	this.presentation.context.pause();
+	this.notifyPresentationEvent('PAUSE');
 }
 
 // resume
 WebNclPlayer.prototype.resume = function() {
 	this.presentation.context.resume();
+	this.notifyPresentationEvent('RESUME');
 }
         
 // abort
 WebNclPlayer.prototype.abort = function() {
 	this.presentation.context.abort();
-
+	this.notifyPresentationEvent('ABORT');
 }
 
 // stop
 WebNclPlayer.prototype.stop = function() {
 	this.presentation.context.stop();
 	this.presentation.playRequested = false;
-	$('#'+this.presentation.endDiv).show();
+	//$('#'+this.presentation.endDiv).show();
 }
 
 // triggerEvent
@@ -553,7 +557,15 @@ WebNclPlayer.prototype.nSync = function(e,s)
 
 }
 
-WebNclPlayer.prototype.nAction = function()
+WebNclPlayer.prototype.notifyPresentationEvent = function(_event) {
+	for (index in this.presentation.presentationEventListener) {
+		listener = this.presentation.presentationEventListener[index];
+		listener({"type": "presentation", "event": _event})
+	}
+	
+}
+
+WebNclPlayer.prototype.nAction = function(event)
 {
 	var  p = this.presentation;
 	var playDiv = '#'+p.playDiv;
@@ -569,6 +581,7 @@ WebNclPlayer.prototype.nAction = function()
 			p.isStopped = true;
 			p.isPlaying = false;
 			$(endDiv).show();
+			this.notifyPresentationEvent('STOP');
 	
 		} else {
 			//some are paused and no one is playing

@@ -58,7 +58,6 @@ Player.prototype.trigger = function(event,args)
 			if ($.inArray(this,this.parentContext.playingElem) < 0) {
 				this.parentContext.playingElem.push(this);
 			}
-			this.parentContext.playingElem.push(this);
 			
 			b = $.inArray(this,this.parentContext.pausedElem);
 			if(b > -1)
@@ -112,14 +111,14 @@ Player.prototype.trigger = function(event,args)
 	
 	//if no events are being raised
 	if(!callback)
-		this.parentContext.notifyLink(0);
+		this.parentContext.notifyLink(0, event);
 	
 }
 
 // callback used  for function above
-Player.prototype.__ecallback = function()
+Player.prototype.__ecallback = function(event)
 {
-	this.parentContext.notifyLink(0);
+	this.parentContext.notifyLink(0, event);
 }
 
 // bindEvents
