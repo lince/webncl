@@ -47,14 +47,18 @@ function LuaPlayer(p) {
 	this.isHandlingEvent = false;
 	p.createElement("<div class='player' id='" + p.id + "'></div>");
 	
-	this.loaded = false;
+	this.isRunning = false;
 	this.p.onChangeProperty = {};
 	this.p.onChangeProperty.defaultAction = Player.propertyAction.OVERRIDE;
   	this.p.onChangeProperty.propertyMap = {}
   	this.p.onChangeProperty.propertyMap['width'] = Player.propertyAction.IGNORE;
   	this.p.onChangeProperty.propertyMap['height'] = Player.propertyAction.IGNORE;
   	this.p.onChangeProperty.propertyMap['left'] = Player.propertyAction.IGNORE;
+  	this.p.onChangeProperty.propertyMap['right'] = Player.propertyAction.IGNORE;
+  	this.p.onChangeProperty.propertyMap['bottom'] = Player.propertyAction.IGNORE;
   	this.p.onChangeProperty.propertyMap['top'] = Player.propertyAction.IGNORE;
+  	this.p.onChangeProperty.propertyMap['title'] = Player.propertyAction.IGNORE;
+  	this.p.onChangeProperty.propertyMap['zIndex'] = Player.propertyAction.IGNORE;
   	
   	//path to load images correctly in .lua files
   	this.pathlua = '';
@@ -121,9 +125,10 @@ LuaPlayer.prototype.exec = function(time, callback) {
  * Start
  */
 LuaPlayer.prototype.start = function(nodeInterface) {
+	console.log('LuaPlayer.prototype.start', nodeInterface, this.isRunning);
 	
-	if (this.loaded === false) {
-		this.loaded = true;
+	if (this.isRunning === false) {
+		this.isRunning = true;
 		var evt = lua_newtable();
 		evt.str['class'] = 'ncl';
 		evt.str['type'] = 'presentation';
@@ -152,6 +157,8 @@ LuaPlayer.prototype.start = function(nodeInterface) {
  * Stop
  */
 LuaPlayer.prototype.stop = function() {
+	console.log('LuaPlayer.prototype.stop', this.isRunning);
+	this.isRunning = false;
 
 	if (this.events.handlers) {
 		var evt = lua_newtable();
@@ -165,7 +172,7 @@ LuaPlayer.prototype.stop = function() {
  * Pause
  */
 LuaPlayer.prototype.pause = function() {
-	console.log('pause lua');
+	console.log('LuaPlayer.prototype.pause');
 
 	if (this.events.handlers) {
 		var evt = lua_newtable();
@@ -179,6 +186,7 @@ LuaPlayer.prototype.pause = function() {
  * Resume
  */
 LuaPlayer.prototype.resume = function() {
+	console.log('LuaPlayer.prototype.resume');
 
 	if (this.events.handlers) {
 		var evt = lua_newtable();
@@ -192,6 +200,8 @@ LuaPlayer.prototype.resume = function() {
  * Abort
  */
 LuaPlayer.prototype.abort = function() {
+	console.log('LuaPlayer.prototype.abort', this.isRunning);
+	this.isRunning = false;
 
 	if (this.events.handlers) {
 		var evt = lua_newtable();
@@ -228,6 +238,7 @@ LuaPlayer.prototype.keyEventHandler = function(kevent){
 }
 
 LuaPlayer.prototype.setProperty = function(name, value) {
+	console.log('LuaPlayer.prototype.setProperty', name, value)
 
 	if (this.events.handlers) {
 		var evt = lua_newtable();
@@ -293,6 +304,7 @@ LuaPlayer.prototype.bindlibs = function() {
 				url = attr0;
 
 				objCanvas = this.variable.canvas_objects[self.str['id']];
+				console.log(this.variable.pathLua);
 				
 				newObject = objCanvas.newImage(this.variable.pathLua + url);
 				this.variable.id = this.variable.id + 1;
