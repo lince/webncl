@@ -62,8 +62,10 @@ Parser.prototype.parseDescriptor = function (obj,tag,parent,tree) {
 	for (var i in attrs) {
 		attr = attrs[i];
 		value = obj[attr];
+		patt = /^\d+,\d+,\d+$/;
 		if (value != null) {
-			if (jQuery.inArray(value,values)==-1) {
+			if (jQuery.inArray(value,values)==-1 &&
+					!patt.test(value)) {
 				Logger.error(Logger.ERR_INVALID_ATTR_VALUE,tag,[attr,value,values]);
 			}
 		}

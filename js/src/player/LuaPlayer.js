@@ -93,7 +93,10 @@ LuaPlayer.prototype.unload = function() {
 LuaPlayer.prototype.load = function(source) {
 	
 	var breakPath = source.split('/');
-	this.pathLua = breakPath[0] + '/' + breakPath[1] + '/';
+	this.pathLua = "";
+	for (i = 0; i < breakPath.length-1; i++) {
+		this.pathLua = this.pathLua + breakPath[i] + '/'
+	}
 	
 	$.ajax({
 		type : "GET",
@@ -304,7 +307,6 @@ LuaPlayer.prototype.bindlibs = function() {
 				url = attr0;
 
 				objCanvas = this.variable.canvas_objects[self.str['id']];
-				console.log(this.variable.pathLua);
 				
 				newObject = objCanvas.newImage(this.variable.pathLua + url);
 				this.variable.id = this.variable.id + 1;

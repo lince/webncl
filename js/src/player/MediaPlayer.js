@@ -467,7 +467,8 @@ MediaPlayer.prototype.focus = function () {
 			if (borderWidth > 0) {
 				var color = this.node.descriptor.focusBorderColor || this.presentation.systemSettings.getPropertyValue("default.focusBorderColor");
 				var alpha = 1 - parseInt(this.node.descriptor.focusBorderTransparency || 0);
-				var border = borderWidth + "px solid rgba(" + this.colorValues[color] + "," + alpha + ")";
+				var rgbColor = this.colorValues[color] || color;
+				var border = borderWidth + "px solid rgba(" + rgbColor + "," + alpha + ")";
 				$(this.htmlPlayerBkg).css("left","-="+borderWidth);
 				$(this.htmlPlayerBkg).css("top","-="+borderWidth);
 				$(this.htmlPlayerBkg).css("border",border);
