@@ -83,8 +83,7 @@ Listener.prototype.notifyContexts = function()
  *  TODO: compoundStatement
  */
 Listener.prototype.notifyEvent = function(conditionName)
-{
-	
+{	
 	switch(this.listenerType)
 	{
 		case Listener.listenerType.SIMPLE:
@@ -93,25 +92,24 @@ Listener.prototype.notifyEvent = function(conditionName)
 			break;
 			
 		case Listener.listenerType.AND:
-			if((new Date().valueOf() - this.last.valueOf()) > this.presentation.TIME_LIMIT)
-			{
+			if( (this.flagMap.length > 1) && 
+				 ( (new Date().valueOf() - this.last.valueOf()) > this.presentation.TIME_LIMIT) ) {
 				//Reseta todas as flags
 				for(var index in this.flagMap)
 					this.flagMap[index].flag = false;
 				//Seta a flag do evento recebido
-				this.flagMap[conditionName].flag = true;
+				this.flagMap.conditions[conditionName].flag = true;
 				this.last = new Date();
 			}
-			else
-			{
+			else {
 				//Seta a flag do evento recebido
-				this.flagMap[conditionName].flag = true;
+				this.flagMap.conditions[conditionName].flag = true;
 				var tempFlag = true;
 				
 				//Verifica se todas as flags estao setadas
-				for (var index in this.flagMap)
+				for (var index in this.flagMap.conditions)
 				{
-					if( ! (this.flagMap[index].flag))
+					if( ! (this.flagMap.conditions[index].flag))
 					{
 						tempFlag=false;
 						break;
@@ -121,8 +119,8 @@ Listener.prototype.notifyEvent = function(conditionName)
 				if(tempFlag) 
 				{
 					//Limpa todas as flags
-					for(var index in this.flagMap)
-						this.flagMap[index].flag = false;
+					for(var index in this.flagMap.conditions)
+						this.flagMap.conditions[index].flag = false;
 					this.last = 0;
 					if (this.__verifyAssessmentStatements())
 					   this.__executeActions();

@@ -472,12 +472,13 @@ ContextPlayer.prototype.bindLinks = function()
 	 * */
 	for (var i in links)
 	{
-	
 		//causalConnector
 		var link = links[i];
 	    var linkConnector = link.xconnector;
 	    var actionMap = new Object();
 	    var flagMap = new Object();
+	    flagMap.lenght = 0;
+	    flagMap.conditions = {};
 	    var lType = 0;
 	    var aOperator= 'par';
 
@@ -520,12 +521,12 @@ ContextPlayer.prototype.bindLinks = function()
 		{
 			//Tipo do listener
 			conditions = linkConnector.compoundCondition[0].simpleCondition;
-			
+
 			/*
 			   Pode ocorrer de um compoundCondition conter apenas um simpleCondition
 			(quando ele contem tambem um assessmentStatement). 
 			*/
-			if(conditions.length > 1)
+			//if(conditions.length > 1)
 				lType = Listener.listenerType[linkConnector.compoundCondition[0].operator.toUpperCase()];
 			
 			//Verifica se assessmentStatements (só ocorre no compoundCondition)
@@ -587,7 +588,7 @@ ContextPlayer.prototype.bindLinks = function()
 				}
 			} 
 
-			flagMap[currentCondition.role] = {
+			flagMap.conditions[currentCondition.role] = {
 				bindComponent: "",
 				bindInterface: null,
 				eventType: this.eventType[currentCondition.role],
@@ -596,6 +597,7 @@ ContextPlayer.prototype.bindLinks = function()
 				keyDefaultValue: conditionDefaultValue,
 				useKey : conditionUseKey
 			}
+			flagMap.lenght++;
 
 		}
 		
@@ -740,8 +742,8 @@ ContextPlayer.prototype.bindLinks = function()
 			  
 			  
 			//Se o bind for do tipo de condicao (attributeAssessment)
-			} else if (flagMap[currentBind.role]){
-			   var currentFlag = flagMap[currentBind.role];
+			} else if (flagMap.conditions[currentBind.role]){
+			   var currentFlag = flagMap.conditions[currentBind.role];
 			   //associa o component no flagMap do listener para este link				   			   
 			   currentFlag.bindComponent = currentBindComponentSelector;
 			   currentFlag.bindInterface = currentInterface;
@@ -826,7 +828,7 @@ ContextPlayer.prototype.bindLinks = function()
 						for(var listener in cdata)
 						{
 							var clistener = cdata[listener];
-							var flag = clistener.flagMap[e.data.eventName]
+							var flag = clistener.flagMap.conditions[e.data.eventName]
 							if(nclInterface == flag.bindInterface)
 								// For selection conditions we need to check the key
 								// This code maybe redundant
