@@ -200,11 +200,10 @@ InputManager.prototype.setCurrentFocus = function(focusIndex)
 		}
 		this.currentFocusIndex = focusIndex;
 		
-		for (index in this.presentation.keyEventListener) {
-			this.presentation.keyEventListener[index](
-					{ 'type' : 'setFocus',
-					  'focusIndex' : this.currentFocusIndex});
-		}
+		/*this.presentation.notifyEvent(
+				{ 'type' : this.presentation.eventTypes.INPUT,
+				  'event' : 'setFocus',
+				  'focusIndex' : this.currentFocusIndex});*/
 		
 		return true;
 	} 
@@ -349,11 +348,13 @@ InputManager.prototype.keyEvent = function(keyCode)
 	
 	
 	var keyName =  this.presentation.reverseKeys[keyCode];
-	for (index in this.presentation.keyEventListener) {
-		this.presentation.keyEventListener[index](
-				{ 'type' : 'keyPress',
-				  'keyCode' : keyName});
-	}
+	console.log(this.presentation, this.presentation.eventTypes);
+	var json = {
+		  'event' : 'keyPress',
+		  'keyCode' : keyName};
+	
+	json['type'] = this.presentation.eventTypes['INPUT'];
+	this.presentation.notifyEvent(json);
 };
 
 /*
