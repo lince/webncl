@@ -293,8 +293,23 @@ Player.prototype.getProperty = function(name)
 
 };
 
+Player.prototype.notifyEvent = function (event, nodeInterface) {
+	this.presentation.notifyEvent(
+			{"type" : "node",
+			 "nodeId" : this.node.id,
+			 "event" : event,
+			 "interfaceId" : nodeInterface});
+}
+
 // setProperty
 Player.prototype.setProperty = function (name, value, ignoreEvents) {
+	
+	this.presentation.notifyEvent({
+		"type" : "node",
+		"event" : "set",
+		"nodeId" : this.node.id,
+		"property" : name,
+		"value" : value});
     
 	if (!ignoreEvents) {
 		// TODO: verify events

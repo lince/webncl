@@ -200,10 +200,10 @@ InputManager.prototype.setCurrentFocus = function(focusIndex)
 		}
 		this.currentFocusIndex = focusIndex;
 		
-		/*this.presentation.notifyEvent(
-				{ 'type' : this.presentation.eventTypes.INPUT,
+		this.presentation.notifyEvent(
+				{ 'type' : 'input',
 				  'event' : 'setFocus',
-				  'focusIndex' : this.currentFocusIndex});*/
+				  'focusIndex' : this.currentFocusIndex});
 		
 		return true;
 	} 
@@ -295,6 +295,12 @@ InputManager.prototype.triggerKeyMaster = function(whichKey) {
 
 InputManager.prototype.keyEvent = function(keyCode)
 {
+	var keyName =  this.presentation.reverseKeys[keyCode];
+	this.presentation.notifyEvent({
+		  'event' : 'keyPress',
+		  'keyCode' : keyName,
+		  'type' : 'input'});
+	
 	if (this.keyMaster && this.keyMaster  != '') {
 		this.triggerKeyMaster(keyCode);
 	} else {
@@ -345,16 +351,6 @@ InputManager.prototype.keyEvent = function(keyCode)
 		}
 	
 	}
-	
-	
-	var keyName =  this.presentation.reverseKeys[keyCode];
-	console.log(this.presentation, this.presentation.eventTypes);
-	var json = {
-		  'event' : 'keyPress',
-		  'keyCode' : keyName};
-	
-	json['type'] = this.presentation.eventTypes['INPUT'];
-	this.presentation.notifyEvent(json);
 };
 
 /*

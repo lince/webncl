@@ -34,6 +34,7 @@
  */
 function SystemSettings(presentation)
 {
+	this.presentation = presentation;
 	//Propriedades que nao precisam de funcoes de get e set
 	this.settings = {
 		'default.focusBorderColor' 		 : 'blue',
@@ -71,6 +72,12 @@ function SystemSettings(presentation)
  * 
  */
 SystemSettings.prototype.setPropertyValue = function(property, value) {
+	this.presentation.notifyEvent({
+		"type" : "settings",
+		"event" : "set",
+		"property" : property,
+		"value" : value});
+	
     if(property in this.settings) {
     	this.settings[property] = value;
     } else if(property in this.setMap) {

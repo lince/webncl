@@ -172,8 +172,6 @@ function WebNclPlayer (file, div, directory, passiveMode) {
 	//User can redefine this array to avoid player from processing some key events
 	this.presentation.keys.allCodes = [13,37,38,39,40,81,87,69,82,96,97,98,99,100,101,102,103,104,105,90,88,67,86,66,78,65,83,68];
 
-    
-
     //postEvent
     this.presentation.postEvent = $.proxy(this.postEvent,this); 
 
@@ -185,16 +183,15 @@ function WebNclPlayer (file, div, directory, passiveMode) {
 	this.presentation.notifyLink =$.proxy(this.nAction,this);
 	this.presentation.lastMediaAborted = false;
 	this.presentation.parser = new Parser(this.presentation.path);
-
-
-	this.eventListeners = [];
-	this.presentation.eventTypes = {
-		INPUT 			: 1,
-		ACTION 			: 2,
-		SETTINGS 		: 4,
-		PRESENTATION	: 8		
-	};
-	this.presentation.notifyEvent = this.__notifyEvents;
+	
+	
+	// Event Listeners
+	this.presentation.eventTypes = ["input", "node", "settings", "presentation"]
+	this.eventListeners = {}
+	for (var index in this.presentation.eventTypes) {
+		this.eventListeners[this.presentation.eventTypes[index]] = [];
+	}
+	this.presentation.notifyEvent = $.proxy(this.__notifyEvent, this);
 	
 	/*
     	Carrega o arquivo
@@ -227,51 +224,30 @@ WebNclPlayer.prototype.getPassiveMode = function() {
 	return this.presentation.passiveMode;
 };
 
-WebNclPlayer.prototype.addListener = function (listener, eventTypesArray) {
-	var eventType = 0;
-	console.log(eventTypesArray);
+WebNclPlayer.prototype.addListener = function (listenerFunc, eventTypesArray) {
 	if (eventTypesArray != undefined) {
-		if ($.inArray('presentation', eventTypesArray) >= 0) {
-			console.log('presentation');
-			eventType += this.presentation.eventTypes.PRESENTATION;	
+		for (var index in eventTypesArray) {
+			var strType = (eventTypesArray[index]).toLowerCase();
+			this.eventListeners[strType].push(listenerFunc);
 		}
-		if ($.inArray('input', eventTypesArray) >= 0) {
-			console.log('input');
-			eventType += this.presentation.eventTypes.INPUT;
-		}
-		if ($.inArray('action', eventTypesArray) >= 0) {
-			eventType += this.presentation.eventTypes.ACTION;
-		}
-		if ($.inArray('settings', eventTypesArray) >= 0) {
-			eventType += this.presentation.eventTypes.SETTINGS;
-		} 
 	}
-	
-	console.log('WebNclPlayer.prototype.addListener', eventType);
-	this.eventListeners.push({func: listener, types : eventType});
 };
 
 WebNclPlayer.prototype.addKeyEventListener = function (listener) {
-	this.addListener(listener, this.presentation.eventTypes.INPUT);
+	this.addListener(listener, ['INPUT']);
 };
 
 WebNclPlayer.prototype.addPresentationEventListener = function(listener) {
-	this.addListener(listener, this.presentation.eventTypes.PRESENTATION);
+	this.addListener(listener, ['PRESENTATION']);
 };
 
-WebNclPlayer.prototype.__notifyEvents = function(event) {
-	console.log('WebNclPlayer.prototype.__notifyEvents', event, this.presentation, this.eventListeners);
-	
-	console.log(this.eventListeners.length);
-	for (index in this.eventListeners) {
-		
-		var localeventListeners = this.eventListeners[index];
-		console.log ('.......', localeventListeners.types & event.type);
-		if ((localeventListeners.types & event.type) > 0) {
-			localeventListeners.func(event);
-		}
+WebNclPlayer.prototype.__notifyEvent = function(event) {
+	var listenersList = this.eventListeners[event["type"]];
+	for (var index in listenersList) {
+		var listenerFunc  = listenersList[index];
+		listenerFunc(event);
 	}
-	console.log(this.eventListeners.length);
+	
 };
 
 
@@ -596,9 +572,8 @@ WebNclPlayer.prototype.nSync = function(e,s)
 }
 
 WebNclPlayer.prototype.notifyPresentationEvent = function(_event) {
-	console.log('WebNclPlayer.prototype.notifyPresentationEvent', _event)
-	this.__notifyEvents({
-		"type": this.presentation.eventTypes.PRESENTATION, 
+	this.__notifyEvent(
+		{"type": 'presentation', 
 		"event": _event});
 }
 

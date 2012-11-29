@@ -246,6 +246,7 @@ ContextPlayer.prototype.start = function (nodeInterface) {
 	}	
 
 	//if a interface is defined
+	this.notifyEvent('start', nodeInterface);
 	if(nodeInterface)
 	{
 		this.portAction(this.port[nodeInterface],'start');		
@@ -264,6 +265,7 @@ ContextPlayer.prototype.start = function (nodeInterface) {
 
 // stop
 ContextPlayer.prototype.stop = function (nodeInterface) {
+	this.notifyEvent('stop', nodeInterface);
 	if(nodeInterface)
 	{
 		this.portAction(this.port[nodeInterface],'stop');
@@ -291,6 +293,7 @@ ContextPlayer.prototype.stop = function (nodeInterface) {
 // pause
 ContextPlayer.prototype.pause = function (nodeInterface) {
 	if (this.isPlaying) {
+		this.notifyEvent('pause', nodeInterface);
 		if(!nodeInterface)
 		{
 
@@ -319,6 +322,7 @@ ContextPlayer.prototype.pause = function (nodeInterface) {
 // resume
 ContextPlayer.prototype.resume = function (nodeInterface) {
 	
+	this.notifyEvent('resume', nodeInterface);
 	if(nodeInterface)
 	{
 		this.portAction(this.port[nodeInterface],'resume');
@@ -351,6 +355,8 @@ ContextPlayer.prototype.resume = function (nodeInterface) {
 
 // abort
 ContextPlayer.prototype.abort = function (nodeInterface) {
+	
+	this.notifyEvent('abort', nodeInterface);
 	if(!nodeInterface)
 	{
 		this.pausedMediaList = [];

@@ -680,14 +680,16 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 		this.isStopped = false;
 		this.show();
 	}
-	
+	this.notifyEvent("start", nodeInterface);
 	this.trigger("presentation.onBegin",[nodeInterface]);
-
 	
 };
 
 // stop
 MediaPlayer.prototype.stop = function (nodeInterface) {
+	
+	this.presentation.notifyEvent("stop", nodeInterface);
+	
 	if (!this.isStopped) {
         this.presentation.inputManager.disableKeys(this.htmlPlayer);
 		if(this.node.descriptor){
@@ -699,6 +701,7 @@ MediaPlayer.prototype.stop = function (nodeInterface) {
 		this.player.stop();
 		//notify parentContext of its action
 
+		this.notifyEvent("stop", nodeInterface);
 		this.trigger("presentation.onEnd",[nodeInterface]);
 
 	}
@@ -706,13 +709,15 @@ MediaPlayer.prototype.stop = function (nodeInterface) {
 
 // pause
 MediaPlayer.prototype.pause = function (nodeInterface) {
+	
 	if (this.isPlaying) {
 		this.isPlaying = false;
 		this.isStopped = false;
 		this.presentation.inputManager.disableKeys(this.htmlPlayer);
 		this.player.pause()
 		//notify parentContext of its action
-
+		
+		this.notifyEvent("pause", nodeInterface);
 		this.trigger("presentation.onPause",[nodeInterface]);
 
 	}
@@ -720,6 +725,7 @@ MediaPlayer.prototype.pause = function (nodeInterface) {
 
 // resume
 MediaPlayer.prototype.resume = function (nodeInterface) {
+	
 	if (!this.isStopped && !this.isPlaying) {
 		this.isPlaying = true;
 		this.isStopped = false;
@@ -727,6 +733,7 @@ MediaPlayer.prototype.resume = function (nodeInterface) {
 		this.player.resume();        
 		//notify parentContext of its action
 		
+		this.notifyEvent("resume", nodeInterface);
 		this.trigger("presentation.onResume",[nodeInterface]);
 
 	}
@@ -734,6 +741,7 @@ MediaPlayer.prototype.resume = function (nodeInterface) {
 
 // abort
 MediaPlayer.prototype.abort = function (nodeInterface) {
+		
 	if (!this.isStopped) {
 		this.presentation.inputManager.disableKeys(this.htmlPlayer);
 		if(this.node.descriptor){
@@ -743,6 +751,8 @@ MediaPlayer.prototype.abort = function (nodeInterface) {
 		this.isStopped = true;
 		this.hide();
         this.player.abort();
+        
+        this.notifyEvent("abort", nodeInterface);
 		this.trigger("presentation.onAbort",[nodeInterface]);
 
 	}
