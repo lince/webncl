@@ -71,13 +71,7 @@ function SystemSettings(presentation)
  * 					  propriedade de sistema
  * 
  */
-SystemSettings.prototype.setPropertyValue = function(property, value) {
-	this.presentation.notifyEvent({
-		"type" : "settings",
-		"event" : "set",
-		"property" : property,
-		"value" : value});
-	
+SystemSettings.prototype.setPropertyValue = function(property, value) {	
     if(property in this.settings) {
     	this.settings[property] = value;
     } else if(property in this.setMap) {

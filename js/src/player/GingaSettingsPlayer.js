@@ -31,6 +31,7 @@ function GingaSettingsPlayer(p) {
     this.p = p;
     this.htmlPlayer = "#" + p.id;
     this.flowPlayer = undefined;
+    console.log('GingaSettingsPlayer', p);
     
 	p.createElement("<div class='player' id='" + p.id + "'></div>");	
 	
@@ -43,6 +44,12 @@ function GingaSettingsPlayer(p) {
  * setProperty
  */
 GingaSettingsPlayer.prototype.setProperty = function(name, value) {
+	this.p.systemSettings.presentation.notifyEvent({
+		"type" : "settings",
+		"event" : "set",
+		"property" : name,
+		"value" : value});
+	
 	switch(name) {
 		case "service.currentFocus":
 		case "service.currentKeyMaster":
