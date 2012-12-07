@@ -19,7 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function WebNclPlayer (file, div, directory, passiveMode) {
+function WebNclPlayer (nclSource, div, directory, mode) {
 
 	if (directory && directory[directory.length-1] != '/') {
 		directory += '/';
@@ -49,7 +49,7 @@ function WebNclPlayer (file, div, directory, passiveMode) {
 			// -----------------
 			// return "ncl" + this.playerId + (type||"") + "_" + nodeId;
 		},
-		path: directory || (file && patt.exec(file)[0]) || '',
+		path: directory || (nclSource && patt.exec(nclSource)[0]) || '',
                 
 		//Default media players
 		//TODO: Future webncl versions should
@@ -110,7 +110,7 @@ function WebNclPlayer (file, div, directory, passiveMode) {
 		keyEvents : {}
 	};
 	
-	if (passiveMode) {
+	if (mode && mode == "passiveMode") {
 		this.presentation.passiveMode = passiveMode;
 	}
 	
@@ -196,12 +196,18 @@ function WebNclPlayer (file, div, directory, passiveMode) {
 	/*
     	Carrega o arquivo
 	 */
-	if (file) {
-		this.presentation.parser.load(file,$.proxy(this.execute,this));
+	if (nclSource) {
+		if (mode && mode == "codeAsParameter") {
+			var url = document.URL.split('/');
+			url = url[url.length-1];
+			this.presentation.parser.loadString(nclSource, url, $.proxy(this.execute,this));
+		} else {
+			this.presentation.parser.loadFile(nclSource,$.proxy(this.execute,this));
+		}
 	} else {
-		file = document.URL.split('/');
-		file = file[file.length-1];
-	    this.presentation.parser.load(file,$.proxy(this.execute,this),this.div);
+		nclSource = document.URL.split('/');
+		nclSource = nclSource[nclSource.length-1];
+	    this.presentation.parser.loadFile(nclSource,$.proxy(this.execute,this),this.div);
 	}
 	
 };

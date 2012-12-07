@@ -45,8 +45,7 @@ function Parser (path,alias) {
 	
 };
 
-Parser.prototype.load = function(url,parseCallback,div)
-{
+Parser.prototype.loadFile = function(url,parseCallback,div) {
 	if(this.loading)
 		return false;
 	
@@ -65,6 +64,32 @@ Parser.prototype.load = function(url,parseCallback,div)
 	
 	return true;
 }
+
+Parser.prototype.loadString = function(nclCode, url, parseCallback) {
+	if(this.loading)
+		return false;
+	
+	this.loading = true;
+	this.url = url;
+	this.parsers[url] = {
+		parser: this, 
+		loadTime: 0,
+		parseTime : 0,
+		xmlParse : 0
+	};
+	this.info = this.parsers[url];
+	this.__callback = parseCallback;
+	
+	this.info.loadTime = 0;
+	this.info.parseTime = new Date();
+	var xmlData = $($.parseXML(nclCode));
+	this.info.parseTime = new Date() - this.info.parseTime;
+	this.parse(xmlData);
+	
+	return true;
+}
+
+
 
 //__load
 Parser.prototype.__load = function(url, callback, div)
