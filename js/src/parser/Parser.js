@@ -116,7 +116,7 @@ Parser.prototype.__load = function(url, callback, div)
 		{
 			var tm = this.times;
 			tm.loadTime = new Date() - tm.loadTime;
-			Logger.error('PARSER',[textStatus,errorThrown]);
+			Logger.error('PARSER','XML',[textStatus,errorThrown]);
 		}
 	});	
 }
@@ -159,7 +159,7 @@ Parser.prototype.importNcl = function(lastParser)
 	var i = this.uniqueTable['aliasList'].splice(0,1);
 	if(i.length > 0)
 	{
-		i[0].parser.load(this.path + i[0].url, $.proxy(this.importNcl,this));
+		i[0].parser.loadFile(this.path + i[0].url, $.proxy(this.importNcl,this));
 	} else {
 		var x = new Date(),f,o;
 		
