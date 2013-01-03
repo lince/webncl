@@ -9,7 +9,8 @@
 CLOSURE_COMPILER=~/bin/compiler.jar
 JSPATH=js
 SPATH=$(JSPATH)/src
-FILES=$(wildcard $(SPATH)/*.js) $(wildcard $(SPATH)/formatter/*.js) $(wildcard $(SPATH)/parser/*.js) $(wildcard $(SPATH)/player/*.js) $(wildcard $(SPATH)/parser/tags/*.js)
+FILES=$(wildcard $(SPATH)/*.js) $(wildcard $(SPATH)/formatter/*.js) $(wildcard $(SPATH)/parser/*.js) $(wildcard $(SPATH)/player/*.js) $(wildcard $(SPATH)/parser/tags/*.js) \
+					$(wildcard $(SPATH)/lua/*.js) $(wildcard $(SPATH)/loader/*.js)
 MINFILE=$(JSPATH)/webncl.min.js
 DEBFILE=$(JSPATH)/webncl.deb.js
 
