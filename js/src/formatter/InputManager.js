@@ -101,6 +101,12 @@ InputManager.prototype.addMedia = function(focusIndex, mediaId)
 			this.setMediaFocus(mediaId);
 		}
 		
+	} else if (focusIndex) {
+			this.descriptors[focusIndex] = {
+			self: undefined,			//there is no really descriptor
+			mediaArray: []				//array de medias
+		}
+		this.addMedia(focusIndex, mediaId);
 	}
 };
 
@@ -314,26 +320,26 @@ InputManager.prototype.keyEvent = function(keyCode)
 			{
 	
 				case Keys.CURSOR_UP:
-					if(currentDescriptor.self.moveUp)
+					if(currentDescriptor.self && currentDescriptor.self.moveUp)
 						this.__setCurrentFocus(currentDescriptor.self.moveUp.focusIndex)
 	                
 				break;		
 				
 				case Keys.CURSOR_DOWN:
-					if(currentDescriptor.self.moveDown)
+					if(currentDescriptor.self && currentDescriptor.self.moveDown)
 						this.__setCurrentFocus(currentDescriptor.self.moveDown.focusIndex)
 	
 	
 				break;
 				
 				case Keys.CURSOR_LEFT:
-					if(currentDescriptor.self.moveLeft)
+					if(currentDescriptor.self && currentDescriptor.self.moveLeft)
 						this.__setCurrentFocus(currentDescriptor.self.moveLeft.focusIndex)
 						
 				break;
 				
 				case Keys.CURSOR_RIGHT:
-					if(currentDescriptor.self.moveRight)
+					if(currentDescriptor.self && currentDescriptor.self.moveRight)
 						this.__setCurrentFocus(currentDescriptor.self.moveRight.focusIndex)
 					
 				break;					

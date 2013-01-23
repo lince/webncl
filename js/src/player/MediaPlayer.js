@@ -476,7 +476,7 @@ MediaPlayer.prototype.focus = function () {
 				// TODO
 				Logger.warning(Logger.WARN_NOT_IMPLEMENTED_YET,"border",[borderWidth]);
 			}
-			if (this.node.descriptor.focusSrc) {
+			if (this.node.descriptor && this.node.descriptor.focusSrc) {
 				this.load(this.node.descriptor.focusSrc);
 			}
 		}
@@ -491,7 +491,7 @@ MediaPlayer.prototype.blur = function () {
 	$(this.htmlPlayerBkg).css("width",$(this.htmlPlayer).data("property").width);
 	$(this.htmlPlayerBkg).css("height",$(this.htmlPlayer).data("property").height);
 	$(this.htmlPlayerBkg).css("border","none");
-	if (this.node.descriptor.focusSrc) {
+	if (this.node.descriptor && this.node.descriptor.focusSrc) {
 		this.load(this.node.src);
 	}
 };
@@ -671,9 +671,11 @@ MediaPlayer.prototype.start = function (nodeInterface) {
 	// --- quick fix ends here
 	this.player.start(nodeInterface);
 	
-	if (this.isStopped) {
+	if (this.isStopped) {		
         this.presentation.inputManager.enableKeys(this.htmlPlayer);
-		if(this.node.descriptor){
+        if (this.focusIndex) {
+        	this.presentation.inputManager.addMedia(this.focusIndex,this.htmlPlayer);
+        } else if(this.node.descriptor && this.node.descriptor.focusIndex){
 			this.presentation.inputManager.addMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
 		}
 		this.isPlaying = true;
@@ -692,7 +694,9 @@ MediaPlayer.prototype.stop = function (nodeInterface) {
 	
 	if (!this.isStopped) {
         this.presentation.inputManager.disableKeys(this.htmlPlayer);
-		if(this.node.descriptor){
+        if (this.focusIndex) {
+        	this.presentation.inputManager.removeMedia(this.focusIndex,this.htmlPlayer);
+        } else if(this.node.descriptor && this.node.descriptor.focusIndex){
 			this.presentation.inputManager.removeMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
 		}
 		this.isPlaying = false;
@@ -744,7 +748,9 @@ MediaPlayer.prototype.abort = function (nodeInterface) {
 		
 	if (!this.isStopped) {
 		this.presentation.inputManager.disableKeys(this.htmlPlayer);
-		if(this.node.descriptor){
+        if (this.focusIndex) {
+        	this.presentation.inputManager.removeMedia(this.focusIndex,this.htmlPlayer);
+        } else if(this.node.descriptor && this.node.descriptor.focusIndex){
 			this.presentation.inputManager.removeMedia(this.node.descriptor.focusIndex,this.htmlPlayer);
 		}
 		this.isPlaying = false;

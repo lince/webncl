@@ -33,6 +33,7 @@ function Player () {
 	this.htmlPlayer = "";
 	this.isPlaying = false;
 	this.isStopped = true;
+	this.focusIndex = undefined
 
 }
 
@@ -373,6 +374,11 @@ Player.prototype.setProperty = function (name, value, ignoreEvents) {
 					case "zIndex": 
 						$(this.htmlPlayer).css("z-index",value)
 						$(this.htmlPlayerBkg).css("z-index",value)
+						break;
+					
+					// FocusIndex 
+					case "focusIndex":
+						this.focusIndex = value;
 						break;
 					
 
