@@ -27,3 +27,5 @@
 	height: 48px;
 	background-image: url('../images/replay.png');
 }
+
+body {margin:0; padding:0;}
